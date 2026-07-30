@@ -1,0 +1,4239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="이름, 사주팔자, 별자리, 혈액형, MBTI로 보는 우리 둘의 궁합을 재미로 확인하고 인스타 스토리용 이미지로 저장해보세요.">
+
+<!-- ===== PWA (홈 화면 설치 / 오프라인 실행) ===== -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#ffc107">
+<meta name="color-scheme" content="light">
+<!-- iOS는 manifest를 거의 안 보므로 아래 메타/아이콘이 홈 화면 앱 모드의 실제 근거가 된다 -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="삐약궁합">
+<meta name="application-name" content="삐약궁합">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='58' r='38' fill='%23ffca28'/%3E%3Cpath d='M46 21 Q58 12 55 26 Z' fill='%23ffca28'/%3E%3Cellipse cx='23' cy='63' rx='6' ry='4' fill='%23ffb3c1' opacity='0.8'/%3E%3Cellipse cx='77' cy='63' rx='6' ry='4' fill='%23ffb3c1' opacity='0.8'/%3E%3Ccircle cx='34' cy='53' r='6.5' fill='%232b2b2b'/%3E%3Ccircle cx='66' cy='53' r='6.5' fill='%232b2b2b'/%3E%3Ccircle cx='32' cy='50' r='2' fill='%23fff'/%3E%3Ccircle cx='64' cy='50' r='2' fill='%23fff'/%3E%3Cpath d='M50 61 L59 69 L50 77 L41 69 Z' fill='%23ff9800' stroke='%23e07c00' stroke-width='2'/%3E%3Cline x1='41' y1='69' x2='59' y2='69' stroke='%23e07c00' stroke-width='2'/%3E%3C/svg%3E">
+<title>삐약궁합 - 이름 · 사주 · 별자리 · MBTI 궁합</title>
+<style>
+  :root{
+    --pink: #ffc107;
+    --purple: #b5650d;
+    --bg1: #fffbe6;
+    --bg2: #fff3c4;
+    --card: #ffffff;
+    /* 노란 테마에 맞춰 글자색도 차가운 회색 대신 따뜻한 계열로 통일 */
+    --text: #3b3227;
+    --muted: #8b7a63;
+    /* 밝은 앰버 계열 토큰 (기존 --purple 은 갈색이라 그라데이션이 탁해 보였음) */
+    --amber-strong: #ffa000;
+    --amber-text: #c07f00;   /* 흰 배경에서 읽히는 앰버 (원래 #ffc107 은 대비가 너무 낮음) */
+    --grad-amber: linear-gradient(135deg, #ffcf3f, #ffa000);
+    --line: #ffe7b3;
+    --panel: #fffbf0;
+  }
+  @font-face {
+    font-family: 'JuaTitle';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(data:font/woff2;base64,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) format('woff2');
+    unicode-range: U+c090-c091, U+c57c-c57d, U+ad81, U+d569;
+  }
+  * { box-sizing: border-box; }
+  html {
+    background: linear-gradient(168deg, #fffdf2 0%, #fff6d4 38%, #ffeeb4 100%);
+  }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    /* 겹겹의 방사형 그라데이션 6장을 2장으로 줄여 밝기는 유지하고 탁한 느낌만 걷어냄 */
+    background:
+      radial-gradient(120% 80% at 15% 0%, rgba(255,236,150,0.85) 0%, rgba(255,236,150,0) 55%),
+      radial-gradient(100% 70% at 92% 100%, rgba(255,205,80,0.42) 0%, rgba(255,205,80,0) 55%),
+      linear-gradient(168deg, #fffdf2 0%, #fff6d4 38%, #ffeeb4 100%);
+    background-attachment: fixed;
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px 64px;
+    position: relative;
+    overflow-x: hidden;
+  }
+  .bg-sticker {
+    position: fixed;
+    font-size: 30px;
+    opacity: 0.34;
+    pointer-events: none;
+    animation: floaty 6s ease-in-out infinite;
+    z-index: 0;
+    user-select: none;
+  }
+  /* 좁은 화면에서는 콘텐츠 위로 올라오는 안쪽 스티커를 감추고, 나머지는 더 연하게 */
+  @media (max-width: 700px) {
+    .bg-sticker { font-size: 26px; opacity: 0.22; }
+    .bg-sticker.s-inner { display: none; }
+  }
+  @keyframes floaty {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-18px) rotate(8deg); }
+  }
+  .wrap { width: 100%; max-width: 560px; position: relative; z-index: 1; }
+
+  h1 {
+    text-align: center;
+    font-family: 'JuaTitle', "Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+    font-size: 52px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    margin: 12px 46px 6px;
+    line-height: 1.15;
+    background: linear-gradient(90deg, #ffb300, #e07c00, #ffb300);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 3px 9px rgba(224,150,0,0.28));
+    animation: titleShine 5s ease-in-out infinite, titlePop .6s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes titleShine {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  @keyframes titlePop {
+    0% { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @media (max-width: 380px) {
+    h1 { font-size: 38px; margin: 10px 40px 6px; }
+    .music-toggle { width: 42px; height: 42px; font-size: 19px; }
+  }
+  .subtitle {
+    text-align: center;
+    color: #8f6208;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 1.55;
+    letter-spacing: -0.2px;
+    max-width: 420px;
+    margin: 0 auto 26px;
+    padding: 0 12px;
+  }
+  .card {
+    background: var(--card);
+    /* 3px 그라데이션 테두리 → 얇은 실선 + 2단 그림자로 가볍고 정돈된 느낌 */
+    border: 1.5px solid rgba(255,193,7,0.32);
+    border-radius: 24px;
+    padding: 28px 24px;
+    box-shadow:
+      0 1px 2px rgba(180,120,0,0.05),
+      0 14px 30px -10px rgba(224,150,0,0.28);
+    position: relative;
+  }
+  .field { margin-bottom: 16px; }
+  label {
+    display: block;
+    font-size: 14.5px;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    color: var(--purple);
+    margin-bottom: 7px;
+  }
+  input[type=text] {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1.5px solid var(--line);
+    font-size: 18px;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+    background: #fffdf7;
+    color: var(--text);
+  }
+  input[type=text]::placeholder { color: #c4b394; }
+  input[type=text]:focus {
+    border-color: var(--pink);
+    box-shadow: 0 0 0 3.5px rgba(255,193,7,0.18);
+  }
+  button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 8px;
+    border: none;
+    border-radius: 14px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: #fff;
+    background: var(--grad-amber);
+    cursor: pointer;
+    box-shadow: 0 8px 18px -7px rgba(224,150,0,0.75);
+    transition: transform .1s, opacity .15s, box-shadow .15s;
+  }
+  button:active { transform: scale(0.98); box-shadow: 0 4px 10px -6px rgba(224,150,0,0.7); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .result { display: none; margin-top: 24px; }
+  .result.show { display: block; animation: fadeUp .4s ease; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .score-circle {
+    width: 160px; height: 160px;
+    margin: 8px auto 12px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: conic-gradient(var(--pink) calc(var(--pct) * 1%), #fff1c9 0);
+    box-shadow: 0 10px 22px -14px rgba(224,150,0,0.9);
+    position: relative;
+  }
+  .score-circle::before {
+    content: "";
+    position: absolute;
+    width: 128px; height: 128px;
+    background: #fff;
+    border-radius: 50%;
+  }
+  .score-inner {
+    position: relative;
+    text-align: center;
+  }
+  /* 점수가 올라가는 애니메이션 중 글자 폭이 흔들리지 않도록 고정폭 숫자 사용 */
+  .score-inner .num {
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--purple);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -1px;
+    line-height: 1.1;
+  }
+  .score-inner .pct-sign { font-size: 17px; color: var(--muted); }
+
+  .tier-emoji { text-align: center; font-size: 50px; margin-bottom: 4px; }
+  .tier-chick-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 4px;
+  }
+  .tier-chick-img {
+    width: 190px;
+    height: 122px;
+    display: block;
+    border-radius: 22px;
+    border: 4px solid #fff;
+    box-shadow: 0 8px 20px rgba(224,150,0,0.35);
+  }
+  .tier-chick-badge {
+    font-size: 30px;
+    display: block;
+    text-align: center;
+    margin-top: -6px;
+  }
+  .tier-title {
+    text-align: center;
+    font-size: 23px;
+    font-weight: 800;
+    letter-spacing: -0.6px;
+    color: #3b2f1c;
+    margin-bottom: 6px;
+  }
+  .tier-desc {
+    text-align: center;
+    color: #7d6e58;
+    font-size: 16.5px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    padding: 0 8px;
+  }
+
+  /* 카드 안쪽 패널들: 차가운 라벤더(#faf8ff) 대신 따뜻한 크림 + 실선 한 줄로 통일 */
+  .person, .ilgan-box, .oheng-analysis, .person-form,
+  .reason-box, .sign-card, .combo-row {
+    border: 1px solid #ffeeca;
+  }
+
+  .breakdown {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .person {
+    flex: 1;
+    background: var(--panel);
+    border-radius: 14px;
+    padding: 14px;
+  }
+  .person h3 {
+    margin: 0 0 8px;
+    font-size: 17px;
+    color: var(--purple);
+    text-align: center;
+  }
+  .chars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+  .char-chip {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 6px 8px;
+    text-align: center;
+    min-width: 40px;
+  }
+  .char-chip .ch { font-size: 18px; font-weight: 700; }
+  .char-chip .st { font-size: 12px; color: var(--muted); }
+  .total-strokes {
+    text-align: center;
+    font-size: 16px;
+    color: var(--text);
+    font-weight: 600;
+  }
+  .total-strokes b { color: var(--amber-text); font-size: 18px; }
+
+  /* 배경 스티커 위에 겹쳐도 읽히도록 반투명 흰 판을 깐다 */
+  .disclaimer {
+    margin: 20px auto 0;
+    max-width: 480px;
+    padding: 12px 16px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.55);
+    font-size: 12.5px;
+    color: #867760;
+    text-align: center;
+    line-height: 1.65;
+  }
+
+  .error {
+    color: #e0245e;
+    font-size: 16px;
+    text-align: center;
+    margin-top: 8px;
+    display: none;
+  }
+
+  /* ---- Tabs ---- */
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 18px;
+    background: rgba(255,255,255,0.78);
+    border: 1px solid rgba(255,255,255,0.95);
+    border-radius: 18px;
+    padding: 6px;
+    box-shadow:
+      0 1px 2px rgba(180,120,0,0.04),
+      0 10px 24px -12px rgba(224,150,0,0.3);
+    backdrop-filter: blur(6px);
+  }
+  .tab-btn {
+    flex: 1 1 30%;
+    margin: 0;
+    padding: 9px 4px 8px;
+    border: none;
+    border-radius: 13px;
+    background: transparent;
+    color: #a38256;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    cursor: pointer;
+    transition: background .15s, color .15s, box-shadow .15s;
+    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    box-shadow: none;
+  }
+  .tab-btn .tab-icon { font-size: 21px; line-height: 1; }
+  .tab-btn .tab-label { line-height: 1.1; }
+  /* 마지막 '종합 궁합'은 홀로 남는 줄이라 가로로 꽉 채워 의도적인 배치로 보이게 */
+  .tab-btn:last-child {
+    flex: 1 1 100%;
+    flex-direction: row;
+    gap: 7px;
+    padding: 10px 4px;
+  }
+  .tab-btn:last-child .tab-icon { font-size: 18px; }
+  .tab-btn.active {
+    background: var(--grad-amber);
+    color: #fff;
+    box-shadow: 0 6px 14px -6px rgba(224,150,0,0.85);
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ---- Saju ---- */
+  select {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1.5px solid var(--line);
+    font-size: 18px;
+    outline: none;
+    background: #fffdf7;
+    color: var(--text);
+    transition: border-color .15s, box-shadow .15s;
+  }
+  select:focus {
+    border-color: var(--pink);
+    box-shadow: 0 0 0 3.5px rgba(255,193,7,0.18);
+  }
+
+  .date-select-row {
+    display: flex;
+    gap: 6px;
+  }
+  .date-select-row select {
+    padding-left: 8px;
+    padding-right: 6px;
+    text-align: center;
+  }
+  .date-select-row select:nth-child(1) { flex: 1.3; }
+  .date-select-row select:nth-child(2) { flex: 1; }
+  .date-select-row select:nth-child(3) { flex: 1; }
+
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin: 8px 0 18px;
+  }
+  .pillar-col { text-align: center; }
+  .pillar-col .pillar-label {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .ganzi-box {
+    border-radius: 12px;
+    padding: 10px 4px;
+    color: #fff;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .ganzi-box .hanja { font-size: 24px; display: block; }
+  .ganzi-box .hangul { font-size: 13px; opacity: 0.9; display: block; }
+  .ganzi-box.el-wood { background: #4caf7d; }
+  .ganzi-box.el-fire { background: #e35d6a; }
+  .ganzi-box.el-earth { background: #c9973a; }
+  .ganzi-box.el-metal { background: #9aa0a6; }
+  .ganzi-box.el-water { background: #3b5580; }
+  .pillar-animal { font-size: 13px; color: var(--muted); }
+
+  .element-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .element-chip {
+    flex: 1;
+    text-align: center;
+    border-radius: 10px;
+    padding: 8px 2px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .element-chip .cnt { display: block; font-size: 18px; }
+
+  .ilgan-box {
+    background: var(--panel);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 8px;
+  }
+  .ilgan-box .ilgan-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--purple);
+    margin-bottom: 6px;
+    text-align: center;
+  }
+  .ilgan-box .ilgan-desc {
+    font-size: 16px;
+    color: var(--text);
+    line-height: 1.6;
+    text-align: center;
+  }
+  .ilgan-detail-row {
+    text-align: left;
+    margin-top: 12px;
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--text);
+  }
+  .ilgan-detail-row b {
+    display: block;
+    font-size: 14px;
+    color: var(--purple);
+    margin-bottom: 3px;
+  }
+
+  .oheng-analysis {
+    background: var(--panel);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+  .oheng-analysis h4 {
+    margin: 0 0 8px;
+    font-size: 16px;
+    color: var(--purple);
+  }
+  .oheng-analysis p {
+    margin: 0 0 8px;
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--text);
+  }
+  .oheng-analysis p:last-child { margin-bottom: 0; }
+
+  .pillar-legend {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+    text-align: center;
+    margin: -8px 0 16px;
+    padding: 0 4px;
+  }
+  .saju-name-title {
+    text-align: center;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--purple);
+    margin-bottom: 10px;
+  }
+  .saju-name-title:empty { display: none; margin: 0; }
+
+  /* ---- 두 사람 입력 (사주궁합/별자리궁합/혈액형궁합 공통) ---- */
+  .person-form {
+    background: var(--panel);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .person-form h4 {
+    margin: 0 0 10px;
+    font-size: 16px;
+    color: var(--purple);
+  }
+  .person-form .field { margin-bottom: 10px; }
+  .person-form .field:last-child { margin-bottom: 0; }
+  .person-form label { font-size: 14px; }
+  .person-form input[type=text],
+  .person-form input[type=date],
+  .person-form select {
+    padding: 11px 12px;
+    font-size: 17px;
+  }
+
+  .reason-box {
+    background: var(--panel);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+  .reason-box h4 {
+    margin: 0 0 6px;
+    font-size: 16px;
+    color: var(--purple);
+  }
+  .reason-box p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+  .reason-box + .reason-box { margin-top: -2px; }
+
+  .sign-pair {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .sign-card {
+    flex: 1;
+    text-align: center;
+    background: var(--panel);
+    border-radius: 14px;
+    padding: 16px 8px;
+  }
+  .sign-card .emoji { font-size: 41px; display: block; margin-bottom: 4px; }
+  .sign-card .name { font-weight: 700; font-size: 18px; }
+  .sign-card .range { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .sign-card .el-tag {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 13px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    color: #fff;
+    font-weight: 700;
+  }
+
+  .blood-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--grad-amber);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 800;
+    margin-right: 6px;
+  }
+
+  /* ---- 종합 궁합 ---- */
+  .combo-row {
+    background: var(--panel);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .combo-row-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .combo-row-head .label {
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--purple);
+  }
+  .combo-row-head .score {
+    font-weight: 800;
+    font-size: 19px;
+    color: var(--amber-text);
+    font-variant-numeric: tabular-nums;
+  }
+  .combo-row p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  .combo-bar-track {
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: #fff3cc;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+  .combo-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--grad-amber);
+  }
+
+  /* ---- 스토리 이미지 버튼 & 모달 ---- */
+  .action-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  /* 점선 테두리 대신 '채운 버튼 + 외곽선 버튼' 조합으로 위계를 준다 */
+  .story-btn {
+    flex: 1;
+    width: 100%;
+    margin-top: 0;
+    padding: 13px 8px;
+    border: 1.5px solid transparent;
+    border-radius: 13px;
+    background: #ffefc4;
+    color: #8f5c00;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    cursor: pointer;
+    box-shadow: none;
+    transition: transform .1s, background .15s;
+  }
+  .story-btn:active { transform: scale(0.98); background: #ffe7a8; }
+  .copy-btn {
+    flex: 1;
+    margin-top: 0;
+    padding: 13px 8px;
+    border: 1.5px solid var(--line);
+    border-radius: 13px;
+    background: #fff;
+    color: #a3781c;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    cursor: pointer;
+    box-shadow: none;
+    transition: transform .1s, background .15s, color .15s, border-color .15s;
+  }
+  .copy-btn:active { transform: scale(0.98); }
+  .copy-btn.copied { background: #fff8e4; color: #8f5c00; border-color: #ffd876; }
+
+  .story-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(30, 20, 40, 0.72);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .story-modal.show { display: flex; }
+  .story-modal-inner {
+    position: relative;
+    max-width: 360px;
+    width: 100%;
+    text-align: center;
+  }
+  .story-close {
+    position: absolute;
+    top: -44px;
+    right: 0;
+    width: 36px; height: 36px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  #storyPreviewImg {
+    width: 100%;
+    max-height: 65vh;
+    object-fit: contain;
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+    background: #fff;
+  }
+  #storyDownloadBtn {
+    display: block;
+    margin-top: 16px;
+    padding: 15px;
+    border-radius: 14px;
+    background: var(--grad-amber);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .story-hint {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #fff;
+    opacity: 0.85;
+  }
+
+  .music-toggle {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    margin: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(255,193,7,0.28);
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 6px 16px -8px rgba(224,150,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-size: 22px;
+    cursor: pointer;
+    z-index: 500;
+    transition: transform .15s;
+  }
+  .music-toggle:active { transform: scale(0.92); }
+  .music-toggle.playing { animation: musicBounce 0.7s ease-in-out infinite; }
+  @keyframes musicBounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+  }
+
+  /* ============================================================
+     PWA (홈 화면 앱) 관련 스타일
+     ============================================================ */
+
+  /* 노치·홈 인디케이터 영역 회피 + 앱처럼 느껴지는 스크롤 감각
+     (env() 미지원 브라우저는 위쪽 body 규칙의 기본 padding을 그대로 사용) */
+  html {
+    overscroll-behavior-y: contain;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    padding-top: calc(32px + env(safe-area-inset-top));
+    padding-right: calc(16px + env(safe-area-inset-right));
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+    padding-left: calc(16px + env(safe-area-inset-left));
+    -webkit-tap-highlight-color: transparent;
+  }
+  .music-toggle {
+    top: calc(18px + env(safe-area-inset-top));
+    right: calc(18px + env(safe-area-inset-right));
+  }
+  /* 홈 화면에서 실행하면 주소창이 없어 제목이 상단에 딱 붙으므로 여유를 조금 더 준다 */
+  @media all and (display-mode: standalone) {
+    body { padding-top: calc(20px + env(safe-area-inset-top)); }
+    h1 { margin-top: 20px; }
+  }
+
+  .pwa-banner[hidden], .pwa-guide[hidden], .pwa-toast[hidden], #storyShareBtn[hidden] { display: none !important; }
+
+  /* 설치 유도 배너 (하단 고정) */
+  .pwa-banner {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 536px;
+    margin: 0 auto;
+    padding: 12px 14px;
+    border: 2px solid #ffd54f;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 12px 32px rgba(224,150,0,0.28);
+    animation: pwaBannerUp .45s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes pwaBannerUp {
+    0% { transform: translateY(120%); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  .pwa-banner-icon {
+    width: 46px;
+    height: 46px;
+    flex: 0 0 auto;
+    border-radius: 12px;
+    background: linear-gradient(160deg, #fffdf5, #ffefc0);
+  }
+  .pwa-banner-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+  }
+  .pwa-banner-text strong {
+    font-size: 15px;
+    color: var(--purple);
+  }
+  .pwa-banner-text span {
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  /* 이 파일의 전역 button 규칙(width:100%, margin-top:8px)을 PWA 버튼에서는 되돌린다 */
+  .pwa-banner-install, .pwa-banner-close, .pwa-guide-close, .pwa-toast button {
+    width: auto;
+    margin: 0;
+  }
+  .pwa-banner-install {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 11px 16px;
+    border: none;
+    border-radius: 12px;
+    background: var(--grad-amber);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 14px -6px rgba(224,150,0,0.85);
+    transition: transform .15s;
+  }
+  .pwa-banner-install:active { transform: scale(0.94); }
+  .pwa-banner-close {
+    position: absolute;
+    top: -10px;
+    right: -6px;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: 2px solid #ffe082;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  /* iOS 사파리용 '홈 화면에 추가' 안내 시트 */
+  .pwa-guide {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(60,45,10,0.55);
+    backdrop-filter: blur(3px);
+  }
+  .pwa-guide-inner {
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+    padding: 26px 22px 22px;
+    border-radius: 24px;
+    background: linear-gradient(170deg, #fffdf3, #fff3c4);
+    box-shadow: 0 18px 48px rgba(0,0,0,0.32);
+    text-align: center;
+    animation: pwaGuidePop .4s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes pwaGuidePop {
+    0% { transform: scale(0.86); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .pwa-guide-emoji { font-size: 44px; margin: 0 0 4px; }
+  .pwa-guide-inner h2 {
+    margin: 0 0 16px;
+    font-size: 20px;
+    color: var(--purple);
+  }
+  .pwa-guide-inner ol {
+    margin: 0;
+    padding-left: 22px;
+    text-align: left;
+    font-size: 15px;
+    color: var(--text);
+  }
+  .pwa-guide-inner ol li { margin-bottom: 10px; }
+  .pwa-guide-inner ol strong { color: var(--purple); }
+  .pwa-guide-hint {
+    margin: 14px 0 0;
+    font-size: 13px;
+    color: #9c6b0a;
+  }
+  .pwa-guide-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.9);
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  /* 새 버전 안내 토스트 */
+  .pwa-toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* left:50% 기준이면 폭이 화면 절반으로 줄어 글자가 쪼개지므로 내용 폭을 명시 */
+    width: max-content;
+    max-width: calc(100% - 32px);
+    padding: 11px 12px 11px 16px;
+    border-radius: 999px;
+    background: rgba(43,43,43,0.94);
+    color: #fff;
+    font-size: 14px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.28);
+    animation: pwaBannerUp .35s ease-out;
+  }
+  .pwa-toast span { white-space: nowrap; }
+  .pwa-toast button {
+    padding: 7px 13px;
+    white-space: nowrap;
+    line-height: 1.4;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #ffca28, #ffa000);
+    color: #4a3200;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* 모션을 줄이도록 설정한 기기에서는 등장 애니메이션 없이 바로 보여준다 */
+  @media (prefers-reduced-motion: reduce) {
+    .pwa-banner, .pwa-guide-inner, .pwa-toast { animation: none; }
+  }
+
+  /* 스토리 이미지 공유 버튼 (파일 공유를 지원하는 폰에서만 노출) */
+  #storyShareBtn {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 14px;
+    border: 2px solid rgba(255,255,255,0.6);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.14);
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<span class="bg-sticker" style="top:7%; left:4%; animation-delay:0s;">🐥</span>
+<span class="bg-sticker" style="top:26%; left:93%; animation-delay:2.1s;">🌼</span>
+<span class="bg-sticker" style="top:47%; left:3%; animation-delay:0.6s;">⭐</span>
+<span class="bg-sticker" style="top:66%; left:94%; animation-delay:1.8s;">🔮</span>
+<span class="bg-sticker" style="top:84%; left:4%; animation-delay:2.6s;">🌈</span>
+<span class="bg-sticker" style="top:90%; left:92%; animation-delay:0.9s;">💫</span>
+<span class="bg-sticker s-inner" style="top:12%; left:86%; animation-delay:1.2s;">✨</span>
+<span class="bg-sticker s-inner" style="top:38%; left:12%; animation-delay:3.2s;">🐣</span>
+<span class="bg-sticker s-inner" style="top:6%; left:72%; animation-delay:0.3s;">🐤</span>
+<span class="bg-sticker s-inner" style="top:60%; left:88%; animation-delay:2.4s;">🌟</span>
+
+<button id="musicToggleBtn" class="music-toggle" title="배경음악 켜기/끄기" aria-label="배경음악 켜기/끄기">🔇</button>
+
+<div class="wrap">
+  <h1>🐥 삐약궁합</h1>
+  <p class="subtitle">이름부터 사주, 별자리, 혈액형, MBTI까지 — 톡톡 터지는 우리 둘의 케미를 확인해보세요</p>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tabBtnName"><span class="tab-icon">💞</span><span class="tab-label">이름 궁합</span></button>
+    <button class="tab-btn" id="tabBtnSaju"><span class="tab-icon">🔮</span><span class="tab-label">사주팔자</span></button>
+    <button class="tab-btn" id="tabBtnSajuCompat"><span class="tab-icon">🀄</span><span class="tab-label">사주 궁합</span></button>
+    <button class="tab-btn" id="tabBtnZodiac"><span class="tab-icon">⭐</span><span class="tab-label">별자리 궁합</span></button>
+    <button class="tab-btn" id="tabBtnBlood"><span class="tab-icon">🩸</span><span class="tab-label">혈액형 궁합</span></button>
+    <button class="tab-btn" id="tabBtnMbti"><span class="tab-icon">🧩</span><span class="tab-label">MBTI 궁합</span></button>
+    <button class="tab-btn" id="tabBtnCombo"><span class="tab-icon">💫</span><span class="tab-label">종합 궁합</span></button>
+  </div>
+
+  <div class="tab-panel active" id="tabName">
+  <div class="card">
+    <div class="field">
+      <label for="name1">첫 번째 이름</label>
+      <input type="text" id="name1" placeholder="예: 뜨아거" maxlength="10">
+    </div>
+    <div class="field">
+      <label for="name2">두 번째 이름</label>
+      <input type="text" id="name2" placeholder="예: 케로피" maxlength="10">
+    </div>
+    <button id="checkBtn">궁합 보기</button>
+    <p class="error" aria-live="polite" id="errorMsg">이름은 한글로 1자 이상 입력해주세요.</p>
+
+    <div class="result" id="result">
+      <div class="score-circle" id="scoreCircle">
+        <div class="score-inner">
+          <div class="num" id="scoreNum">0</div>
+          <div class="pct-sign">점</div>
+        </div>
+      </div>
+      <div class="tier-emoji" id="tierEmoji"></div>
+      <div class="tier-title" id="tierTitle"></div>
+      <div class="tier-desc" id="tierDesc"></div>
+
+      <div class="breakdown">
+        <div class="person">
+          <h3 id="p1Label"></h3>
+          <div class="chars" id="p1Chars"></div>
+          <div class="total-strokes" id="p1Total"></div>
+        </div>
+        <div class="person">
+          <h3 id="p2Label"></h3>
+          <div class="chars" id="p2Chars"></div>
+          <div class="total-strokes" id="p2Total"></div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button class="story-btn" id="nameStoryBtn">📸 스토리 이미지</button>
+        <button class="copy-btn" id="nameCopyBtn">📋 결과 복사</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="disclaimer">* 이 결과는 두 이름의 한글 획수를 번갈아 배열해 피라미드처럼 더해 내려가는 전통 이름 궁합 계산법(획수 감산법)을 이용한 재미용 콘텐츠이며,<br>과학적·통계적 근거가 없습니다.</p>
+  </div>
+
+  <div class="tab-panel" id="tabSaju">
+  <div class="card">
+    <div class="field">
+      <label for="sajuName">이름 (선택)</label>
+      <input type="text" id="sajuName" placeholder="예: 뜨아거" maxlength="10">
+    </div>
+    <div class="field">
+      <label>생년월일 (양력)</label>
+      <div class="date-select-row">
+        <select id="birthDate_y"></select>
+        <select id="birthDate_m"></select>
+        <select id="birthDate_d"></select>
+      </div>
+    </div>
+    <div class="field">
+      <label for="birthHour">태어난 시간</label>
+      <select id="birthHour"></select>
+    </div>
+    <button id="sajuBtn">사주 보기</button>
+    <p class="error" aria-live="polite" id="sajuErrorMsg">생년월일을 입력해주세요.</p>
+
+    <div class="result" id="sajuResult">
+      <div class="saju-name-title" id="sajuNameTitle"></div>
+      <div class="pillars" id="pillarsGrid"></div>
+      <p class="pillar-legend">년주: 조상·초년운 · 월주: 부모·형제·청년운 · 일주: 나 자신·배우자운 · 시주: 자녀·말년운</p>
+
+      <div class="element-bar" id="elementBar"></div>
+
+      <div class="ilgan-box">
+        <div class="ilgan-title" id="ilganTitle"></div>
+        <div class="ilgan-desc" id="ilganDesc"></div>
+        <div class="ilgan-detail-row"><b>기본 성향</b><span id="ilganTrait"></span></div>
+        <div class="ilgan-detail-row"><b>강점</b><span id="ilganStrength"></span></div>
+        <div class="ilgan-detail-row"><b>유의할 점</b><span id="ilganCaution"></span></div>
+        <div class="ilgan-detail-row"><b>어울리는 관계</b><span id="ilganRelationship"></span></div>
+      </div>
+
+      <div class="oheng-analysis">
+        <h4>오행 밸런스 분석</h4>
+        <p id="ohengMoreText"></p>
+        <p id="ohengLessText"></p>
+      </div>
+
+      <div class="action-row">
+        <button class="story-btn" id="sajuStoryBtn">📸 스토리 이미지</button>
+        <button class="copy-btn" id="sajuCopyBtn">📋 결과 복사</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="disclaimer">* 사주팔자는 절기(입춘 등) 기준 근사 날짜와 일반적인 계산법으로 산출한 재미용 콘텐츠입니다.<br>절기 경계일(전후 1일) 출생, 서머타임, 진태양시(출생지 경도 보정)는 반영되지 않아 정통 만세력과 다를 수 있습니다.</p>
+  </div>
+
+  <div class="tab-panel" id="tabSajuCompat">
+  <div class="card">
+    <div class="person-form">
+      <h4>첫 번째 사람</h4>
+      <div class="field">
+        <label for="scName1">이름 (선택)</label>
+        <input type="text" id="scName1" placeholder="예: 뜨아거" maxlength="10">
+      </div>
+      <div class="field">
+        <label>생년월일 (양력)</label>
+        <div class="date-select-row">
+          <select id="scDate1_y"></select>
+          <select id="scDate1_m"></select>
+          <select id="scDate1_d"></select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="scHour1">태어난 시간</label>
+        <select id="scHour1"></select>
+      </div>
+    </div>
+    <div class="person-form">
+      <h4>두 번째 사람</h4>
+      <div class="field">
+        <label for="scName2">이름 (선택)</label>
+        <input type="text" id="scName2" placeholder="예: 케로피" maxlength="10">
+      </div>
+      <div class="field">
+        <label>생년월일 (양력)</label>
+        <div class="date-select-row">
+          <select id="scDate2_y"></select>
+          <select id="scDate2_m"></select>
+          <select id="scDate2_d"></select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="scHour2">태어난 시간</label>
+        <select id="scHour2"></select>
+      </div>
+    </div>
+    <button id="sajuCompatBtn">사주 궁합 보기</button>
+    <p class="error" aria-live="polite" id="sajuCompatErrorMsg">두 사람의 생년월일을 모두 입력해주세요.</p>
+
+    <div class="result" id="sajuCompatResult">
+      <div class="score-circle" id="sajuCompatScoreCircle">
+        <div class="score-inner">
+          <div class="num" id="sajuCompatScoreNum">0</div>
+          <div class="pct-sign">점</div>
+        </div>
+      </div>
+      <div class="tier-emoji" id="sajuCompatTierEmoji"></div>
+      <div class="tier-title" id="sajuCompatTierTitle"></div>
+      <div class="tier-desc" id="sajuCompatTierDesc"></div>
+
+      <div class="pillars" id="sajuCompatPillars1" style="margin-bottom:4px;"></div>
+      <div class="pillars" id="sajuCompatPillars2" style="margin-bottom:16px;"></div>
+
+      <div class="reason-box">
+        <h4>① 일간(日干) 관계</h4>
+        <p id="scReasonIlgan"></p>
+      </div>
+      <div class="reason-box">
+        <h4>② 일지(日支) 관계</h4>
+        <p id="scReasonIlji"></p>
+      </div>
+
+      <div class="action-row">
+        <button class="story-btn" id="sajuCompatStoryBtn">📸 스토리 이미지</button>
+        <button class="copy-btn" id="sajuCompatCopyBtn">📋 결과 복사</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="disclaimer">* 사주 궁합은 두 사람의 일간(오행 생극) 관계와 일지의 육합·삼합·충 관계를 바탕으로 산출한 재미용 콘텐츠입니다.<br>실제 정통 명리학에서는 대운·세운, 재관, 암합 등 훨씬 많은 요소를 종합적으로 봅니다.</p>
+  </div>
+
+  <div class="tab-panel" id="tabZodiac">
+  <div class="card">
+    <div class="person-form">
+      <h4>첫 번째 사람</h4>
+      <div class="field">
+        <label for="zName1">이름 (선택)</label>
+        <input type="text" id="zName1" placeholder="예: 뜨아거" maxlength="10">
+      </div>
+      <div class="field">
+        <label>생년월일 (양력)</label>
+        <div class="date-select-row">
+          <select id="zDate1_y"></select>
+          <select id="zDate1_m"></select>
+          <select id="zDate1_d"></select>
+        </div>
+      </div>
+    </div>
+    <div class="person-form">
+      <h4>두 번째 사람</h4>
+      <div class="field">
+        <label for="zName2">이름 (선택)</label>
+        <input type="text" id="zName2" placeholder="예: 케로피" maxlength="10">
+      </div>
+      <div class="field">
+        <label>생년월일 (양력)</label>
+        <div class="date-select-row">
+          <select id="zDate2_y"></select>
+          <select id="zDate2_m"></select>
+          <select id="zDate2_d"></select>
+        </div>
+      </div>
+    </div>
+    <button id="zodiacBtn">별자리 궁합 보기</button>
+    <p class="error" aria-live="polite" id="zodiacErrorMsg">두 사람의 생년월일을 모두 입력해주세요.</p>
+
+    <div class="result" id="zodiacResult">
+      <div class="sign-pair">
+        <div class="sign-card" id="zCard1"></div>
+        <div class="sign-card" id="zCard2"></div>
+      </div>
+
+      <div class="score-circle" id="zodiacScoreCircle">
+        <div class="score-inner">
+          <div class="num" id="zodiacScoreNum">0</div>
+          <div class="pct-sign">점</div>
+        </div>
+      </div>
+      <div class="tier-emoji" id="zodiacTierEmoji"></div>
+      <div class="tier-title" id="zodiacTierTitle"></div>
+      <div class="tier-desc" id="zodiacTierDesc"></div>
+
+      <div class="reason-box">
+        <h4>궁합 근거</h4>
+        <p id="zReason"></p>
+      </div>
+
+      <div class="action-row">
+        <button class="story-btn" id="zodiacStoryBtn">📸 스토리 이미지</button>
+        <button class="copy-btn" id="zodiacCopyBtn">📋 결과 복사</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="disclaimer">* 별자리 궁합은 태양별자리(생일 기준)와 4원소(불·땅·바람·물) 조합을 바탕으로 한 서양 점성술식 재미용 콘텐츠입니다.<br>과학적 근거가 없습니다.</p>
+  </div>
+
+  <div class="tab-panel" id="tabBlood">
+  <div class="card">
+    <div class="person-form">
+      <h4>첫 번째 사람</h4>
+      <div class="field">
+        <label for="bName1">이름 (선택)</label>
+        <input type="text" id="bName1" placeholder="예: 뜨아거" maxlength="10">
+      </div>
+      <div class="field">
+        <label for="bType1">혈액형</label>
+        <select id="bType1">
+          <option value="A">A형</option>
+          <option value="B">B형</option>
+          <option value="O">O형</option>
+          <option value="AB">AB형</option>
+        </select>
+      </div>
+    </div>
+    <div class="person-form">
+      <h4>두 번째 사람</h4>
+      <div class="field">
+        <label for="bName2">이름 (선택)</label>
+        <input type="text" id="bName2" placeholder="예: 케로피" maxlength="10">
+      </div>
+      <div class="field">
+        <label for="bType2">혈액형</label>
+        <select id="bType2">
+          <option value="A">A형</option>
+          <option value="B">B형</option>
+          <option value="O">O형</option>
+          <option value="AB">AB형</option>
+        </select>
+      </div>
+    </div>
+    <button id="bloodBtn">혈액형 궁합 보기</button>
+
+    <div class="result" id="bloodResult">
+      <div class="score-circle" id="bloodScoreCircle">
+        <div class="score-inner">
+          <div class="num" id="bloodScoreNum">0</div>
+          <div class="pct-sign">점</div>
+        </div>
+      </div>
+      <div class="tier-emoji" id="bloodTierEmoji"></div>
+      <div class="tier-title" id="bloodTierTitle"></div>
+      <div class="tier-desc" id="bloodTierDesc"></div>
+
+      <div class="reason-box">
+        <h4 id="bTrait1Title"></h4>
+        <p id="bTrait1"></p>
+      </div>
+      <div class="reason-box">
+        <h4 id="bTrait2Title"></h4>
+        <p id="bTrait2"></p>
+      </div>
+      <div class="reason-box">
+        <h4>궁합 근거</h4>
+        <p id="bReason"></p>
+      </div>
+
+      <div class="action-row">
+        <button class="story-btn" id="bloodStoryBtn">📸 스토리 이미지</button>
+        <button class="copy-btn" id="bloodCopyBtn">📋 결과 복사</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="disclaimer">* 혈액형 성격설과 혈액형 궁합은 과학적으로 입증되지 않은 통속적인 이야기입니다.<br>재미로만 봐주세요.</p>
+  </div>
+
+  <div class="tab-panel" id="tabMbti">
+  <div class="card">
+    <div class="person-form">
+      <h4>첫 번째 사람</h4>
+      <div class="field">
+        <label for="mName1">이름 (선택)</label>
+        <input type="text" id="mName1" placeholder="예: 뜨아거" maxlength="10">
+      </div>
+      <div class="field">
+        <label for="mType1">MBTI</label>
+        <select id="mType1">
+          <option>INTJ</option><option>INTP</option><option>ENTJ</option><option>ENTP</option>
+          <option>INFJ</option><option>INFP</option><option>ENFJ</option><option>ENFP</option>
+          <option>ISTJ</option><option>ISFJ</option><option>ESTJ</option><option>ESFJ</option>
+          <option>ISTP</option><option>ISFP</option><option>ESTP</option><option>ESFP</option>
+        </select>
+      </div>
+    </div>
+    <div class="person-form">
+      <h4>두 번째 사람</h4>
+      <div class="field">
+        <label for="mName2">이름 (선택)</label>
+        <input type="text" id="mName2" placeholder="예: 케로피" maxlength="10">
+      </div>
+      <div class="field">
+        <label for="mType2">MBTI</label>
+        <select id="mType2">
+          <option>INTJ</option><option>INTP</option><option>ENTJ</option><option>ENTP</option>
+          <option>INFJ</option><option>INFP</option><option>ENFJ</option><option>ENFP</option>
+          <option>ISTJ</option><option>ISFJ</option><option>ESTJ</option><option>ESFJ</option>
+          <option>ISTP</option><option>ISFP</option><option>ESTP</option><option>ESFP</option>
+        </select>
+      </div>
+    </div>
+    <button id="mbtiBtn">MBTI 궁합 보기</button>
+
+    <div class="result" id="mbtiResult">
+      <div class="score-circle" id="mbtiScoreCircle">
+        <div class="score-inner">
+          <div class="num" id="mbtiScoreNum">0</div>
+          <div class="pct-sign">점</div>
+        </div>
+      </div>
+      <div class="tier-emoji" id="mbtiTierEmoji"></div>
+      <div class="tier-title" id="mbtiTierTitle"></div>
+      <div class="tier-desc" id="mbtiTierDesc"></div>
+
+      <div class="reason-box" id="mSpecialBox">
+        <h4 id="mSpecialTitle"></h4>
+        <p id="mSpecialText"></p>
+      </div>
+
+      <div class="reason-box">
+        <h4 id="mTrait1Title"></h4>
+        <p id="mTrait1"></p>
+      </div>
+      <div class="reason-box">
+        <h4 id="mTrait2Title"></h4>
+        <p id="mTrait2"></p>
+      </div>
+      <div class="reason-box">
+        <h4>① 에너지 방향 (E/I)</h4>
+        <p id="mReasonEI"></p>
+      </div>
+      <div class="reason-box">
+        <h4>② 인식 기능 (S/N)</h4>
+        <p id="mReasonSN"></p>
+      </div>
+      <div class="reason-box">
+        <h4>③ 판단 기능 (T/F)</h4>
+        <p id="mReasonTF"></p>
+      </div>
+      <div class="reason-box">
+        <h4>④ 생활 양식 (J/P)</h4>
+        <p id="mReasonJP"></p>
+      </div>
+
+      <div class="action-row">
+        <button class="story-btn" id="mbtiStoryBtn">📸 스토리 이미지</button>
+        <button class="copy-btn" id="mbtiCopyBtn">📋 결과 복사</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="disclaimer">* MBTI 궁합은 온라인에서 자주 언급되는 유형별 궁합 정보와 네 가지 지표(E/I, S/N, T/F, J/P) 비교를 함께 반영한 재미용 콘텐츠입니다.<br>MBTI 궁합에 대한 공식적인 과학적 근거는 없습니다.</p>
+  </div>
+
+  <div class="tab-panel" id="tabCombo">
+  <div class="card">
+    <div class="person-form">
+      <h4>첫 번째 사람</h4>
+      <div class="field">
+        <label for="cbName1">이름</label>
+        <input type="text" id="cbName1" placeholder="예: 뜨아거" maxlength="10">
+      </div>
+      <div class="field">
+        <label>생년월일 (양력)</label>
+        <div class="date-select-row">
+          <select id="cbDate1_y"></select>
+          <select id="cbDate1_m"></select>
+          <select id="cbDate1_d"></select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="cbHour1">태어난 시간</label>
+        <select id="cbHour1"></select>
+      </div>
+      <div class="field">
+        <label for="cbType1">혈액형</label>
+        <select id="cbType1">
+          <option value="A">A형</option>
+          <option value="B">B형</option>
+          <option value="O">O형</option>
+          <option value="AB">AB형</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="cbMbti1">MBTI</label>
+        <select id="cbMbti1">
+          <option>INTJ</option><option>INTP</option><option>ENTJ</option><option>ENTP</option>
+          <option>INFJ</option><option>INFP</option><option>ENFJ</option><option>ENFP</option>
+          <option>ISTJ</option><option>ISFJ</option><option>ESTJ</option><option>ESFJ</option>
+          <option>ISTP</option><option>ISFP</option><option>ESTP</option><option>ESFP</option>
+        </select>
+      </div>
+    </div>
+    <div class="person-form">
+      <h4>두 번째 사람</h4>
+      <div class="field">
+        <label for="cbName2">이름</label>
+        <input type="text" id="cbName2" placeholder="예: 케로피" maxlength="10">
+      </div>
+      <div class="field">
+        <label>생년월일 (양력)</label>
+        <div class="date-select-row">
+          <select id="cbDate2_y"></select>
+          <select id="cbDate2_m"></select>
+          <select id="cbDate2_d"></select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="cbHour2">태어난 시간</label>
+        <select id="cbHour2"></select>
+      </div>
+      <div class="field">
+        <label for="cbType2">혈액형</label>
+        <select id="cbType2">
+          <option value="A">A형</option>
+          <option value="B">B형</option>
+          <option value="O">O형</option>
+          <option value="AB">AB형</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="cbMbti2">MBTI</label>
+        <select id="cbMbti2">
+          <option>INTJ</option><option>INTP</option><option>ENTJ</option><option>ENTP</option>
+          <option>INFJ</option><option>INFP</option><option>ENFJ</option><option>ENFP</option>
+          <option>ISTJ</option><option>ISFJ</option><option>ESTJ</option><option>ESFJ</option>
+          <option>ISTP</option><option>ISFP</option><option>ESTP</option><option>ESFP</option>
+        </select>
+      </div>
+    </div>
+    <button id="comboBtn">종합 궁합 보기</button>
+    <p class="error" aria-live="polite" id="comboErrorMsg">이름(한글)과 생년월일을 모두 입력해주세요.</p>
+
+    <div class="result" id="comboResult">
+      <div class="score-circle" id="comboScoreCircle">
+        <div class="score-inner">
+          <div class="num" id="comboScoreNum">0</div>
+          <div class="pct-sign">점</div>
+        </div>
+      </div>
+      <div class="tier-emoji" id="comboTierEmoji"></div>
+      <div class="tier-title" id="comboTierTitle"></div>
+      <div class="tier-desc" id="comboTierDesc"></div>
+
+      <div id="comboBreakdown"></div>
+
+      <div class="action-row">
+        <button class="story-btn" id="comboStoryBtn">📸 스토리 이미지</button>
+        <button class="copy-btn" id="comboCopyBtn">📋 결과 복사</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="disclaimer">* 종합 궁합은 이름 궁합·사주 궁합·별자리 궁합·혈액형 궁합·MBTI 궁합 5가지 점수의 평균으로 산출한 재미용 콘텐츠입니다.<br>각 항목의 산출 근거는 해당 탭의 안내를 참고해주세요.</p>
+  </div>
+</div>
+
+<div class="story-modal" id="storyModal">
+  <div class="story-modal-inner">
+    <button class="story-close" id="storyCloseBtn" aria-label="닫기">✕</button>
+    <img id="storyPreviewImg" alt="스토리 이미지 미리보기">
+    <a id="storyDownloadBtn" download="삐약궁합_스토리.png">📥 이미지 저장하기</a>
+    <button id="storyShareBtn" hidden>📤 바로 공유하기</button>
+    <p class="story-hint">길게 눌러 저장하거나, 저장 버튼을 눌러주세요</p>
+  </div>
+</div>
+<canvas id="storyCanvas" width="1080" height="1920" style="display:none;"></canvas>
+
+<!-- PWA: 설치 유도 배너 / iOS 안내 시트 / 새 버전 토스트 -->
+<div class="pwa-banner" id="pwaInstallBanner" hidden>
+  <img class="pwa-banner-icon" src="icons/icon-192.png" width="46" height="46" alt="">
+  <div class="pwa-banner-text">
+    <strong>앱으로 설치하기 🐥</strong>
+    <span>홈 화면에서 바로 열고 오프라인에서도 볼 수 있어요</span>
+  </div>
+  <button class="pwa-banner-install" id="pwaInstallBtn">설치</button>
+  <button class="pwa-banner-close" id="pwaDismissBtn" aria-label="설치 안내 닫기">✕</button>
+</div>
+
+<div class="pwa-guide" id="pwaIosGuide" hidden>
+  <div class="pwa-guide-inner">
+    <button class="pwa-guide-close" id="pwaIosCloseBtn" aria-label="닫기">✕</button>
+    <p class="pwa-guide-emoji">🐥</p>
+    <h2>홈 화면에 추가하기</h2>
+    <ol>
+      <li>화면 아래쪽 <strong>공유 버튼</strong>을 눌러주세요</li>
+      <li>목록을 내려서 <strong>‘홈 화면에 추가’</strong>를 선택해주세요</li>
+      <li>오른쪽 위 <strong>‘추가’</strong>를 누르면 끝이에요! 🎉</li>
+    </ol>
+    <p class="pwa-guide-hint">홈 화면에서 열면 주소창 없이 앱처럼 실행돼요</p>
+  </div>
+</div>
+
+<div class="pwa-toast" id="pwaUpdateToast" hidden>
+  <span>새 버전이 준비됐어요 🐣</span>
+  <button id="pwaReloadBtn">새로고침</button>
+</div>
+
+<script>
+// ---- 한글 획수 테이블 ----
+// 자음 기본 획수 (겹자음은 이 값의 조합/2배로 파생)
+const CONS_BASE = { 'ㄱ':2,'ㄴ':2,'ㄷ':3,'ㄹ':5,'ㅁ':4,'ㅂ':4,'ㅅ':2,'ㅇ':1,'ㅈ':3,'ㅊ':4,'ㅋ':3,'ㅌ':4,'ㅍ':4,'ㅎ':3 };
+
+// 초성 19개 획수 (겹자음은 기본값의 2배)
+const LEAD_STROKES = [
+  CONS_BASE['ㄱ'], CONS_BASE['ㄱ']*2, CONS_BASE['ㄴ'], CONS_BASE['ㄷ'], CONS_BASE['ㄷ']*2,
+  CONS_BASE['ㄹ'], CONS_BASE['ㅁ'], CONS_BASE['ㅂ'], CONS_BASE['ㅂ']*2, CONS_BASE['ㅅ'],
+  CONS_BASE['ㅅ']*2, CONS_BASE['ㅇ'], CONS_BASE['ㅈ'], CONS_BASE['ㅈ']*2, CONS_BASE['ㅊ'],
+  CONS_BASE['ㅋ'], CONS_BASE['ㅌ'], CONS_BASE['ㅍ'], CONS_BASE['ㅎ']
+];
+
+// 중성 21개 획수 (겹모음은 구성 모음의 합)
+const VOWEL_STROKES = [2,3,3,4,2,3,3,4,2,4,5,3,3,2,4,5,3,3,1,2,1];
+
+// 종성 28개 획수 (0=받침없음, 겹받침은 구성 자음의 합)
+const TAIL_STROKES = [
+  0, CONS_BASE['ㄱ'], CONS_BASE['ㄱ']*2, CONS_BASE['ㄱ']+CONS_BASE['ㅅ'], CONS_BASE['ㄴ'],
+  CONS_BASE['ㄴ']+CONS_BASE['ㅈ'], CONS_BASE['ㄴ']+CONS_BASE['ㅎ'], CONS_BASE['ㄷ'], CONS_BASE['ㄹ'],
+  CONS_BASE['ㄹ']+CONS_BASE['ㄱ'], CONS_BASE['ㄹ']+CONS_BASE['ㅁ'], CONS_BASE['ㄹ']+CONS_BASE['ㅂ'],
+  CONS_BASE['ㄹ']+CONS_BASE['ㅅ'], CONS_BASE['ㄹ']+CONS_BASE['ㅌ'], CONS_BASE['ㄹ']+CONS_BASE['ㅍ'],
+  CONS_BASE['ㄹ']+CONS_BASE['ㅎ'], CONS_BASE['ㅁ'], CONS_BASE['ㅂ'], CONS_BASE['ㅂ']+CONS_BASE['ㅅ'],
+  CONS_BASE['ㅅ'], CONS_BASE['ㅅ']*2, CONS_BASE['ㅇ'], CONS_BASE['ㅈ'], CONS_BASE['ㅊ'],
+  CONS_BASE['ㅋ'], CONS_BASE['ㅌ'], CONS_BASE['ㅍ'], CONS_BASE['ㅎ']
+];
+
+function strokesOfChar(ch) {
+  const code = ch.charCodeAt(0);
+  // 완성형 한글 음절 범위
+  if (code >= 0xAC00 && code <= 0xD7A3) {
+    const idx = code - 0xAC00;
+    const lead = Math.floor(idx / (21 * 28));
+    const vowel = Math.floor((idx % (21 * 28)) / 28);
+    const tail = idx % 28;
+    return LEAD_STROKES[lead] + VOWEL_STROKES[vowel] + TAIL_STROKES[tail];
+  }
+  // 한글이 아닌 문자는 기본 2획으로 처리 (영문/숫자 등)
+  if (/[a-zA-Z0-9]/.test(ch)) return 2;
+  return 0; // 공백 등 무시
+}
+
+function analyzeName(name) {
+  const chars = [...name].filter(c => c.trim().length > 0);
+  const breakdown = chars.map(c => ({ ch: c, strokes: strokesOfChar(c) }));
+  const total = breakdown.reduce((s, b) => s + b.strokes, 0);
+  return { breakdown, total };
+}
+
+function interleaveStrokes(breakdown1, breakdown2) {
+  const s1 = breakdown1.map(b => b.strokes);
+  const s2 = breakdown2.map(b => b.strokes);
+  const result = [];
+  const maxLen = Math.max(s1.length, s2.length);
+  for (let i = 0; i < maxLen; i++) {
+    if (i < s1.length) result.push(s1[i]);
+    if (i < s2.length) result.push(s2[i]);
+  }
+  return result;
+}
+
+// 전통적인 이름 궁합 계산법(피라미드 획수 감산법):
+// 두 이름의 글자별 획수를 한 글자씩 번갈아 배열한 뒤, 인접한 두 수를 더해
+// 한 자리 수(mod 10)로 줄이는 과정을 파스칼의 삼각형처럼 반복해 마지막 2자리를 궁합 점수로 삼는다.
+function computeScore(breakdown1, breakdown2) {
+  let nums = interleaveStrokes(breakdown1, breakdown2);
+  while (nums.length > 2 && nums.join('') !== '100') {
+    const next = [];
+    for (let i = 0; i < nums.length - 1; i++) {
+      next.push((nums[i] + nums[i + 1]) % 10);
+    }
+    nums = next;
+  }
+  return Number(nums.join(''));
+}
+
+const TIERS = [
+  { min: 90, emoji: '👑', title: '삐약계의 전설, 100년에 한 번 나올 조합', desc: '삐약!! 이 궁합 실화입니까? 전생에 나라를 구했나 봐요. 둘이 나란히 서 있는 것만으로 주변이 다 흐뭇해지는 조합이에요.' },
+  { min: 75, emoji: '💕', title: '삐약이들 사이에 낀 큐피드', desc: '삐약~ 서로 보기만 해도 웃음이 나는 사이네요! 애쓰지 않아도 착착 맞아떨어지는, 주변에서 부러워할 케미예요.' },
+  { min: 60, emoji: '😆', title: '티키타카 만렙, 알콩달콩 라이벌', desc: '삐약삐약! 투닥거려도 뒤끝은 1도 없는 사이! 서로 놀리다가도 결국 제일 편한 사람이 되어주는 궁합이에요.' },
+  { min: 45, emoji: '🙂', title: '아직은 눈치게임 중인 사이', desc: '삐약... 아직 서로 탐색 레이더 가동 중! 어색함은 시간이 해결해줄 거예요, 조급해하지 말고 천천히 다가가 보세요.' },
+  { min: 30, emoji: '❓', title: '물음표가 둥둥 뜨는 사이', desc: '삐약? 대화 코드가 살짝 어긋나는 편이네요. 그래도 노력하면 의외의 케미가 터질 수도 있으니 포기는 일러요!' },
+  { min: 0,  emoji: '😵', title: '정반대 행성에서 온 삐약이', desc: '삐약... 취향부터 텐션까지 극과 극! 하지만 안 맞는 사람에게도 배울 점은 있는 법이니 너무 실망하지 마세요.' },
+];
+
+
+// ============================================================
+// 삐약이 캐릭터 드로잉 (등급별 표정/포즈를 직접 그림)
+// tierIdx: 0=90+ 천생연분, 1=75+ 찰떡콩떡, 2=60+ 티격태격, 3=45+ 적응중, 4=30+ 탐색중, 5=0+ 극과극
+// ============================================================
+const CHICK_BG_PALETTE = [
+  ['#ffe1ee', '#fff2e0'], // 0: 90+ 로맨틱 핑크
+  ['#efe4ff', '#fdeaff'], // 1: 75+ 라벤더
+  ['#d8f4ea', '#f2fff2'], // 2: 60+ 민트
+  ['#ffe9d2', '#fff6e6'], // 3: 45+ 피치
+  ['#ddf1ff', '#eef8ff'], // 4: 30+ 스카이블루
+  ['#ece3e3', '#f7ecec'], // 5: 0+ 그레이로즈
+];
+
+function drawChickSceneBg(ctx, x, y, w, h, tierIdx) {
+  const [c1, c2] = CHICK_BG_PALETTE[tierIdx];
+  const grad = ctx.createLinearGradient(x, y, x + w, y + h);
+  grad.addColorStop(0, c1);
+  grad.addColorStop(1, c2);
+  ctx.save();
+  roundRectPathGeneric(ctx, x, y, w, h, Math.min(w, h) * 0.12);
+  ctx.fillStyle = grad;
+  ctx.fill();
+  ctx.restore();
+}
+
+function roundRectPathGeneric(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function drawChickEyes(ctx, s, type) {
+  const ex = s * 0.15, ey = -s * 0.04;
+  ctx.save();
+  if (type === 'heart') {
+    [-1, 1].forEach(dir => {
+      const cx0 = ex * dir, cy0 = ey;
+      const hs = s * 0.075;
+      ctx.beginPath();
+      ctx.moveTo(cx0, cy0 + hs * 0.65);
+      ctx.bezierCurveTo(cx0 - hs * 1.1, cy0 - hs * 0.5, cx0 - hs * 0.4, cy0 - hs * 1.3, cx0, cy0 - hs * 0.4);
+      ctx.bezierCurveTo(cx0 + hs * 0.4, cy0 - hs * 1.3, cx0 + hs * 1.1, cy0 - hs * 0.5, cx0, cy0 + hs * 0.65);
+      ctx.closePath();
+      ctx.fillStyle = '#ff4f7b';
+      ctx.fill();
+    });
+  } else if (type === 'happy') {
+    ctx.strokeStyle = '#3a2b1a';
+    ctx.lineWidth = s * 0.032;
+    ctx.lineCap = 'round';
+    [-1, 1].forEach(dir => {
+      ctx.beginPath();
+      ctx.arc(ex * dir, ey + s * 0.02, s * 0.06, Math.PI * 1.15, Math.PI * 1.85);
+      ctx.stroke();
+    });
+  } else if (type === 'x') {
+    ctx.strokeStyle = '#3a2b1a';
+    ctx.lineWidth = s * 0.03;
+    ctx.lineCap = 'round';
+    [-1, 1].forEach(dir => {
+      const cx0 = ex * dir;
+      ctx.beginPath();
+      ctx.moveTo(cx0 - s * 0.045, ey - s * 0.045);
+      ctx.lineTo(cx0 + s * 0.045, ey + s * 0.045);
+      ctx.moveTo(cx0 + s * 0.045, ey - s * 0.045);
+      ctx.lineTo(cx0 - s * 0.045, ey + s * 0.045);
+      ctx.stroke();
+    });
+  } else if (type === 'wink') {
+    ctx.fillStyle = '#3a2b1a';
+    ctx.beginPath();
+    ctx.arc(-ex, ey, s * 0.045, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(-ex + s * 0.014, ey - s * 0.014, s * 0.014, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+    ctx.strokeStyle = '#3a2b1a';
+    ctx.lineWidth = s * 0.03;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.arc(ex, ey + s * 0.02, s * 0.055, Math.PI * 1.15, Math.PI * 1.85);
+    ctx.stroke();
+  } else if (type === 'flat') {
+    ctx.strokeStyle = '#3a2b1a';
+    ctx.lineWidth = s * 0.03;
+    ctx.lineCap = 'round';
+    [-1, 1].forEach(dir => {
+      ctx.beginPath();
+      ctx.moveTo(ex * dir - s * 0.045, ey);
+      ctx.lineTo(ex * dir + s * 0.045, ey);
+      ctx.stroke();
+    });
+  } else {
+    ctx.fillStyle = '#3a2b1a';
+    [-1, 1].forEach(dir => {
+      ctx.beginPath();
+      ctx.arc(ex * dir, ey, s * 0.048, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(ex * dir + s * 0.015, ey - s * 0.015, s * 0.015, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+      ctx.fillStyle = '#3a2b1a';
+    });
+  }
+  ctx.restore();
+}
+
+function drawChickMouth(ctx, s, type) {
+  ctx.save();
+  ctx.strokeStyle = '#c9720f';
+  ctx.lineWidth = s * 0.028;
+  ctx.lineCap = 'round';
+  const my = s * 0.145;
+  if (type === 'open') {
+    ctx.beginPath();
+    ctx.ellipse(0, my, s * 0.035, s * 0.045, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#e0672a';
+    ctx.fill();
+  } else if (type === 'pout') {
+    ctx.beginPath();
+    ctx.arc(0, my + s * 0.05, s * 0.05, Math.PI * 1.15, Math.PI * 1.85, true);
+    ctx.stroke();
+  } else if (type === 'flat') {
+    ctx.beginPath();
+    ctx.moveTo(-s * 0.04, my);
+    ctx.lineTo(s * 0.04, my);
+    ctx.stroke();
+  } else {
+    ctx.beginPath();
+    ctx.arc(0, my - s * 0.02, s * 0.05, Math.PI * 0.15, Math.PI * 0.85);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawChick(ctx, cx, cy, s, opts) {
+  const o = Object.assign({ mirror: 1, eyes: 'normal', mouth: 'smile', blush: false, tilt: 0 }, opts);
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate((o.tilt * Math.PI) / 180);
+  ctx.scale(o.mirror, 1);
+
+  // 발
+  ctx.fillStyle = '#f08a1e';
+  [-1, 1].forEach(dir => {
+    ctx.beginPath();
+    ctx.ellipse(dir * s * 0.16, s * 0.42, s * 0.07, s * 0.035, 0, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // 날개
+  ctx.fillStyle = '#ffc433';
+  ctx.beginPath();
+  ctx.ellipse(s * 0.36, s * 0.05, s * 0.15, s * 0.21, 0.3, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 몸통
+  const bodyGrad = ctx.createRadialGradient(-s * 0.15, -s * 0.2, s * 0.05, 0, 0, s * 0.5);
+  bodyGrad.addColorStop(0, '#ffe487');
+  bodyGrad.addColorStop(1, '#ffca28');
+  ctx.beginPath();
+  ctx.ellipse(0, 0, s * 0.48, s * 0.44, 0, 0, Math.PI * 2);
+  ctx.fillStyle = bodyGrad;
+  ctx.fill();
+
+  // 머리 깃털
+  ctx.fillStyle = '#ffca28';
+  ctx.beginPath();
+  ctx.moveTo(-s * 0.05, -s * 0.42);
+  ctx.quadraticCurveTo(0, -s * 0.58, s * 0.07, -s * 0.4);
+  ctx.quadraticCurveTo(-s * 0.02, -s * 0.46, -s * 0.05, -s * 0.42);
+  ctx.fill();
+
+  // 볼터치
+  if (o.blush) {
+    ctx.fillStyle = 'rgba(255,140,165,0.65)';
+    [-1, 1].forEach(dir => {
+      ctx.beginPath();
+      ctx.ellipse(dir * s * 0.26, s * 0.05, s * 0.06, s * 0.04, 0, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  // 부리
+  ctx.fillStyle = '#f08a1e';
+  ctx.beginPath();
+  ctx.moveTo(-s * 0.05, s * 0.08);
+  ctx.lineTo(s * 0.05, s * 0.08);
+  ctx.lineTo(0, s * 0.15);
+  ctx.closePath();
+  ctx.fill();
+
+  drawChickEyes(ctx, s, o.eyes);
+  drawChickMouth(ctx, s, o.mouth);
+
+  ctx.restore();
+}
+
+function drawChickProp(ctx, cx, cy, size, emoji) {
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = `${Math.round(size)}px 'Malgun Gothic', sans-serif`;
+  ctx.fillText(emoji, cx, cy);
+  ctx.restore();
+}
+
+function drawChickScene(ctx, cx, cy, size, tierIdx) {
+  const gap = size * 0.62;
+  if (tierIdx === 5) {
+    // 0+: 극과 극, 서로 등 돌림
+    drawChick(ctx, cx - gap, cy, size * 0.62, { mirror: -1, eyes: 'flat', mouth: 'flat', tilt: -6 });
+    drawChick(ctx, cx + gap, cy, size * 0.62, { mirror: 1, eyes: 'flat', mouth: 'flat', tilt: 6 });
+    drawChickProp(ctx, cx, cy - size * 0.5, size * 0.34, '💔');
+  } else if (tierIdx === 4) {
+    // 30+: 탐색 중
+    drawChick(ctx, cx - gap, cy, size * 0.62, { mirror: 1, eyes: 'normal', mouth: 'flat', tilt: -4 });
+    drawChick(ctx, cx + gap, cy, size * 0.62, { mirror: 1, eyes: 'normal', mouth: 'flat', tilt: 2 });
+    ctx.save();
+    ctx.strokeStyle = '#8a8a99';
+    ctx.lineWidth = size * 0.035;
+    ctx.lineCap = 'round';
+    const mgx = cx - gap * 0.15, mgy = cy - size * 0.06;
+    ctx.beginPath();
+    ctx.arc(mgx, mgy, size * 0.13, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(mgx + size * 0.09, mgy + size * 0.09);
+    ctx.lineTo(mgx + size * 0.2, mgy + size * 0.2);
+    ctx.stroke();
+    ctx.restore();
+    drawChickProp(ctx, cx + gap, cy - size * 0.52, size * 0.3, '❓');
+  } else if (tierIdx === 3) {
+    // 45+: 알콩달콩 적응 중
+    drawChick(ctx, cx - gap * 0.75, cy, size * 0.64, { mirror: 1, eyes: 'normal', mouth: 'smile', blush: true, tilt: -3 });
+    drawChick(ctx, cx + gap * 0.75, cy, size * 0.64, { mirror: -1, eyes: 'normal', mouth: 'smile', blush: true, tilt: 3 });
+    drawChickProp(ctx, cx + gap * 0.75 + size * 0.34, cy - size * 0.28, size * 0.26, '💧');
+  } else if (tierIdx === 2) {
+    // 60+: 티격태격 정드는 사이
+    drawChick(ctx, cx - gap * 0.8, cy, size * 0.65, { mirror: 1, eyes: 'x', mouth: 'open', tilt: -8 });
+    drawChick(ctx, cx + gap * 0.8, cy, size * 0.65, { mirror: -1, eyes: 'happy', mouth: 'smile', tilt: 6 });
+    drawChickProp(ctx, cx, cy - size * 0.5, size * 0.3, '💢');
+  } else if (tierIdx === 1) {
+    // 75+: 찰떡콩떡 단짝
+    drawChick(ctx, cx - gap * 0.55, cy, size * 0.68, { mirror: 1, eyes: 'happy', mouth: 'smile', blush: true, tilt: -6 });
+    drawChick(ctx, cx + gap * 0.55, cy, size * 0.68, { mirror: -1, eyes: 'happy', mouth: 'smile', blush: true, tilt: 6 });
+    drawChickProp(ctx, cx, cy - size * 0.55, size * 0.3, '💕');
+  } else {
+    // 90+: 천생연분
+    drawChick(ctx, cx - gap * 0.42, cy + size * 0.05, size * 0.7, { mirror: 1, eyes: 'heart', mouth: 'smile', blush: true, tilt: -8 });
+    drawChick(ctx, cx + gap * 0.42, cy + size * 0.05, size * 0.7, { mirror: -1, eyes: 'heart', mouth: 'smile', blush: true, tilt: 8 });
+    drawChickProp(ctx, cx, cy - size * 0.62, size * 0.4, '💘');
+    drawChickProp(ctx, cx - size * 0.75, cy - size * 0.1, size * 0.22, '✨');
+    drawChickProp(ctx, cx + size * 0.75, cy - size * 0.2, size * 0.22, '✨');
+  }
+}
+
+function renderTierChick(elId, tierIdx, emoji) {
+  const el = document.getElementById(elId);
+  el.innerHTML = `<div class="tier-chick-wrap"><canvas class="tier-chick-img" width="380" height="244"></canvas></div><span class="tier-chick-badge">${emoji}</span>`;
+  const canvas = el.querySelector('canvas');
+  const ctx = canvas.getContext('2d');
+  drawChickSceneBg(ctx, 0, 0, 380, 244, tierIdx);
+  drawChickScene(ctx, 190, 132, 92, tierIdx);
+}
+
+function getTier(score) {
+  return TIERS.find(t => score >= t.min);
+}
+
+function renderChars(containerId, breakdown) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  breakdown.forEach(b => {
+    const chip = document.createElement('div');
+    chip.className = 'char-chip';
+    chip.innerHTML = `<div class="ch">${b.ch}</div><div class="st">${b.strokes}획</div>`;
+    el.appendChild(chip);
+  });
+}
+
+function showResult(name1, name2) {
+  const a1 = analyzeName(name1);
+  const a2 = analyzeName(name2);
+  const score = computeScore(a1.breakdown, a2.breakdown);
+  const tier = getTier(score);
+
+  document.getElementById('errorMsg').style.display = 'none';
+
+  const circle = document.getElementById('scoreCircle');
+  circle.style.setProperty('--pct', score);
+  document.getElementById('scoreNum').textContent = score;
+  renderTierChick('tierEmoji', tierIndexFromScore(score), tier.emoji);
+  document.getElementById('tierTitle').textContent = tier.title;
+  document.getElementById('tierDesc').textContent = tier.desc;
+
+  document.getElementById('p1Label').textContent = name1;
+  document.getElementById('p2Label').textContent = name2;
+  renderChars('p1Chars', a1.breakdown);
+  renderChars('p2Chars', a2.breakdown);
+  document.getElementById('p1Total').innerHTML = `총 획수 <b>${a1.total}</b>획`;
+  document.getElementById('p2Total').innerHTML = `총 획수 <b>${a2.total}</b>획`;
+
+  const resultEl = document.getElementById('result');
+  resultEl.classList.remove('show');
+  void resultEl.offsetWidth; // reflow to restart animation
+  resultEl.classList.add('show');
+
+  lastNameResult = { name1, name2, score, tier };
+  playScoreSfx(score);
+}
+
+document.getElementById('checkBtn').addEventListener('click', () => {
+  const name1 = document.getElementById('name1').value.trim();
+  const name2 = document.getElementById('name2').value.trim();
+  const hangulRegex = /[가-힣]/;
+
+  if (!name1 || !name2 || !hangulRegex.test(name1) || !hangulRegex.test(name2)) {
+    document.getElementById('errorMsg').style.display = 'block';
+    document.getElementById('result').classList.remove('show');
+    return;
+  }
+  showResult(name1, name2);
+});
+
+[document.getElementById('name1'), document.getElementById('name2')].forEach(input => {
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('checkBtn').click();
+  });
+});
+
+// ============================================================
+// 탭 전환
+// ============================================================
+const TAB_LINKS = [
+  ['tabBtnName', 'tabName'],
+  ['tabBtnSaju', 'tabSaju'],
+  ['tabBtnSajuCompat', 'tabSajuCompat'],
+  ['tabBtnZodiac', 'tabZodiac'],
+  ['tabBtnBlood', 'tabBlood'],
+  ['tabBtnMbti', 'tabMbti'],
+  ['tabBtnCombo', 'tabCombo'],
+];
+
+function activateTab(btnId) {
+  const target = TAB_LINKS.find(([bId]) => bId === btnId);
+  if (!target) return;
+  const panelId = target[1];
+  TAB_LINKS.forEach(([bId, pId]) => {
+    document.getElementById(bId).classList.toggle('active', bId === btnId);
+    document.getElementById(pId).classList.toggle('active', pId === panelId);
+  });
+}
+
+TAB_LINKS.forEach(([btnId]) => {
+  document.getElementById(btnId).addEventListener('click', () => activateTab(btnId));
+});
+
+// 홈 화면 아이콘 길게 눌러 나오는 바로가기(?tab=combo 등)로 열렸으면 해당 탭부터 보여줌
+const TAB_BY_PARAM = {
+  name: 'tabBtnName',
+  saju: 'tabBtnSaju',
+  sajucompat: 'tabBtnSajuCompat',
+  zodiac: 'tabBtnZodiac',
+  blood: 'tabBtnBlood',
+  mbti: 'tabBtnMbti',
+  combo: 'tabBtnCombo',
+};
+const requestedTab = new URLSearchParams(location.search).get('tab');
+if (requestedTab && TAB_BY_PARAM[requestedTab.toLowerCase()]) {
+  activateTab(TAB_BY_PARAM[requestedTab.toLowerCase()]);
+}
+
+// ============================================================
+// 사주팔자 계산
+// ============================================================
+const STEMS = ['갑','을','병','정','무','기','경','신','임','계'];
+const STEMS_HANJA = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const STEM_ELEMENT = ['wood','wood','fire','fire','earth','earth','metal','metal','water','water'];
+
+const BRANCHES = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
+const BRANCHES_HANJA = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const BRANCH_ELEMENT = ['water','earth','wood','wood','earth','fire','fire','earth','metal','metal','earth','water'];
+const BRANCH_ANIMAL = ['쥐','소','호랑이','토끼','용','뱀','말','양','원숭이','닭','개','돼지'];
+
+const ELEMENT_INFO = {
+  wood:  { label: '목(木)', color: '#4caf7d', class: 'el-wood',  desc: '성장과 추진력, 새로운 시작의 기운' },
+  fire:  { label: '화(火)', color: '#e35d6a', class: 'el-fire',  desc: '열정과 표현력, 밝고 활동적인 기운' },
+  earth: { label: '토(土)', color: '#c9973a', class: 'el-earth', desc: '안정과 신뢰, 중심을 잡아주는 기운' },
+  metal: { label: '금(金)', color: '#9aa0a6', class: 'el-metal', desc: '결단력과 원칙, 예리하고 강한 기운' },
+  water: { label: '수(水)', color: '#3b5580', class: 'el-water', desc: '지혜와 유연함, 깊이 있는 사고의 기운' },
+};
+
+// 절기 근사 경계 (월지 시작일). 실제 절입 시각은 해마다 ±1일 정도 다를 수 있음.
+const MONTH_BOUNDARIES = [
+  { mmdd: 106,  branch: 1 },  // 축월 시작 (소한)
+  { mmdd: 204,  branch: 2 },  // 인월 시작 (입춘)
+  { mmdd: 306,  branch: 3 },  // 묘월 시작 (경칩)
+  { mmdd: 405,  branch: 4 },  // 진월 시작 (청명)
+  { mmdd: 506,  branch: 5 },  // 사월 시작 (입하)
+  { mmdd: 606,  branch: 6 },  // 오월 시작 (망종)
+  { mmdd: 707,  branch: 7 },  // 미월 시작 (소서)
+  { mmdd: 808,  branch: 8 },  // 신월 시작 (입추)
+  { mmdd: 908,  branch: 9 },  // 유월 시작 (백로)
+  { mmdd: 1008, branch: 10 }, // 술월 시작 (한로)
+  { mmdd: 1107, branch: 11 }, // 해월 시작 (입동)
+  { mmdd: 1207, branch: 0 },  // 자월 시작 (대설)
+];
+// branch(0~11, 자~해) -> 인월을 0으로 하는 순서 인덱스 (월간 계산용)
+const BRANCH_TO_MONTH_ORDER = { 2:0, 3:1, 4:2, 5:3, 6:4, 7:5, 8:6, 9:7, 10:8, 11:9, 0:10, 1:11 };
+
+// 시진(2시간 단위) 목록
+const HOUR_BLOCKS = [
+  { value: 'jasi',   label: '자시', range: '23:00~00:59', branch: 0 },
+  { value: 'chuksi', label: '축시', range: '01:00~02:59', branch: 1 },
+  { value: 'insi',   label: '인시', range: '03:00~04:59', branch: 2 },
+  { value: 'myosi',  label: '묘시', range: '05:00~06:59', branch: 3 },
+  { value: 'jinsi',  label: '진시', range: '07:00~08:59', branch: 4 },
+  { value: 'sasi',   label: '사시', range: '09:00~10:59', branch: 5 },
+  { value: 'osi',    label: '오시', range: '11:00~12:59', branch: 6 },
+  { value: 'misi',   label: '미시', range: '13:00~14:59', branch: 7 },
+  { value: 'sinsi',  label: '신시', range: '15:00~16:59', branch: 8 },
+  { value: 'yusi',   label: '유시', range: '17:00~18:59', branch: 9 },
+  { value: 'sulsi',  label: '술시', range: '19:00~20:59', branch: 10 },
+  { value: 'haesi',  label: '해시', range: '21:00~22:59', branch: 11 },
+];
+
+function mod(n, m) { return ((n % m) + m) % m; }
+
+// Fliegel & Van Flandern 공식 (그레고리력 -> Julian Day Number)
+function toJDN(y, m, d) {
+  const a = Math.floor((14 - m) / 12);
+  const yy = y + 4800 - a;
+  const mm = m + 12 * a - 3;
+  return d + Math.floor((153 * mm + 2) / 5) + 365 * yy + Math.floor(yy / 4) - Math.floor(yy / 100) + Math.floor(yy / 400) - 32045;
+}
+
+// 기준점: 2019-01-27(JDN 2458511) = 갑자일 (검증된 기준, ytliu0 Chinese Calendar 자료 기준)
+const JDN_ANCHOR = 2458511;
+
+function dayGanzi(y, m, d) {
+  const jdn = toJDN(y, m, d);
+  const g60 = mod(jdn - JDN_ANCHOR, 60);
+  return { stem: mod(g60, 10), branch: mod(g60, 12) };
+}
+
+// 입춘(2/4) 기준 사주年 결정
+function getSajuYear(y, m, d) {
+  if (m < 2 || (m === 2 && d < 4)) return y - 1;
+  return y;
+}
+
+function yearGanzi(sajuYear) {
+  return { stem: mod(sajuYear - 4, 10), branch: mod(sajuYear - 4, 12) };
+}
+
+function monthBranchOf(m, d) {
+  const mmdd = m * 100 + d;
+  if (mmdd < MONTH_BOUNDARIES[0].mmdd) return 0; // 1/1~1/5 -> 전년도 자월 연장
+  let branch = 0;
+  for (const b of MONTH_BOUNDARIES) {
+    if (mmdd >= b.mmdd) branch = b.branch;
+  }
+  return branch;
+}
+
+// 오호둔법: 연간(0~9) -> 인월의 월간
+const YIN_MONTH_STEM_BASE = [2, 4, 6, 8, 0, 2, 4, 6, 8, 0]; // index = 연간(0~9)
+
+function monthGanzi(sajuYear, m, d) {
+  const yStem = yearGanzi(sajuYear).stem;
+  const branch = monthBranchOf(m, d);
+  const order = BRANCH_TO_MONTH_ORDER[branch];
+  const stem = mod(YIN_MONTH_STEM_BASE[yStem] + order, 10);
+  return { stem, branch };
+}
+
+// 오서둔법: 일간(0~9) -> 자시의 시간
+const JASI_STEM_BASE = [0, 2, 4, 6, 8, 0, 2, 4, 6, 8]; // index = 일간(0~9)
+
+function hourGanzi(dayStem, hourBranch) {
+  const stem = mod(JASI_STEM_BASE[dayStem] + hourBranch, 10);
+  return { stem, branch: hourBranch };
+}
+
+function buildPillar(stemIdx, branchIdx) {
+  return {
+    stemIdx, branchIdx,
+    stemChar: STEMS[stemIdx], stemHanja: STEMS_HANJA[stemIdx], stemElement: STEM_ELEMENT[stemIdx],
+    branchChar: BRANCHES[branchIdx], branchHanja: BRANCHES_HANJA[branchIdx], branchElement: BRANCH_ELEMENT[branchIdx],
+    animal: BRANCH_ANIMAL[branchIdx],
+  };
+}
+
+const ILGAN_DETAIL = [
+  { // 갑(甲) 목
+    keyword: '큰 나무',
+    desc: '곧고 위로 뻗어나가는 큰 나무 같은 사람이에요. 목표가 뚜렷하고 앞장서서 이끄는 걸 좋아해요.',
+    trait: '자존심이 뚜렷하고 우직하게 목표를 향해 나아가는 타입이에요. 시작한 일은 끝까지 밀고 나가는 힘이 있어요.',
+    strength: '리더십과 추진력이 뛰어나고, 한번 마음먹은 일은 흔들림 없이 밀어붙이는 뚝심이 있어요.',
+    caution: '고집이 세서 주변 의견을 잘 듣지 않을 때가 있어요. 조금만 유연해지면 관계가 훨씬 편해져요.',
+    relationship: '리드하는 역할을 좋아해서, 자신을 존중해주고 함께 성장할 수 있는 상대와 특히 잘 맞아요.',
+  },
+  { // 을(乙) 목
+    keyword: '부드러운 넝쿨',
+    desc: '바람에 흔들려도 꺾이지 않는 넝쿨처럼 유연하고 적응력이 뛰어난 사람이에요.',
+    trait: '눈치가 빠르고 사교성이 좋아, 어떤 환경에서도 자기 자리를 잘 찾아가는 편이에요.',
+    strength: '은근히 강한 생존력과 융통성을 갖고 있어, 위기 상황에서도 유연하게 대처해요.',
+    caution: '우유부단해 보이거나 상황에 따라 입장이 바뀌는 것처럼 비칠 수 있어요.',
+    relationship: '은근한 매력으로 사람을 끌어당기며, 자신을 세심하게 챙겨주는 상대와 잘 맞아요.',
+  },
+  { // 병(丙) 화
+    keyword: '태양',
+    desc: '세상을 환하게 비추는 태양처럼 밝고 에너지 넘치는 사람이에요.',
+    trait: '열정적이고 표현력이 풍부하며, 주변을 환하게 만드는 리더 기질이 있어요.',
+    strength: '사람들을 이끄는 매력이 있어 어디서든 주목받고, 분위기를 밝게 만드는 힘이 있어요.',
+    caution: '감정 기복이 크거나 성급하게 결정할 때가 있어요. 한 박자 쉬어가는 연습이 도움이 돼요.',
+    relationship: '화끈하고 다정하게 표현하는 편이라, 감정 표현에 적극적으로 반응해주는 상대와 잘 맞아요.',
+  },
+  { // 정(丁) 화
+    keyword: '촛불',
+    desc: '은은하게 주변을 밝히는 촛불 같은 사람이에요. 따뜻하고 섬세한 매력이 있어요.',
+    trait: '조용히 주변을 챙기는 배려심 많은 타입이고, 분위기를 세심하게 살피는 편이에요.',
+    strength: '섬세한 감성과 배려심이 깊어, 곁에 있는 사람을 편안하게 만들어줘요.',
+    caution: '속마음을 잘 드러내지 않아 답답해 보이거나, 예민해질 때가 있어요.',
+    relationship: '조용히 곁을 지키는 스타일이라, 진심을 알아봐주고 꾸준히 다가와주는 상대와 잘 맞아요.',
+  },
+  { // 무(戊) 토
+    keyword: '큰 산',
+    desc: '든든하게 자리를 지키는 큰 산처럼 안정감 있고 믿음직한 사람이에요.',
+    trait: '신뢰감이 있고 포용력이 넓으며, 웬만한 일에는 잘 흔들리지 않아요.',
+    strength: '포용력이 크고 중심이 단단해서, 주변 사람들이 편하게 기댈 수 있는 존재예요.',
+    caution: '변화를 꺼리거나 고지식하게 원칙을 고수해 답답해 보일 수 있어요.',
+    relationship: '묵묵히 곁을 지켜주는 스타일이라, 조급해하지 않고 천천히 신뢰를 쌓는 관계에서 빛을 발해요.',
+  },
+  { // 기(己) 토
+    keyword: '비옥한 논밭',
+    desc: '생명을 길러내는 논밭처럼 실속 있고 현실감각이 뛰어난 사람이에요.',
+    trait: '성실하고 꼼꼼하며, 실속을 챙기는 현실 감각이 뛰어나요.',
+    strength: '맡은 일을 확실하게 해내는 책임감과, 상황을 꼼꼼히 살피는 눈썰미가 있어요.',
+    caution: '걱정이 많거나 지나치게 계산적으로 보일 때가 있어요.',
+    relationship: '실질적인 배려로 마음을 표현하는 편이라, 그 진심을 알아채고 편안하게 받아주는 상대와 잘 맞아요.',
+  },
+  { // 경(庚) 금
+    keyword: '무쇠',
+    desc: '잘 벼려진 무쇠처럼 강인하고 결단력 있는 사람이에요.',
+    trait: '결단력이 강하고 원칙을 중요하게 여기며, 카리스마가 느껴지는 타입이에요.',
+    strength: '옳다고 생각하는 일은 망설임 없이 밀어붙이는 추진력과 의리가 있어요.',
+    caution: '지나치게 직설적이거나 냉정해 보여 오해를 살 때가 있어요.',
+    relationship: '겉은 단단해도 속은 의리 있는 편이라, 진심을 알아주는 사람에게는 한없이 든든한 존재가 돼요.',
+  },
+  { // 신(辛) 금
+    keyword: '보석',
+    desc: '정교하게 세공된 보석처럼 예리하고 완벽을 추구하는 사람이에요.',
+    trait: '섬세하고 예리하며, 완벽을 추구하는 깔끔한 성향이에요.',
+    strength: '디테일을 놓치지 않는 분석력과 감각이 뛰어나, 완성도 높은 결과물을 만들어내요.',
+    caution: '예민하거나 까다로워 보일 수 있고, 스스로에게도 엄격한 편이에요.',
+    relationship: '겉으로는 도도해 보여도, 마음을 준 상대에게는 세심하게 잘해주는 스타일이에요.',
+  },
+  { // 임(壬) 수
+    keyword: '큰 바다',
+    desc: '넓고 깊은 바다처럼 스케일이 크고 포용력 있는 사람이에요.',
+    trait: '생각이 깊고 포용력이 크며, 상황에 따라 유연하게 대처하는 편이에요.',
+    strength: '지혜롭고 유연해서, 어떤 상황에서도 나름의 대처 방법을 잘 찾아내요.',
+    caution: '속을 잘 알 수 없거나, 결정을 미루며 우유부단해 보일 때가 있어요.',
+    relationship: '편안하게 품어주는 스타일이라, 솔직하게 다가와주는 상대와 깊은 신뢰를 쌓아요.',
+  },
+  { // 계(癸) 수
+    keyword: '이슬비',
+    desc: '조용히 스며드는 이슬비처럼 섬세하고 감수성이 풍부한 사람이에요.',
+    trait: '감성적이고 직관이 뛰어나며, 섬세하게 주변을 살피는 타입이에요.',
+    strength: '공감 능력이 좋아 다른 사람의 마음을 잘 헤아리고, 직관적으로 분위기를 파악해요.',
+    caution: '감정 기복에 예민하거나, 소극적으로 물러설 때가 있어요.',
+    relationship: '잔잔하지만 깊은 애정을 주는 스타일이라, 그 진심을 알아채주는 상대와 특히 잘 맞아요.',
+  },
+];
+
+// 오행 밸런스 해설 (많음 / 부족)
+const OHENG_MORE_TEXT = {
+  wood:  '목(木) 기운이 강해요. 성장 욕구와 추진력이 넘치고 새로운 일을 벌이는 걸 좋아하지만, 자칫 고집스럽거나 급해 보일 수 있어요.',
+  fire:  '화(火) 기운이 강해요. 열정적이고 표현력이 풍부하며 주목받는 걸 즐기지만, 감정 기복이 크거나 성급해질 수 있어요.',
+  earth: '토(土) 기운이 강해요. 안정감 있고 신뢰할 수 있는 사람이지만, 변화를 꺼리고 고지식해 보일 수 있어요.',
+  metal: '금(金) 기운이 강해요. 원칙적이고 결단력이 있으며 목표 지향적이지만, 지나치게 날카롭거나 냉정해 보일 수 있어요.',
+  water: '수(水) 기운이 강해요. 지혜롭고 유연하며 생각이 깊지만, 우유부단해지거나 속마음을 잘 드러내지 않을 수 있어요.',
+};
+const OHENG_LESS_TEXT = {
+  wood:  '목(木) 기운이 부족해요. 새로운 도전이나 결단이 필요한 순간에 망설임이 많을 수 있어요. 계획을 세워 한 걸음씩 추진하는 연습이 도움이 돼요.',
+  fire:  '화(火) 기운이 부족해요. 자기 표현이나 적극성이 다소 약할 수 있어요. 감정을 표현하는 연습을 하면 관계에 활력이 생겨요.',
+  earth: '토(土) 기운이 부족해요. 중심을 잡거나 꾸준히 지속하는 힘이 약할 수 있어요. 루틴을 만들어보면 안정감을 키우는 데 도움이 돼요.',
+  metal: '금(金) 기운이 부족해요. 결단을 내리거나 맺고 끊는 것이 어려울 수 있어요. 우선순위를 정하는 연습이 도움이 돼요.',
+  water: '수(水) 기운이 부족해요. 유연하게 대처하거나 깊이 생각하는 힘이 약할 수 있어요. 여유를 갖고 충분히 생각하는 습관이 도움이 돼요.',
+};
+
+function calcSaju(y, m, d, hourBranch /* number or null */) {
+  const sajuYear = getSajuYear(y, m, d);
+  const yg = yearGanzi(sajuYear);
+  const mg = monthGanzi(sajuYear, m, d);
+  const dg = dayGanzi(y, m, d);
+  const pillars = {
+    year: buildPillar(yg.stem, yg.branch),
+    month: buildPillar(mg.stem, mg.branch),
+    day: buildPillar(dg.stem, dg.branch),
+  };
+  if (hourBranch !== null) {
+    const hg = hourGanzi(dg.stem, hourBranch);
+    pillars.hour = buildPillar(hg.stem, hg.branch);
+  }
+  return pillars;
+}
+
+// ---- 시진 선택 UI 렌더 ----
+populateHourSelect(document.getElementById('birthHour'));
+
+function renderPillars(pillars, gridId = 'pillarsGrid') {
+  const grid = document.getElementById(gridId);
+  grid.innerHTML = '';
+  const order = [
+    ['year', '년주'], ['month', '월주'], ['day', '일주'], ['hour', '시주'],
+  ];
+  order.forEach(([key, label]) => {
+    const col = document.createElement('div');
+    col.className = 'pillar-col';
+    const p = pillars[key];
+    if (!p) {
+      col.innerHTML = `<div class="pillar-label">${label}</div><div class="ganzi-box" style="background:#ddd;"><span class="hanja">-</span><span class="hangul">모름</span></div>`;
+      grid.appendChild(col);
+      return;
+    }
+    const stemEl = ELEMENT_INFO[p.stemElement];
+    const branchEl = ELEMENT_INFO[p.branchElement];
+    col.innerHTML = `
+      <div class="pillar-label">${label}</div>
+      <div class="ganzi-box ${stemEl.class}"><span class="hanja">${p.stemHanja}</span><span class="hangul">${p.stemChar}</span></div>
+      <div class="ganzi-box ${branchEl.class}"><span class="hanja">${p.branchHanja}</span><span class="hangul">${p.branchChar}</span></div>
+      <div class="pillar-animal">${p.animal}띠</div>
+    `;
+    grid.appendChild(col);
+  });
+}
+
+function renderElementBar(pillars) {
+  const counts = { wood: 0, fire: 0, earth: 0, metal: 0, water: 0 };
+  Object.values(pillars).forEach(p => {
+    if (!p) return;
+    counts[p.stemElement]++;
+    counts[p.branchElement]++;
+  });
+  const bar = document.getElementById('elementBar');
+  bar.innerHTML = '';
+  Object.keys(ELEMENT_INFO).forEach(key => {
+    const info = ELEMENT_INFO[key];
+    const chip = document.createElement('div');
+    chip.className = 'element-chip';
+    chip.style.background = info.color;
+    chip.innerHTML = `${info.label}<span class="cnt">${counts[key]}</span>`;
+    bar.appendChild(chip);
+  });
+  return counts;
+}
+
+function renderOhengAnalysis(counts, totalSlots) {
+  const keys = Object.keys(counts);
+  const maxCount = Math.max(...keys.map(k => counts[k]));
+  const moreKeys = maxCount >= 3 ? keys.filter(k => counts[k] === maxCount) : [];
+  const lessKeys = keys.filter(k => counts[k] === 0);
+
+  const moreText = moreKeys.length
+    ? moreKeys.map(k => OHENG_MORE_TEXT[k]).join(' ')
+    : '특별히 치우친 기운 없이 오행이 비교적 고르게 분포되어 있어요. 상황에 따라 균형 잡힌 태도를 보이는 편이에요.';
+  const lessText = lessKeys.length
+    ? lessKeys.map(k => OHENG_LESS_TEXT[k]).join(' ')
+    : '다섯 가지 기운을 모두 갖추고 있어요. 어느 한쪽으로 크게 치우치지 않는 균형잡힌 사주예요.';
+
+  document.getElementById('ohengMoreText').textContent = moreText;
+  document.getElementById('ohengLessText').textContent = lessText;
+}
+
+document.getElementById('sajuBtn').addEventListener('click', () => {
+  const dateVal = getDateValue('birthDate');
+  const errEl = document.getElementById('sajuErrorMsg');
+  if (!dateVal) {
+    errEl.style.display = 'block';
+    document.getElementById('sajuResult').classList.remove('show');
+    return;
+  }
+  errEl.style.display = 'none';
+
+  const [y, m, d] = dateVal.split('-').map(Number);
+  const hourVal = document.getElementById('birthHour').value;
+  const hourBlock = HOUR_BLOCKS.find(hb => hb.value === hourVal);
+  const hourBranch = hourBlock ? hourBlock.branch : null;
+
+  const name = document.getElementById('sajuName').value.trim();
+  document.getElementById('sajuNameTitle').textContent = name ? `${name}님의 사주팔자` : '';
+
+  const pillars = calcSaju(y, m, d, hourBranch);
+  renderPillars(pillars);
+  const counts = renderElementBar(pillars);
+
+  const detail = ILGAN_DETAIL[pillars.day.stemIdx];
+  document.getElementById('ilganTitle').textContent =
+    `일간(日干): ${pillars.day.stemChar}${pillars.day.stemHanja} · ${ELEMENT_INFO[pillars.day.stemElement].label} · ${detail.keyword}`;
+  document.getElementById('ilganDesc').textContent = detail.desc;
+  document.getElementById('ilganTrait').textContent = detail.trait;
+  document.getElementById('ilganStrength').textContent = detail.strength;
+  document.getElementById('ilganCaution').textContent = detail.caution;
+  document.getElementById('ilganRelationship').textContent = detail.relationship;
+
+  renderOhengAnalysis(counts, pillars.hour ? 8 : 6);
+
+  const resultEl = document.getElementById('sajuResult');
+  resultEl.classList.remove('show');
+  void resultEl.offsetWidth;
+  resultEl.classList.add('show');
+
+  lastSajuResult = { pillars, detail, name };
+});
+
+// ============================================================
+// 공통: 점수 원 + 등급 렌더 (사주궁합 / 별자리궁합 / 혈액형궁합 공용)
+// ============================================================
+function renderScoreUI(prefix, score) {
+  const tier = getTier(score);
+  const circle = document.getElementById(prefix + 'ScoreCircle');
+  circle.style.setProperty('--pct', score);
+  document.getElementById(prefix + 'ScoreNum').textContent = score;
+  renderTierChick(prefix + 'TierEmoji', tierIndexFromScore(score), tier.emoji);
+  document.getElementById(prefix + 'TierTitle').textContent = tier.title;
+  document.getElementById(prefix + 'TierDesc').textContent = tier.desc;
+  return tier;
+}
+
+function showBox(id) {
+  const el = document.getElementById(id);
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+
+// ============================================================
+// 사주 궁합 (오행 상생상극 + 일지 합충)
+// ============================================================
+const ELEMENT_ORDER = ['wood', 'fire', 'earth', 'metal', 'water'];
+
+// 상생: A가 다음 순서를 낳음 (목생화,화생토,토생금,금생수,수생목)
+// 상극: A가 두 칸 뒤를 극함 (목극토,화극금,토극수,금극목,수극화)
+function ohengRelation(elA, elB) {
+  if (elA === elB) return { type: 'same' };
+  const ia = ELEMENT_ORDER.indexOf(elA), ib = ELEMENT_ORDER.indexOf(elB);
+  const diff = mod(ib - ia, 5);
+  if (diff === 1) return { type: 'a_generates_b' };
+  if (diff === 4) return { type: 'b_generates_a' };
+  if (diff === 2) return { type: 'a_overcomes_b' };
+  return { type: 'b_overcomes_a' }; // diff === 3
+}
+
+// 지지 육합 (자축, 인해, 묘술, 진유, 사신, 오미)
+const BRANCH_HAP = [[0,1],[2,11],[3,10],[4,9],[5,8],[6,7]];
+// 지지 충 (자오, 축미, 인신, 묘유, 진술, 사해)
+const BRANCH_CHUNG = [[0,6],[1,7],[2,8],[3,9],[4,10],[5,11]];
+// 지지 삼합 (인오술=화국, 사유축=금국, 신자진=수국, 해묘미=목국) — 두 글자만 겹치면 반합(半合)
+const SAMHAP_GROUPS = [
+  { branches: [2, 6, 10], label: '화국(火局)' },
+  { branches: [5, 9, 1], label: '금국(金局)' },
+  { branches: [8, 0, 4], label: '수국(水局)' },
+  { branches: [11, 3, 7], label: '목국(木局)' },
+];
+
+function branchRelation(b1, b2) {
+  if (b1 === b2) return 'same';
+  const isPair = (arr) => arr.some(([x, y]) => (x === b1 && y === b2) || (x === b2 && y === b1));
+  if (isPair(BRANCH_HAP)) return 'hap';
+  if (isPair(BRANCH_CHUNG)) return 'chung';
+  if (SAMHAP_GROUPS.some(g => g.branches.includes(b1) && g.branches.includes(b2))) return 'samhap';
+  return 'none';
+}
+
+function samhapLabelOf(b1, b2) {
+  const g = SAMHAP_GROUPS.find(g => g.branches.includes(b1) && g.branches.includes(b2));
+  return g ? g.label : '';
+}
+
+function populateHourSelect(selectEl) {
+  const optUnknown = document.createElement('option');
+  optUnknown.value = 'unknown';
+  optUnknown.textContent = '시간 모름';
+  selectEl.appendChild(optUnknown);
+  HOUR_BLOCKS.forEach(hb => {
+    const opt = document.createElement('option');
+    opt.value = hb.value;
+    opt.textContent = `${hb.label} (${hb.range})`;
+    selectEl.appendChild(opt);
+  });
+}
+populateHourSelect(document.getElementById('scHour1'));
+populateHourSelect(document.getElementById('scHour2'));
+
+// ---- 생년월일 년/월/일 드롭다운 ----
+function initDateSelect(prefix) {
+  const yEl = document.getElementById(prefix + '_y');
+  const mEl = document.getElementById(prefix + '_m');
+  const dEl = document.getElementById(prefix + '_d');
+  const curYear = new Date().getFullYear();
+
+  const yBlank = document.createElement('option');
+  yBlank.value = ''; yBlank.textContent = '년';
+  yEl.appendChild(yBlank);
+  for (let y = curYear; y >= 1900; y--) {
+    const opt = document.createElement('option');
+    opt.value = String(y);
+    opt.textContent = y + '년';
+    yEl.appendChild(opt);
+  }
+
+  const mBlank = document.createElement('option');
+  mBlank.value = ''; mBlank.textContent = '월';
+  mEl.appendChild(mBlank);
+  for (let m = 1; m <= 12; m++) {
+    const opt = document.createElement('option');
+    opt.value = String(m);
+    opt.textContent = m + '월';
+    mEl.appendChild(opt);
+  }
+
+  function populateDays() {
+    const y = yEl.value, m = mEl.value;
+    const daysInMonth = (y && m) ? new Date(Number(y), Number(m), 0).getDate() : 31;
+    const prevVal = dEl.value;
+    dEl.innerHTML = '';
+    const dBlank = document.createElement('option');
+    dBlank.value = ''; dBlank.textContent = '일';
+    dEl.appendChild(dBlank);
+    for (let d = 1; d <= daysInMonth; d++) {
+      const opt = document.createElement('option');
+      opt.value = String(d);
+      opt.textContent = d + '일';
+      dEl.appendChild(opt);
+    }
+    if (prevVal && Number(prevVal) <= daysInMonth) dEl.value = prevVal;
+  }
+  populateDays();
+  yEl.addEventListener('change', populateDays);
+  mEl.addEventListener('change', populateDays);
+}
+
+function getDateValue(prefix) {
+  const y = document.getElementById(prefix + '_y').value;
+  const m = document.getElementById(prefix + '_m').value;
+  const d = document.getElementById(prefix + '_d').value;
+  if (!y || !m || !d) return '';
+  return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+}
+
+['birthDate', 'scDate1', 'scDate2', 'zDate1', 'zDate2', 'cbDate1', 'cbDate2'].forEach(initDateSelect);
+
+function computeSajuCompat(y1, m1, d1, hb1, y2, m2, d2, hb2) {
+  const p1 = calcSaju(y1, m1, d1, hb1);
+  const p2 = calcSaju(y2, m2, d2, hb2);
+
+  const ilganRel = ohengRelation(p1.day.stemElement, p2.day.stemElement);
+  const iljiRel = branchRelation(p1.day.branchIdx, p2.day.branchIdx);
+
+  let score = 60;
+  let ilganText = '';
+  const e1 = ELEMENT_INFO[p1.day.stemElement].label;
+  const e2 = ELEMENT_INFO[p2.day.stemElement].label;
+  const n1 = `${p1.day.stemChar}${p1.day.stemHanja}(${e1})`;
+  const n2 = `${p2.day.stemChar}${p2.day.stemHanja}(${e2})`;
+
+  if (ilganRel.type === 'same') {
+    score = 70;
+    ilganText = `두 사람의 일간이 똑같이 ${n1} 기운이에요. 비화(比和) 관계로, 서로 통하는 부분이 많고 가치관이 비슷해요. 다만 같은 기운끼리는 은근히 경쟁심이 생기거나 고집이 부딪힐 때도 있어요.`;
+  } else if (ilganRel.type === 'a_generates_b' || ilganRel.type === 'b_generates_a') {
+    score = 88;
+    const giver = ilganRel.type === 'a_generates_b' ? n1 : n2;
+    const receiver = ilganRel.type === 'a_generates_b' ? n2 : n1;
+    ilganText = `${giver}이 ${receiver}을 낳는 상생(相生) 관계예요. 한쪽의 기운이 자연스럽게 다른 쪽에 힘을 보태주는 흐름이라, 명리학에서 궁합을 볼 때 가장 이상적으로 보는 조합 중 하나예요.`;
+  } else {
+    score = 48;
+    const winner = ilganRel.type === 'a_overcomes_b' ? n1 : n2;
+    const loser = ilganRel.type === 'a_overcomes_b' ? n2 : n1;
+    ilganText = `${winner}이 ${loser}을 극(剋)하는 상극(相剋) 관계예요. 기운이 서로 부딪히는 편이라 초반엔 삐걱거리거나 주도권 다툼이 생기기 쉽지만, 서로에게 자극이 되어 함께 성장하는 케이스도 많아요.`;
+  }
+
+  const b1 = `${p1.day.branchChar}${p1.day.branchHanja}(${p1.day.animal}띠)`;
+  const b2 = `${p2.day.branchChar}${p2.day.branchHanja}(${p2.day.animal}띠)`;
+  let iljiText = '';
+  if (iljiRel === 'same') {
+    score += 10;
+    iljiText = `일지가 똑같이 ${b1}로 같아요. 생활 리듬이나 성향이 비슷해 편안하지만, 가끔은 서로 다른 자극이 부족하게 느껴질 수 있어요.`;
+  } else if (iljiRel === 'hap') {
+    score += 15;
+    iljiText = `일지 ${b1}와 ${b2}는 육합(六合) 관계예요. 서로 자연스럽게 끌리고 조화를 이루는 조합으로, 함께 있으면 편안함을 느끼기 쉬워요.`;
+  } else if (iljiRel === 'chung') {
+    score -= 20;
+    iljiText = `일지 ${b1}와 ${b2}는 충(沖) 관계예요. 성향이나 생활 방식에서 부딪히는 부분이 있을 수 있어 서로 배려하는 노력이 필요해요.`;
+  } else if (iljiRel === 'samhap') {
+    score += 12;
+    const label = samhapLabelOf(p1.day.branchIdx, p2.day.branchIdx);
+    iljiText = `일지 ${b1}와 ${b2}는 삼합(三合) 중 ${label}을 이루는 반합(半合) 관계예요. 두 기운이 하나로 뭉치는 조합이라 함께 있을 때 시너지가 좋아요.`;
+  } else {
+    iljiText = `일지 ${b1}와 ${b2}는 특별한 합·충 관계는 아니에요. 서로 무난하게 영향을 주고받는 편이에요.`;
+  }
+
+  score = clamp(Math.round(score), 5, 98);
+  return { p1, p2, score, ilganText, iljiText };
+}
+
+document.getElementById('sajuCompatBtn').addEventListener('click', () => {
+  const d1 = getDateValue('scDate1');
+  const d2 = getDateValue('scDate2');
+  const errEl = document.getElementById('sajuCompatErrorMsg');
+  if (!d1 || !d2) {
+    errEl.style.display = 'block';
+    document.getElementById('sajuCompatResult').classList.remove('show');
+    return;
+  }
+  errEl.style.display = 'none';
+
+  const [y1, m1, dd1] = d1.split('-').map(Number);
+  const [y2, m2, dd2] = d2.split('-').map(Number);
+  const h1 = document.getElementById('scHour1').value;
+  const h2 = document.getElementById('scHour2').value;
+  const hb1 = h1 === 'unknown' ? null : HOUR_BLOCKS.find(hb => hb.value === h1).branch;
+  const hb2 = h2 === 'unknown' ? null : HOUR_BLOCKS.find(hb => hb.value === h2).branch;
+
+  const result = computeSajuCompat(y1, m1, dd1, hb1, y2, m2, dd2, hb2);
+  renderPillars(result.p1, 'sajuCompatPillars1');
+  renderPillars(result.p2, 'sajuCompatPillars2');
+  const tier = renderScoreUI('sajuCompat', result.score);
+  document.getElementById('scReasonIlgan').textContent = result.ilganText;
+  document.getElementById('scReasonIlji').textContent = result.iljiText;
+  showBox('sajuCompatResult');
+
+  const n1 = document.getElementById('scName1').value.trim() || '첫 번째 분';
+  const n2 = document.getElementById('scName2').value.trim() || '두 번째 분';
+  lastSajuCompatResult = { ...result, tier, name1: n1, name2: n2 };
+  playScoreSfx(result.score);
+});
+
+// ============================================================
+// 별자리 궁합
+// ============================================================
+const ZODIAC_SIGNS = [
+  { name: '염소자리', emoji: '♑', range: '12/22~1/19', element: 'earth', startMMDD: 1222 },
+  { name: '물병자리', emoji: '♒', range: '1/20~2/18', element: 'air', startMMDD: 120 },
+  { name: '물고기자리', emoji: '♓', range: '2/19~3/20', element: 'water', startMMDD: 219 },
+  { name: '양자리', emoji: '♈', range: '3/21~4/19', element: 'fire', startMMDD: 321 },
+  { name: '황소자리', emoji: '♉', range: '4/20~5/20', element: 'earth', startMMDD: 420 },
+  { name: '쌍둥이자리', emoji: '♊', range: '5/21~6/21', element: 'air', startMMDD: 521 },
+  { name: '게자리', emoji: '♋', range: '6/22~7/22', element: 'water', startMMDD: 622 },
+  { name: '사자자리', emoji: '♌', range: '7/23~8/22', element: 'fire', startMMDD: 723 },
+  { name: '처녀자리', emoji: '♍', range: '8/23~9/22', element: 'earth', startMMDD: 823 },
+  { name: '천칭자리', emoji: '♎', range: '9/23~10/23', element: 'air', startMMDD: 923 },
+  { name: '전갈자리', emoji: '♏', range: '10/24~11/22', element: 'water', startMMDD: 1024 },
+  { name: '사수자리', emoji: '♐', range: '11/23~12/21', element: 'fire', startMMDD: 1123 },
+];
+
+const ZODIAC_ELEMENT_INFO = {
+  fire:  { label: '불', color: '#e35d6a' },
+  earth: { label: '땅', color: '#c9973a' },
+  air:   { label: '바람', color: '#5aa9d6' },
+  water: { label: '물', color: '#3b5580' },
+};
+
+function getZodiacSign(m, d) {
+  const mmdd = m * 100 + d;
+  if (mmdd >= 1222 || mmdd < 120) return ZODIAC_SIGNS[0];
+  let sign = ZODIAC_SIGNS[0];
+  for (const s of ZODIAC_SIGNS) {
+    if (s.startMMDD <= mmdd) sign = s;
+  }
+  return sign;
+}
+
+// 같은 원소끼리는 최상, 불+공기·땅+물은 좋음, 불+땅·땅+공기·공기+물은 도전적,
+// 불+물이 가장 긴장도 높은 조합으로 보는 서양 점성술 4원소 궁합 통설을 반영
+const ZODIAC_MATRIX = {
+  'fire,fire':  { score: 94, desc: '둘 다 불의 기운이라 열정과 에너지가 서로를 증폭시키는 최상의 조합이에요. 다만 주도권을 두고 부딪힐 수 있으니 양보가 필요해요.' },
+  'air,air':    { score: 90, desc: '지적 자극이 넘치는 최상의 조합이에요. 대화가 끊이지 않지만, 둘 다 감정 표현에는 서툴 수 있어요.' },
+  'earth,earth':{ score: 92, desc: '안정과 신뢰, 실용성을 함께 나누는 최상의 조합으로 장기적인 관계에 특히 잘 맞아요. 다만 변화가 적어 루틴이 지루해질 수 있어요.' },
+  'water,water':{ score: 93, desc: '말하지 않아도 통하는 감정적 깊이가 최고인 조합이에요. 다만 감정의 소용돌이에 함께 휩쓸리지 않도록 적당한 경계가 필요해요.' },
+  'fire,air':   { score: 82, desc: '공기가 불을 살리듯 서로 지적 자극과 소통을 더해주는 좋은 조합이에요. 함께 있으면 활기차고 새로운 일을 벌이기 좋아요.' },
+  'earth,water':{ score: 80, desc: '물이 땅에 스며들듯 물의 감수성이 땅의 현실적인 성향에 깊이를 더해주는 좋은 조합이에요. 안정과 감성의 균형이 잘 맞아요.' },
+  'fire,earth': { score: 60, desc: '불의 충동성과 땅의 신중함이 부딪히기 쉬운 조합이에요. 답답하게 느껴질 때도 있지만, 서로의 약점을 채워주는 보완재가 될 수 있어요.' },
+  'earth,air':  { score: 58, desc: '현실적인 땅과 이상을 좇는 공기가 부딪히기 쉬운 조합이에요. 갈등이 생기기도 하지만 그만큼 서로에게 배우는 점도 많아요.' },
+  'air,water':  { score: 56, desc: '논리로 접근하는 공기와 감정으로 접근하는 물이 서로 다른 방식이라 오해가 생기기 쉬운 조합이에요. 표현 방식의 차이를 이해하는 데 시간이 필요해요.' },
+  'fire,water': { score: 42, desc: '물이 불을 끄듯, 네 원소 조합 중 가장 도전적인 관계로 꼽혀요. 직진하는 불의 화법과 섬세한 물의 감수성이 오해를 만들기 쉬워 대화로 채워가는 노력이 특히 중요해요.' },
+};
+
+function getZodiacMatchup(elA, elB) {
+  const key1 = `${elA},${elB}`, key2 = `${elB},${elA}`;
+  return ZODIAC_MATRIX[key1] || ZODIAC_MATRIX[key2];
+}
+
+function renderSignCard(elId, sign) {
+  const el = document.getElementById(elId);
+  const info = ZODIAC_ELEMENT_INFO[sign.element];
+  el.innerHTML = `
+    <span class="emoji">${sign.emoji}</span>
+    <span class="name">${sign.name}</span>
+    <div class="range">${sign.range}</div>
+    <span class="el-tag" style="background:${info.color}">${info.label}의 기운</span>
+  `;
+}
+
+document.getElementById('zodiacBtn').addEventListener('click', () => {
+  const d1 = getDateValue('zDate1');
+  const d2 = getDateValue('zDate2');
+  const errEl = document.getElementById('zodiacErrorMsg');
+  if (!d1 || !d2) {
+    errEl.style.display = 'block';
+    document.getElementById('zodiacResult').classList.remove('show');
+    return;
+  }
+  errEl.style.display = 'none';
+
+  const [, m1, dd1] = d1.split('-').map(Number);
+  const [, m2, dd2] = d2.split('-').map(Number);
+  const sign1 = getZodiacSign(m1, dd1);
+  const sign2 = getZodiacSign(m2, dd2);
+  const matchup = getZodiacMatchup(sign1.element, sign2.element);
+
+  renderSignCard('zCard1', sign1);
+  renderSignCard('zCard2', sign2);
+  const tier = renderScoreUI('zodiac', matchup.score);
+
+  const el1 = ZODIAC_ELEMENT_INFO[sign1.element].label;
+  const el2 = ZODIAC_ELEMENT_INFO[sign2.element].label;
+  document.getElementById('zReason').textContent =
+    `${sign1.name}(${el1}의 기운)와 ${sign2.name}(${el2}의 기운)의 조합: ${matchup.desc}`;
+  showBox('zodiacResult');
+
+  const n1 = document.getElementById('zName1').value.trim() || '첫 번째 분';
+  const n2 = document.getElementById('zName2').value.trim() || '두 번째 분';
+  lastZodiacResult = { sign1, sign2, matchup, tier, name1: n1, name2: n2 };
+  playScoreSfx(matchup.score);
+});
+
+// ============================================================
+// 혈액형 궁합
+// ============================================================
+const BLOOD_TRAITS = {
+  A:  '꼼꼼하고 신중하며 책임감이 강해요. 계획적으로 움직이는 걸 좋아하고, 배려심이 깊은 편이에요.',
+  B:  '자유분방하고 개성이 강해요. 마이웨이 기질이 있고, 관심 있는 일에는 몰입도가 아주 높아요.',
+  O:  '사교적이고 리더십이 있어요. 통이 크고 목표 지향적이며, 사람들과 잘 어울리는 편이에요.',
+  AB: '이성적이고 개성이 뚜렷해요. 두 가지 상반된 모습을 함께 가지고 있어 예측하기 어려운 매력이 있어요.',
+};
+
+const BLOOD_MATRIX = {
+  'O,A':  { score: 85, desc: 'O형의 리더십과 A형의 세심함이 잘 맞물려요. O형이 이끌고 A형이 꼼꼼히 챙겨주는 조합이에요.' },
+  'O,B':  { score: 82, desc: '자유로운 B형과 통 큰 O형이 잘 어울려요. 서로의 다름을 매력으로 느끼는 편이에요.' },
+  'O,O':  { score: 65, desc: '둘 다 주도적인 성향이라 케미가 화끈하지만, 주도권을 두고 신경전이 벌어질 수도 있어요.' },
+  'O,AB': { score: 60, desc: 'O형의 직진성과 AB형의 복잡한 매력이 처음엔 낯설 수 있지만, 서로 신선한 자극이 되기도 해요.' },
+  'A,A':  { score: 88, desc: '서로 배려심이 깊어 잔잔하지만 편안하게 잘 맞는 조합이에요. 다만 너무 서로 눈치를 볼 때도 있어요.' },
+  'A,B':  { score: 55, desc: '계획적인 A형과 즉흥적인 B형의 스타일 차이로 부딪힐 수 있어요. 다름을 인정하면 균형 잡힌 관계가 돼요.' },
+  'A,AB': { score: 84, desc: 'A형의 성실함과 AB형의 아이디어가 만나 좋은 시너지를 내는 조합이에요.' },
+  'B,B':  { score: 68, desc: '자유로운 영혼끼리 잘 통하지만, 서로 챙겨주는 것에는 소홀해질 수 있어요.' },
+  'B,AB': { score: 86, desc: '톡톡 튀는 매력끼리 서로 끌리는 조합이에요. 대화가 잘 통하고 함께 있으면 즐거워요.' },
+  'AB,AB':{ score: 58, desc: '서로 예측 불가능한 매력에 신비롭게 끌리지만, 둘 다 종잡을 수 없어 피곤해질 때도 있어요.' },
+};
+
+function getBloodMatchup(t1, t2) {
+  const key1 = `${t1},${t2}`, key2 = `${t2},${t1}`;
+  return BLOOD_MATRIX[key1] || BLOOD_MATRIX[key2];
+}
+
+document.getElementById('bloodBtn').addEventListener('click', () => {
+  const t1 = document.getElementById('bType1').value;
+  const t2 = document.getElementById('bType2').value;
+  const n1 = document.getElementById('bName1').value.trim() || '첫 번째 분';
+  const n2 = document.getElementById('bName2').value.trim() || '두 번째 분';
+  const matchup = getBloodMatchup(t1, t2);
+
+  const tier = renderScoreUI('blood', matchup.score);
+  document.getElementById('bTrait1Title').textContent = `${n1}님 (${t1}형)의 특징`;
+  document.getElementById('bTrait1').textContent = BLOOD_TRAITS[t1];
+  document.getElementById('bTrait2Title').textContent = `${n2}님 (${t2}형)의 특징`;
+  document.getElementById('bTrait2').textContent = BLOOD_TRAITS[t2];
+  document.getElementById('bReason').textContent = `${t1}형과 ${t2}형의 조합: ${matchup.desc}`;
+  showBox('bloodResult');
+
+  lastBloodResult = { t1, t2, n1, n2, matchup, tier };
+  playScoreSfx(matchup.score);
+});
+
+// ============================================================
+// MBTI 궁합 (E/I, S/N, T/F, J/P 4개 지표 비교)
+// ============================================================
+const MBTI_TRAITS = {
+  INTJ: '치밀한 전략가 — 목표를 향해 체계적으로 움직이는 타입이에요.',
+  INTP: '논리적인 사색가 — 호기심이 많고 아이디어를 깊이 파고드는 타입이에요.',
+  ENTJ: '대담한 지휘관 — 목표 지향적이고 리더십이 강한 타입이에요.',
+  ENTP: '재기발랄한 논쟁가 — 새로운 아이디어와 토론을 즐기는 타입이에요.',
+  INFJ: '통찰력 있는 조언가 — 깊이 있는 공감과 신념을 가진 타입이에요.',
+  INFP: '이상을 좇는 중재자 — 따뜻한 감성과 뚜렷한 가치관을 가진 타입이에요.',
+  ENFJ: '사람을 이끄는 선도자 — 타인을 챙기고 이끄는 데 탁월한 타입이에요.',
+  ENFP: '열정적인 활동가 — 에너지 넘치고 사람을 좋아하는 타입이에요.',
+  ISTJ: '신뢰할 수 있는 관리자 — 성실하고 원칙을 중시하는 타입이에요.',
+  ISFJ: '다정한 수호자 — 세심하게 주변을 챙기는 헌신적인 타입이에요.',
+  ESTJ: '체계적인 경영자 — 효율과 질서를 중시하는 실행력 있는 타입이에요.',
+  ESFJ: '사교적인 외교관 — 배려심이 많고 분위기를 잘 챙기는 타입이에요.',
+  ISTP: '만능 재주꾼 — 손재주가 좋고 문제를 실용적으로 해결하는 타입이에요.',
+  ISFP: '자유로운 예술가 — 감성적이고 자기만의 방식을 존중하는 타입이에요.',
+  ESTP: '모험을 즐기는 사업가 — 순발력 있고 행동파인 타입이에요.',
+  ESFP: '자유로운 연예인 — 즉흥적이고 분위기를 살리는 타입이에요.',
+};
+
+const MBTI_AXES = [
+  {
+    key: 'EI', a: 'E', b: 'I', label: { E: '외향(E)', I: '내향(I)' },
+    same: { delta: 5, text: (l) => `두 분 다 ${l} 성향이라 에너지를 쓰는 방식이 비슷해서 서로를 이해하기 쉬워요.` },
+    diff: { delta: 10, text: (lA, lB) => `한 분은 ${lA}, 다른 분은 ${lB}라서 외향의 활기와 내향의 차분함이 서로를 보완해줘요.` },
+  },
+  {
+    key: 'SN', a: 'S', b: 'N', label: { S: '현실(S)', N: '직관(N)' },
+    same: { delta: 16, text: (l) => `두 분 다 ${l} 성향이라 정보를 받아들이고 세상을 보는 방식이 비슷해서 대화가 잘 통해요.` },
+    diff: { delta: -6, text: (lA, lB) => `한 분은 ${lA}, 다른 분은 ${lB}라서 현실적인 시각과 직관적인 시각이 달라 대화 코드가 어긋날 때가 있어요.` },
+  },
+  {
+    key: 'TF', a: 'T', b: 'F', label: { T: '사고(T)', F: '감정(F)' },
+    same: { delta: 11, text: (l) => `두 분 다 ${l} 성향이라 판단 기준이 비슷해서 갈등이 상대적으로 적은 편이에요.` },
+    diff: { delta: -2, text: (lA, lB) => `한 분은 ${lA}, 다른 분은 ${lB}라서 논리와 감정 중 우선순위가 달라 의견 차이가 생기기 쉬워요.` },
+  },
+  {
+    key: 'JP', a: 'J', b: 'P', label: { J: '계획(J)', P: '인식(P)' },
+    same: { delta: 8, text: (l) => `두 분 다 ${l} 성향이라 생활 리듬과 일 처리 속도가 잘 맞아요.` },
+    diff: { delta: 4, text: (lA, lB) => `한 분은 ${lA}, 다른 분은 ${lB}라서 계획적인 스타일과 즉흥적인 스타일이 만나 서로 다른 매력에 끌리지만 조율이 필요해요.` },
+  },
+];
+const MBTI_BASE_SCORE = 45;
+
+// 실제 MBTI 궁합 콘텐츠(testmoa.com 등)에서 자주 언급되는 유형별 "최고 궁합/최악 궁합" 2개씩을 근거로 정리한 데이터
+// 출처: https://testmoa.com/mbti-compatibility-chart/ (검색 결과 기반, 절대적 기준이 아닌 대중적으로 자주 언급되는 조합)
+const MBTI_MATCH_DATA = {
+  INTJ: { best: ['ENFP', 'ENTP'], bestReason: '직관과 창의성이 만나 서로에게 강한 지적 자극을 줘요.', worst: ['ESFP', 'ESTP'], worstReason: '감각적이고 즉흥적인 유형과는 계획성에서 부딪히기 쉬워요.' },
+  INTP: { best: ['ENTJ', 'ENFJ'], bestReason: '이성적인 사고가 잘 통하고, 상대가 INTP에게 부족한 구조와 추진력을 채워줘요.', worst: ['ESFJ', 'ISFJ'], worstReason: '관리자형 특유의 체계와 규칙 중심 사고가 INTP에게는 답답하게 느껴질 수 있어요.' },
+  ENTJ: { best: ['INTP', 'INFP'], bestReason: '깊이 있는 사고를 가진 상대와 만나 분석력과 실행력이 상호보완돼요.', worst: ['ISFP', 'ESFP'], worstReason: '우선순위와 속도가 달라 부딪히기 쉬워요.' },
+  ENTP: { best: ['INFJ', 'INTJ'], bestReason: '창의적인 아이디어를 마음껏 주고받을 수 있는 지적 파트너예요.', worst: ['ISFJ', 'ESFJ'], worstReason: '안정과 규칙을 중시하는 유형과는 생활 방식이 크게 달라요.' },
+  INFJ: { best: ['ENFP', 'ENTP'], bestReason: '감정의 깊이와 통찰이 잘 어우러지는, 흔히 "소울메이트 조합"으로 불리는 궁합이에요.', worst: ['ESTP', 'ESTJ'], worstReason: '현재 중심적인 성향과 장기적인 시선이 자주 부딪혀요.' },
+  INFP: { best: ['ENFJ', 'ENTJ'], bestReason: '그라운딩해주는 상대를 만나 이상을 현실로 옮기는 데 힘을 얻어요.', worst: ['ESTJ', 'ISTJ'], worstReason: '현실과 이상이 충돌하기 쉽고, 직설적인 표현에 상처받기 쉬워요.' },
+  ENFJ: { best: ['INFP', 'ISFP'], bestReason: '돌봄과 공감이 오가는 조합으로 감정적 교류가 유독 잘 통해요.', worst: ['ISTP', 'ESTP'], worstReason: '세심한 감정 교류를 상대가 부담스러워할 수 있어요.' },
+  ENFP: { best: ['INFJ', 'INTJ'], bestReason: '열정과 직관이 만나 끝없이 대화가 이어지는 조합이에요.', worst: ['ISTJ', 'ESTJ'], worstReason: '자유로움과 체계 사이에서 온도차가 커요.' },
+  ISTJ: { best: ['ESFP', 'ESTP'], bestReason: '자유로움과 체계성이 균형을 이루는 대표적인 보완형 궁합이에요.', worst: ['ENFP', 'INFP'], worstReason: '계획과 즉흥성 사이에서 자주 엇갈려요.' },
+  ISFJ: { best: ['ESFP', 'ESTP'], bestReason: '차분한 안정감과 활력이 잘 어우러지는 조합이에요.', worst: ['ENTP', 'INTP'], worstReason: '안정보다 변화와 새로움을 추구하는 유형과는 생활 리듬이 달라요.' },
+  ESTJ: { best: ['ISFP', 'ISTP'], bestReason: '결단력 있는 리더십과 유연한 감성이 만나 서로를 다독여줘요.', worst: ['INFP', 'INFJ'], worstReason: '결과 중시와 과정 중시, 서로 우선순위가 달라요.' },
+  ESFJ: { best: ['ISFP', 'ISTP'], bestReason: '따뜻한 배려를 알아주고 편안하게 받아주는 조합이에요.', worst: ['INTP', 'ENTP'], worstReason: '감정 중심과 사고 중심, 의사결정 방식이 서로 달라요.' },
+  ISTP: { best: ['ESTJ', 'ESFJ'], bestReason: '체계적인 유형과 만나면 실무적인 협력이 특히 잘 맞아요.', worst: ['ENFJ', 'INFJ'], worstReason: '깊은 감정 교류를 다소 부담스러워할 수 있어요.' },
+  ISFP: { best: ['ESTJ', 'ENTJ'], bestReason: '뚜렷한 리더십과 섬세한 감성이 조화를 이루는 보완형 궁합이에요.', worst: ['ENTP', 'INTP'], worstReason: '관심사와 생활 속도가 달라 엇갈리기 쉬워요.' },
+  ESTP: { best: ['ISTJ', 'ISFJ'], bestReason: '즉흥적인 매력과 안정감이 만나 서로를 보완해줘요.', worst: ['INFJ', 'INFP'], worstReason: '계획적인 상대와는 "계획 vs 즉흥"으로 부딪히기 쉬워요.' },
+  ESFP: { best: ['ISTJ', 'ISFJ'], bestReason: '순간을 즐기는 매력을 든든하게 받아주는 조합이에요.', worst: ['INTJ', 'INTP'], worstReason: '미래 중심적인 계획형과는 서로 조율이 많이 필요해요.' },
+};
+
+function computeMbtiCompat(type1, type2) {
+  const reasons = {};
+  MBTI_AXES.forEach((axis, i) => {
+    const c1 = type1[i], c2 = type2[i];
+    reasons[axis.key] = (c1 === c2)
+      ? axis.same.text(axis.label[c1])
+      : axis.diff.text(axis.label[c1], axis.label[c2]);
+  });
+
+  const d1 = MBTI_MATCH_DATA[type1], d2 = MBTI_MATCH_DATA[type2];
+  let tag = 'neutral', score, special = null;
+
+  if (type1 === type2) {
+    tag = 'identity';
+    score = 68;
+    special = { title: '🪞 같은 유형끼리의 궁합', text: `두 분 다 ${type1}라서 서로를 아주 잘 이해하지만, 비슷한 강점과 약점을 공유하다 보니 새로운 자극은 조금 부족할 수 있어요.` };
+  } else if (d1.best.includes(type2) || d2.best.includes(type1)) {
+    tag = 'best';
+    score = 90;
+    special = { title: '💘 자주 언급되는 찰떡 궁합', text: d1.best.includes(type2) ? d1.bestReason : d2.bestReason };
+  } else if (d1.worst.includes(type2) || d2.worst.includes(type1)) {
+    tag = 'worst';
+    score = 38;
+    special = { title: '⚡ 부딪히기 쉬운 것으로 알려진 조합', text: d1.worst.includes(type2) ? d1.worstReason : d2.worstReason };
+  } else {
+    score = MBTI_BASE_SCORE;
+    MBTI_AXES.forEach((axis, i) => {
+      const c1 = type1[i], c2 = type2[i];
+      score += (c1 === c2) ? axis.same.delta : axis.diff.delta;
+    });
+    score = clamp(Math.round(score), 40, 85);
+  }
+
+  return { score: clamp(Math.round(score), 0, 100), reasons, tag, special };
+}
+
+document.getElementById('mbtiBtn').addEventListener('click', () => {
+  const type1 = document.getElementById('mType1').value;
+  const type2 = document.getElementById('mType2').value;
+  const n1 = document.getElementById('mName1').value.trim() || '첫 번째 분';
+  const n2 = document.getElementById('mName2').value.trim() || '두 번째 분';
+  const result = computeMbtiCompat(type1, type2);
+
+  const tier = renderScoreUI('mbti', result.score);
+  const specialBox = document.getElementById('mSpecialBox');
+  if (result.special) {
+    specialBox.style.display = '';
+    document.getElementById('mSpecialTitle').textContent = result.special.title;
+    document.getElementById('mSpecialText').textContent = result.special.text;
+  } else {
+    specialBox.style.display = 'none';
+  }
+  document.getElementById('mTrait1Title').textContent = `${n1}님 (${type1})의 특징`;
+  document.getElementById('mTrait1').textContent = MBTI_TRAITS[type1];
+  document.getElementById('mTrait2Title').textContent = `${n2}님 (${type2})의 특징`;
+  document.getElementById('mTrait2').textContent = MBTI_TRAITS[type2];
+  document.getElementById('mReasonEI').textContent = result.reasons.EI;
+  document.getElementById('mReasonSN').textContent = result.reasons.SN;
+  document.getElementById('mReasonTF').textContent = result.reasons.TF;
+  document.getElementById('mReasonJP').textContent = result.reasons.JP;
+  showBox('mbtiResult');
+
+  lastMbtiResult = { type1, type2, n1, n2, result, tier };
+  playScoreSfx(result.score);
+});
+
+// ============================================================
+// 종합 궁합 (이름 + 사주 + 별자리 + 혈액형 평균)
+// ============================================================
+populateHourSelect(document.getElementById('cbHour1'));
+populateHourSelect(document.getElementById('cbHour2'));
+
+function renderComboBreakdown(items) {
+  const el = document.getElementById('comboBreakdown');
+  el.innerHTML = '';
+  items.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'combo-row';
+    row.innerHTML = `
+      <div class="combo-row-head"><span class="label">${item.icon} ${item.label}</span><span class="score">${item.score}점</span></div>
+      <div class="combo-bar-track"><div class="combo-bar-fill" style="width:${item.score}%"></div></div>
+      <p>${item.desc}</p>
+    `;
+    el.appendChild(row);
+  });
+}
+
+document.getElementById('comboBtn').addEventListener('click', () => {
+  const name1 = document.getElementById('cbName1').value.trim();
+  const name2 = document.getElementById('cbName2').value.trim();
+  const d1 = getDateValue('cbDate1');
+  const d2 = getDateValue('cbDate2');
+  const errEl = document.getElementById('comboErrorMsg');
+  const hangulRegex = /[가-힣]/;
+
+  if (!name1 || !name2 || !hangulRegex.test(name1) || !hangulRegex.test(name2) || !d1 || !d2) {
+    errEl.style.display = 'block';
+    document.getElementById('comboResult').classList.remove('show');
+    return;
+  }
+  errEl.style.display = 'none';
+
+  // 1) 이름 궁합
+  const a1 = analyzeName(name1), a2 = analyzeName(name2);
+  const nameScore = computeScore(a1.breakdown, a2.breakdown);
+
+  // 2) 사주 궁합
+  const [y1, m1, dd1] = d1.split('-').map(Number);
+  const [y2, m2, dd2] = d2.split('-').map(Number);
+  const h1 = document.getElementById('cbHour1').value;
+  const h2 = document.getElementById('cbHour2').value;
+  const hb1 = h1 === 'unknown' ? null : HOUR_BLOCKS.find(hb => hb.value === h1).branch;
+  const hb2 = h2 === 'unknown' ? null : HOUR_BLOCKS.find(hb => hb.value === h2).branch;
+  const sajuRes = computeSajuCompat(y1, m1, dd1, hb1, y2, m2, dd2, hb2);
+
+  // 3) 별자리 궁합
+  const sign1 = getZodiacSign(m1, dd1);
+  const sign2 = getZodiacSign(m2, dd2);
+  const zodiacMatch = getZodiacMatchup(sign1.element, sign2.element);
+
+  // 4) 혈액형 궁합
+  const t1 = document.getElementById('cbType1').value;
+  const t2 = document.getElementById('cbType2').value;
+  const bloodMatch = getBloodMatchup(t1, t2);
+
+  // 5) MBTI 궁합
+  const mbti1 = document.getElementById('cbMbti1').value;
+  const mbti2 = document.getElementById('cbMbti2').value;
+  const mbtiRes = computeMbtiCompat(mbti1, mbti2);
+
+  const overall = Math.round((nameScore + sajuRes.score + zodiacMatch.score + bloodMatch.score + mbtiRes.score) / 5);
+
+  const tier = renderScoreUI('combo', overall);
+  renderComboBreakdown([
+    { icon: '💞', label: '이름 궁합', score: nameScore, desc: `총 획수 ${a1.total}획과 ${a2.total}획을 전통 이름 궁합 계산법(피라미드 획수 감산법)으로 계산한 점수예요.` },
+    { icon: '🀄', label: '사주 궁합', score: sajuRes.score, desc: sajuRes.ilganText },
+    { icon: sign1.emoji + sign2.emoji, label: '별자리 궁합', score: zodiacMatch.score, desc: `${sign1.name}와 ${sign2.name}: ${zodiacMatch.desc}` },
+    { icon: '🩸', label: '혈액형 궁합', score: bloodMatch.score, desc: `${t1}형과 ${t2}형: ${bloodMatch.desc}` },
+    { icon: '🧩', label: 'MBTI 궁합', score: mbtiRes.score, desc: `${mbti1}와 ${mbti2}: ${mbtiRes.reasons.SN}` },
+  ]);
+  showBox('comboResult');
+
+  lastComboResult = {
+    name1, name2, overall, tier,
+    breakdown: [
+      { label: '이름궁합', score: nameScore },
+      { label: '사주궁합', score: sajuRes.score },
+      { label: '별자리궁합', score: zodiacMatch.score },
+      { label: '혈액형궁합', score: bloodMatch.score },
+      { label: 'MBTI궁합', score: mbtiRes.score },
+    ],
+  };
+  playScoreSfx(overall);
+});
+
+// ============================================================
+// 스토리 이미지 (인스타그램 스토리용 카드 생성)
+// ============================================================
+let lastNameResult = null;
+let lastSajuResult = null;
+let lastSajuCompatResult = null;
+let lastZodiacResult = null;
+let lastBloodResult = null;
+let lastMbtiResult = null;
+let lastComboResult = null;
+
+const THEME_BY_TIER = [
+  { bgFrom: '#fff176', bgTo: '#ffca28', stickers: ['🐥','✨','💕','🌼','⭐','🐣','✨'] },
+  { bgFrom: '#ffe082', bgTo: '#ffb300', stickers: ['🐥','🌻','✨','🐤','🌼','💫','⭐'] },
+  { bgFrom: '#fff9c4', bgTo: '#ffe57f', stickers: ['😊','🌼','☀️','✨','🍀','🐥','⭐'] },
+  { bgFrom: '#ffecb3', bgTo: '#ffca80', stickers: ['🙂','☁️','💧','🌾','✨','🐤','⭐'] },
+  { bgFrom: '#f2dd9a', bgTo: '#d9b35c', stickers: ['😅','🌧️','🍂','💭','✨','🌙','⭐'] },
+  { bgFrom: '#e0bd6b', bgTo: '#b8873a', stickers: ['😬','🌙','⭐','✨','🔮','🌌','💫'] },
+];
+const SAJU_THEME = { bgFrom: '#ffe9a8', bgTo: '#ffca28', stickers: ['🔮','✨','⭐','🌙','💫','🀄','🐥'] };
+
+const STICKER_SPOTS = [
+  { x: 120, y: 180, size: 100, rot: -18 },
+  { x: 960, y: 215, size: 120, rot: 14 },
+  { x: 985, y: 800, size: 95, rot: -12 },
+  { x: 85, y: 850, size: 100, rot: 16 },
+  { x: 115, y: 1765, size: 100, rot: -10 },
+  { x: 965, y: 1775, size: 110, rot: 12 },
+];
+
+// 카드 프레임 좌표
+const CARD_X = 70, CARD_Y = 190, CARD_W = 940, CARD_H = 1540, CARD_R = 60;
+const CARD_CX = CARD_X + CARD_W / 2; // 540
+
+function tierIndexFromScore(score) {
+  return TIERS.findIndex(t => score >= t.min);
+}
+
+function roundRectPath(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function wrapCanvasText(ctx, text, cx, y, maxWidth, lineHeight, maxLines = 5) {
+  const words = text.split(' ');
+  const lines = [];
+  let line = '';
+  for (let n = 0; n < words.length; n++) {
+    const testLine = line + words[n] + ' ';
+    if (ctx.measureText(testLine).width > maxWidth && line !== '') {
+      lines.push(line.trim());
+      line = words[n] + ' ';
+    } else {
+      line = testLine;
+    }
+  }
+  if (line) lines.push(line.trim());
+
+  if (lines.length > maxLines) {
+    lines.length = maxLines;
+    lines[maxLines - 1] += '…';
+  }
+  lines.forEach((l, i) => ctx.fillText(l, cx, y + i * lineHeight));
+  return y + lines.length * lineHeight;
+}
+
+function drawStoryBackground(ctx, theme) {
+  const grad = ctx.createLinearGradient(0, 0, 1080, 1920);
+  grad.addColorStop(0, theme.bgFrom);
+  grad.addColorStop(1, theme.bgTo);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 1080, 1920);
+
+  ctx.save();
+  ctx.globalAlpha = 0.32;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  STICKER_SPOTS.forEach((spot, i) => {
+    const emoji = theme.stickers[i % theme.stickers.length];
+    ctx.save();
+    ctx.translate(spot.x, spot.y);
+    ctx.rotate(spot.rot * Math.PI / 180);
+    ctx.font = `${spot.size}px 'Malgun Gothic', sans-serif`;
+    ctx.fillText(emoji, 0, 0);
+    ctx.restore();
+  });
+  ctx.restore();
+}
+
+function drawStoryCardFrame(ctx) {
+  // 은은한 그라데이션 테두리
+  ctx.save();
+  const borderGrad = ctx.createLinearGradient(CARD_X, CARD_Y, CARD_X + CARD_W, CARD_Y + CARD_H);
+  borderGrad.addColorStop(0, '#ffe082');
+  borderGrad.addColorStop(0.5, '#ffca28');
+  borderGrad.addColorStop(1, '#ffb300');
+  ctx.shadowColor = 'rgba(0,0,0,0.22)';
+  ctx.shadowBlur = 55;
+  ctx.shadowOffsetY = 18;
+  ctx.fillStyle = borderGrad;
+  roundRectPath(ctx, CARD_X - 7, CARD_Y - 7, CARD_W + 14, CARD_H + 14, CARD_R + 7);
+  ctx.fill();
+  ctx.restore();
+
+  // 카드 본체
+  ctx.save();
+  ctx.fillStyle = '#fffdf2';
+  roundRectPath(ctx, CARD_X, CARD_Y, CARD_W, CARD_H, CARD_R);
+  ctx.fill();
+  ctx.restore();
+
+  // 금색 모서리 장식 (네 귀퉁이)
+  drawGoldCorner(ctx, CARD_X + 22, CARD_Y + 22, 1, 1);
+  drawGoldCorner(ctx, CARD_X + CARD_W - 22, CARD_Y + 22, -1, 1);
+  drawGoldCorner(ctx, CARD_X + 22, CARD_Y + CARD_H - 22, 1, -1);
+  drawGoldCorner(ctx, CARD_X + CARD_W - 22, CARD_Y + CARD_H - 22, -1, -1);
+
+  // 벚꽃 가지 (좌상단) & 잎사귀 (우상단)
+  drawBlossomBranch(ctx, CARD_X + 66, CARD_Y + 8, 0.62, 1);
+  drawLeafSprig(ctx, CARD_X + CARD_W - 66, CARD_Y + 8, 0.62);
+}
+
+function drawGoldCorner(ctx, x, y, flipX, flipY) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(flipX, flipY);
+  const g = ctx.createLinearGradient(0, 0, 58, 58);
+  g.addColorStop(0, '#ffe29a');
+  g.addColorStop(1, '#dba43f');
+  ctx.strokeStyle = g;
+  ctx.lineCap = 'round';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(56, 0);
+  ctx.lineTo(12, 0);
+  ctx.quadraticCurveTo(0, 0, 0, 12);
+  ctx.lineTo(0, 56);
+  ctx.stroke();
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(42, 15);
+  ctx.lineTo(22, 15);
+  ctx.quadraticCurveTo(15, 15, 15, 22);
+  ctx.lineTo(15, 42);
+  ctx.stroke();
+  ctx.fillStyle = '#ffb300';
+  heartPath(ctx, 27, 19, 15, 15);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawBlossomCluster(ctx, cx, cy, scale) {
+  for (let i = 0; i < 5; i++) {
+    const a = (i / 5) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.ellipse(cx + Math.cos(a) * 6 * scale, cy + Math.sin(a) * 6 * scale, 6 * scale, 4 * scale, a, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff3b0';
+    ctx.fill();
+  }
+  ctx.beginPath();
+  ctx.arc(cx, cy, 3 * scale, 0, Math.PI * 2);
+  ctx.fillStyle = '#ff9800';
+  ctx.fill();
+}
+
+function drawBlossomBranch(ctx, x, y, scale, mirror) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(mirror * scale, scale);
+  ctx.strokeStyle = '#9a6a4f';
+  ctx.lineWidth = 4;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(-4, 130);
+  ctx.bezierCurveTo(8, 90, -12, 55, 18, 5);
+  ctx.stroke();
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(4, 78);
+  ctx.quadraticCurveTo(28, 62, 38, 40);
+  ctx.stroke();
+  [[18, 5], [38, 40], [4, 78], [-8, 105], [12, 50], [26, 20]].forEach(([dx, dy]) => drawBlossomCluster(ctx, dx, dy, 1.25));
+  ctx.restore();
+}
+
+function drawLeafSprig(ctx, x, y, scale) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(-scale, scale);
+  ctx.strokeStyle = '#8fae6b';
+  ctx.lineWidth = 4;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(-4, 120);
+  ctx.bezierCurveTo(6, 85, -8, 50, 14, 5);
+  ctx.stroke();
+  const leaves = [[16, 10], [2, 45], [16, 45], [-6, 80], [10, 80]];
+  leaves.forEach(([dx, dy], i) => {
+    ctx.save();
+    ctx.translate(dx, dy);
+    ctx.rotate((i % 2 === 0 ? -1 : 1) * 0.5);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 13, 6, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#a8cf85';
+    ctx.fill();
+    ctx.restore();
+  });
+  ctx.restore();
+}
+
+function drawEmojiGlow(ctx, cx, cy, radius) {
+  const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+  g.addColorStop(0, 'rgba(255,213,79,0.55)');
+  g.addColorStop(1, 'rgba(255,213,79,0)');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawGradientDivider(ctx, y, width) {
+  const x1 = CARD_CX - width / 2, x2 = CARD_CX + width / 2;
+  const g = ctx.createLinearGradient(x1, 0, x2, 0);
+  g.addColorStop(0, 'rgba(255,179,0,0)');
+  g.addColorStop(0.5, 'rgba(255,179,0,0.55)');
+  g.addColorStop(1, 'rgba(255,179,0,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(x1, y, width, 3);
+}
+
+function heartPath(ctx, x, y, width, height) {
+  ctx.beginPath();
+  const t = height * 0.3;
+  ctx.moveTo(x, y + t);
+  ctx.bezierCurveTo(x, y, x - width / 2, y, x - width / 2, y + t);
+  ctx.bezierCurveTo(x - width / 2, y + (height + t) / 2, x, y + (height + t) / 2, x, y + height);
+  ctx.bezierCurveTo(x, y + (height + t) / 2, x + width / 2, y + (height + t) / 2, x + width / 2, y + t);
+  ctx.bezierCurveTo(x + width / 2, y, x, y, x, y + t);
+  ctx.closePath();
+}
+
+function drawKawaiiHeart(ctx, cx, topY, w, h, color, expression) {
+  expression = expression || 'happy'; // 'happy' | 'neutral' | 'worried'
+  heartPath(ctx, cx, topY, w, h);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+  ctx.stroke();
+
+  ctx.save();
+  ctx.globalAlpha = 0.45;
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.ellipse(cx - w * 0.18, topY + h * 0.4, w * 0.13, h * 0.09, -0.4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  const eyeY = topY + h * 0.52;
+  const eyeDX = w * 0.17;
+  [-1, 1].forEach(dir => {
+    ctx.fillStyle = '#3a2a2a';
+    ctx.beginPath();
+    ctx.arc(cx + dir * eyeDX, eyeY, w * 0.06, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(cx + dir * eyeDX + w * 0.02, eyeY - w * 0.022, w * 0.018, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  if (expression === 'happy') {
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = '#ff9eb5';
+    [-1, 1].forEach(dir => {
+      ctx.beginPath();
+      ctx.ellipse(cx + dir * w * 0.31, topY + h * 0.6, w * 0.075, h * 0.05, 0, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.restore();
+  }
+
+  ctx.strokeStyle = '#3a2a2a';
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  if (expression === 'happy') {
+    ctx.arc(cx, eyeY + h * 0.11, w * 0.09, 0.15 * Math.PI, 0.85 * Math.PI);
+  } else if (expression === 'worried') {
+    ctx.moveTo(cx - w * 0.08, eyeY + h * 0.17);
+    ctx.quadraticCurveTo(cx - w * 0.03, eyeY + h * 0.21, cx, eyeY + h * 0.17);
+    ctx.quadraticCurveTo(cx + w * 0.03, eyeY + h * 0.13, cx + w * 0.08, eyeY + h * 0.17);
+  } else {
+    ctx.moveTo(cx - w * 0.07, eyeY + h * 0.17);
+    ctx.lineTo(cx + w * 0.07, eyeY + h * 0.17);
+  }
+  ctx.stroke();
+
+  if (expression === 'worried') {
+    ctx.fillStyle = '#8fd0f5';
+    ctx.beginPath();
+    ctx.ellipse(cx + w * 0.34, topY + h * 0.22, w * 0.045, h * 0.06, 0.3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.fillStyle = color;
+  ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+  ctx.lineWidth = 2;
+  [-1, 1].forEach(dir => {
+    roundRectPath(ctx, cx + dir * w * 0.17 - w * 0.05, topY + h * 0.92, w * 0.1, h * 0.24, w * 0.05);
+    ctx.fill();
+    ctx.stroke();
+  });
+}
+
+function chickBodyPath(ctx, cx, topY, w, h) {
+  ctx.beginPath();
+  ctx.ellipse(cx, topY + h * 0.5, w * 0.5, h * 0.52, 0, 0, Math.PI * 2);
+  ctx.closePath();
+}
+
+function drawKawaiiChick(ctx, cx, topY, w, h, color, expression) {
+  expression = expression || 'happy'; // 'happy' | 'neutral' | 'worried'
+
+  chickBodyPath(ctx, cx, topY, w, h);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+  ctx.stroke();
+
+  // 정수리 깃털
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(cx - w * 0.03, topY - h * 0.01);
+  ctx.quadraticCurveTo(cx + w * 0.12, topY - h * 0.18, cx + w * 0.04, topY - h * 0.01);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+
+  // 날개
+  [-1, 1].forEach(dir => {
+    ctx.save();
+    ctx.translate(cx + dir * w * 0.42, topY + h * 0.62);
+    ctx.rotate(dir * 0.5);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, w * 0.15, h * 0.2, 0, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
+  });
+
+  ctx.save();
+  ctx.globalAlpha = 0.45;
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.ellipse(cx - w * 0.18, topY + h * 0.32, w * 0.13, h * 0.09, -0.4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  const eyeY = topY + h * 0.5;
+  const eyeDX = w * 0.16;
+  [-1, 1].forEach(dir => {
+    ctx.fillStyle = '#3a2a2a';
+    ctx.beginPath();
+    ctx.arc(cx + dir * eyeDX, eyeY, w * 0.06, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(cx + dir * eyeDX + w * 0.02, eyeY - w * 0.022, w * 0.018, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  if (expression === 'happy') {
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = '#ff9eb5';
+    [-1, 1].forEach(dir => {
+      ctx.beginPath();
+      ctx.ellipse(cx + dir * w * 0.29, topY + h * 0.58, w * 0.07, h * 0.045, 0, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.restore();
+  }
+
+  // 부리 (눈코입의 코+입 역할, 표정별로 모양이 달라짐)
+  const beakY = eyeY + h * 0.13;
+  ctx.fillStyle = '#ff9800';
+  ctx.strokeStyle = '#e07c00';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  if (expression === 'happy') {
+    ctx.moveTo(cx - w * 0.08, beakY);
+    ctx.quadraticCurveTo(cx, beakY + h * 0.09, cx + w * 0.08, beakY);
+    ctx.quadraticCurveTo(cx, beakY + h * 0.03, cx - w * 0.08, beakY);
+  } else if (expression === 'worried') {
+    ctx.ellipse(cx, beakY + h * 0.02, w * 0.05, h * 0.045, 0, 0, Math.PI * 2);
+  } else {
+    ctx.moveTo(cx - w * 0.07, beakY);
+    ctx.lineTo(cx + w * 0.07, beakY);
+    ctx.lineTo(cx, beakY + h * 0.06);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  if (expression === 'worried') {
+    ctx.fillStyle = '#8fd0f5';
+    ctx.beginPath();
+    ctx.ellipse(cx + w * 0.34, topY + h * 0.18, w * 0.045, h * 0.06, 0.3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.strokeStyle = '#ff9800';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  [-1, 1].forEach(dir => {
+    const fx = cx + dir * w * 0.17;
+    const fy = topY + h * 1.0;
+    ctx.beginPath();
+    ctx.moveTo(fx, fy);
+    ctx.lineTo(fx, fy + h * 0.14);
+    ctx.moveTo(fx - 4, fy + h * 0.14);
+    ctx.lineTo(fx, fy + h * 0.14);
+    ctx.lineTo(fx - 4, fy + h * 0.19);
+    ctx.moveTo(fx, fy + h * 0.14);
+    ctx.lineTo(fx + 4, fy + h * 0.19);
+    ctx.stroke();
+  });
+}
+
+function drawFluffyCloud(ctx, cx, cy, scale, color) {
+  ctx.save();
+  ctx.fillStyle = color || 'rgba(255,255,255,0.9)';
+  ctx.beginPath();
+  const bumps = [
+    [-72, 4, 32], [-32, -16, 38], [14, -18, 40], [55, 2, 32], [-8, 12, 46],
+  ];
+  bumps.forEach(([dx, dy, r]) => {
+    ctx.moveTo(cx + (dx + r) * scale, cy + dy * scale);
+    ctx.arc(cx + dx * scale, cy + dy * scale, r * scale, 0, Math.PI * 2);
+  });
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawRings(ctx, cx, cy, r) {
+  ctx.save();
+  const g = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+  g.addColorStop(0, '#ffe9ad');
+  g.addColorStop(1, '#d9a441');
+  ctx.strokeStyle = g;
+  ctx.lineWidth = r * 0.22;
+  ctx.beginPath();
+  ctx.arc(cx - r * 0.32, cy, r * 0.6, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(cx + r * 0.32, cy, r * 0.6, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.font = `${Math.round(r * 0.6)}px 'Malgun Gothic', sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('💎', cx - r * 0.32, cy - r * 0.62);
+  ctx.restore();
+}
+
+// tierIndex: TIERS/THEME_BY_TIER 순서 (0=천생연분 ... 5=신중이 필요한 궁합). 점수대가 낮을수록
+// 병아리 표정과 소품(반지/연꽃 → 구름/땀방울)이 차분하게 바뀐다.
+function drawStoryWatermark(ctx, tierIndex) {
+  tierIndex = tierIndex === undefined ? 0 : tierIndex;
+  const romantic = tierIndex <= 1;   // 최상위: 반지+연꽃+개구리 풀세트
+  const cheerful = tierIndex <= 2;   // 웃는 얼굴 유지
+  const worried = tierIndex >= 4;    // 땀방울 걱정스러운 표정
+  const expression = worried ? 'worried' : (cheerful ? 'happy' : 'neutral');
+  const cloudColor = tierIndex >= 4 ? 'rgba(203,208,224,0.92)' : 'rgba(255,255,255,0.9)';
+
+  drawFluffyCloud(ctx, 540, 1826, 0.5, cloudColor);
+  drawKawaiiChick(ctx, 500, 1750, 54, 60, '#ffd54f', expression);
+  drawKawaiiChick(ctx, 580, 1754, 48, 54, '#ffb74d', expression);
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  if (romantic) {
+    drawRings(ctx, 420, 1815, 26);
+  } else {
+    ctx.font = "30px 'Malgun Gothic', sans-serif";
+    ctx.fillText('✨', 420, 1815);
+  }
+
+  if (romantic) {
+    ctx.font = "34px 'Malgun Gothic', sans-serif";
+    ctx.fillText('🪷', 650, 1800);
+    ctx.font = "26px 'Malgun Gothic', sans-serif";
+    ctx.fillText('🐸', 668, 1830);
+  } else if (worried) {
+    ctx.font = "28px 'Malgun Gothic', sans-serif";
+    ctx.fillText('💧', 654, 1795);
+    ctx.fillText('💧', 672, 1826);
+  } else {
+    ctx.font = "30px 'Malgun Gothic', sans-serif";
+    ctx.fillText('⭐', 656, 1810);
+  }
+
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.font = "700 27px 'Malgun Gothic', sans-serif";
+  ctx.fillText('🐥 삐약궁합', 540, 1890);
+}
+
+function drawBow(ctx, cx, cy, scale) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(scale, scale);
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+
+  ctx.fillStyle = '#ffb300';
+  [-1, 1].forEach(dir => {
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.quadraticCurveTo(dir * 34, -26, dir * 46, 0);
+    ctx.quadraticCurveTo(dir * 34, 24, 0, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  });
+
+  ctx.fillStyle = '#ffb300';
+  [-1, 1].forEach(dir => {
+    ctx.beginPath();
+    ctx.moveTo(dir * 6, 5);
+    ctx.lineTo(dir * 17, 38);
+    ctx.lineTo(dir * 3, 30);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  });
+
+  ctx.fillStyle = '#c9770b';
+  ctx.beginPath();
+  ctx.arc(0, 0, 10, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawOrnateMedallion(ctx, cx, cy, r, emoji, tierIdx) {
+  drawEmojiGlow(ctx, cx, cy, r * 1.9);
+
+  const ringGrad = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+  ringGrad.addColorStop(0, '#ffe082');
+  ringGrad.addColorStop(0.5, '#ffc107');
+  ringGrad.addColorStop(1, '#ff9800');
+  ctx.save();
+  ctx.shadowColor = 'rgba(80,40,90,0.25)';
+  ctx.shadowBlur = 22;
+  ctx.shadowOffsetY = 8;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = ringGrad;
+  ctx.fill();
+  ctx.restore();
+
+  const pearlCount = 22;
+  for (let i = 0; i < pearlCount; i++) {
+    const a = (i / pearlCount) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.arc(cx + Math.cos(a) * r, cy + Math.sin(a) * r, r * 0.05, 0, Math.PI * 2);
+    ctx.fillStyle = '#fffaf0';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  const innerGrad = ctx.createRadialGradient(cx - r * 0.15, cy - r * 0.25, r * 0.1, cx, cy, r * 0.86);
+  innerGrad.addColorStop(0, '#fffdf7');
+  innerGrad.addColorStop(1, '#ffeee5');
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.82, 0, Math.PI * 2);
+  ctx.fillStyle = innerGrad;
+  ctx.fill();
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+  ctx.stroke();
+
+  if (tierIdx != null) {
+    const cr = r * 0.82;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, cr, 0, Math.PI * 2);
+    ctx.clip();
+    drawChickScene(ctx, cx, cy, cr * 0.92, tierIdx);
+    ctx.restore();
+
+    const badgeR = r * 0.32;
+    const badgeCx = cx + r * 0.62, badgeCy = cy + r * 0.62;
+    ctx.save();
+    ctx.shadowColor = 'rgba(80,40,90,0.25)';
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.arc(badgeCx, badgeCy, badgeR, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+    ctx.restore();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `${Math.round(badgeR * 1.3)}px 'Malgun Gothic', sans-serif`;
+    ctx.fillText(emoji, badgeCx, badgeCy + badgeR * 0.05);
+  } else {
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `${Math.round(r * 1.1)}px 'Malgun Gothic', sans-serif`;
+    ctx.fillText(emoji, cx, cy + r * 0.04);
+  }
+
+  drawBow(ctx, cx, cy - r * 1.08, 1);
+
+  ctx.font = `${Math.round(r * 0.32)}px 'Malgun Gothic', sans-serif`;
+  ctx.fillText('✨', cx - r * 1.25, cy - r * 0.45);
+  ctx.fillText('✨', cx + r * 1.25, cy - r * 0.25);
+  ctx.font = `${Math.round(r * 0.22)}px 'Malgun Gothic', sans-serif`;
+  ctx.fillText('💫', cx - r * 1.1, cy + r * 0.85);
+  ctx.fillText('💫', cx + r * 1.1, cy + r * 0.75);
+}
+
+function drawScoreCardHeader(ctx, titleText, emoji, tierIdx) {
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#b5650d';
+  ctx.font = "700 40px 'Malgun Gothic', sans-serif";
+  ctx.fillText(titleText, 540, 250);
+  drawOrnateMedallion(ctx, 540, 460, 140, emoji, tierIdx);
+}
+
+function drawScoreCardBody(ctx, namesText, score, tier, reasonText, extraLines) {
+  ctx.fillStyle = '#333344';
+  ctx.font = "700 44px 'Malgun Gothic', sans-serif";
+  ctx.fillText(namesText, 540, 650);
+
+  {
+    const scoreText = String(score);
+    const scoreFont = "800 168px 'Malgun Gothic', sans-serif";
+    const ptFont = "600 44px 'Malgun Gothic', sans-serif";
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.font = scoreFont;
+    const scoreWidth = ctx.measureText(scoreText).width;
+    ctx.font = ptFont;
+    const ptWidth = ctx.measureText('점').width;
+    const gap = 16;
+    const totalWidth = scoreWidth + gap + ptWidth;
+    const startX = 540 - totalWidth / 2;
+    const baselineY = 860;
+
+    ctx.fillStyle = '#ff5c8a';
+    ctx.font = scoreFont;
+    ctx.fillText(scoreText, startX, baselineY);
+
+    ctx.fillStyle = '#aa88cc';
+    ctx.font = ptFont;
+    ctx.fillText('점', startX + scoreWidth + gap, baselineY);
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+  }
+
+  ctx.fillStyle = '#333344';
+  ctx.font = "700 52px 'Malgun Gothic', sans-serif";
+  ctx.fillText(tier.title, 540, 990);
+
+  ctx.fillStyle = '#666677';
+  ctx.font = "400 31px 'Malgun Gothic', sans-serif";
+  let y = wrapCanvasText(ctx, tier.desc, 540, 1060, 760, 44, 3);
+
+  if (reasonText) {
+    y += 18;
+    drawGradientDivider(ctx, y, 460);
+    y += 40;
+    ctx.fillStyle = '#aa53a8';
+    ctx.font = "700 30px 'Malgun Gothic', sans-serif";
+    ctx.fillText('💡 왜 이 점수일까요?', 540, y);
+    y += 46;
+    ctx.fillStyle = '#555566';
+    ctx.font = "400 28px 'Malgun Gothic', sans-serif";
+    y = wrapCanvasText(ctx, reasonText, 540, y, 800, 38, 9);
+  }
+
+  if (extraLines && extraLines.length) {
+    y += 20;
+    extraLines.forEach(line => {
+      ctx.fillStyle = '#b5650d';
+      ctx.font = "700 30px 'Malgun Gothic', sans-serif";
+      ctx.fillText(line, 540, y);
+      y += 44;
+    });
+  }
+}
+
+function drawPillarChipCanvas(ctx, cx, topY, label, p) {
+  const boxW = 170, boxH = 84, gap = 10;
+  ctx.fillStyle = '#888899';
+  ctx.font = "600 26px 'Malgun Gothic', sans-serif";
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, cx, topY);
+
+  const stemY = topY + 46;
+  ctx.fillStyle = ELEMENT_INFO[p.stemElement].color;
+  roundRectPath(ctx, cx - boxW / 2, stemY, boxW, boxH, 18);
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = "800 40px 'Malgun Gothic', sans-serif";
+  ctx.fillText(p.stemHanja, cx, stemY + 30);
+  ctx.font = "600 22px 'Malgun Gothic', sans-serif";
+  ctx.fillText(p.stemChar, cx, stemY + 62);
+
+  const branchY = stemY + boxH + gap;
+  ctx.fillStyle = ELEMENT_INFO[p.branchElement].color;
+  roundRectPath(ctx, cx - boxW / 2, branchY, boxW, boxH, 18);
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = "800 40px 'Malgun Gothic', sans-serif";
+  ctx.fillText(p.branchHanja, cx, branchY + 30);
+  ctx.font = "600 22px 'Malgun Gothic', sans-serif";
+  ctx.fillText(p.branchChar, cx, branchY + 62);
+
+  ctx.fillStyle = '#888899';
+  ctx.font = "500 24px 'Malgun Gothic', sans-serif";
+  ctx.fillText(p.animal + '띠', cx, branchY + boxH + 34);
+}
+
+function drawPillBadge(ctx, text, cx, cy, bgColor) {
+  const font = "700 38px 'Malgun Gothic', sans-serif";
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = font;
+  const padX = 34, h = 72;
+  const w = ctx.measureText(text).width + padX * 2;
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.15)';
+  ctx.shadowBlur = 14;
+  ctx.shadowOffsetY = 4;
+  ctx.fillStyle = bgColor;
+  roundRectPath(ctx, cx - w / 2, cy - h / 2, w, h, h / 2);
+  ctx.fill();
+  ctx.restore();
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(text, cx, cy + 2);
+}
+
+function drawLabeledParagraph(ctx, label, text, y, maxLines) {
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#aa53a8';
+  ctx.font = "700 30px 'Malgun Gothic', sans-serif";
+  ctx.fillText(label, CARD_CX, y);
+  y += 42;
+  ctx.fillStyle = '#555566';
+  ctx.font = "400 30px 'Malgun Gothic', sans-serif";
+  return wrapCanvasText(ctx, text, CARD_CX, y, 780, 42, maxLines);
+}
+
+function renderStoryCard(kind) {
+  const canvas = document.getElementById('storyCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, 1080, 1920);
+
+  if (kind === 'saju') {
+    const { pillars, detail, name } = lastSajuResult;
+    drawStoryBackground(ctx, SAJU_THEME);
+    drawStoryCardFrame(ctx);
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    drawEmojiGlow(ctx, 540, 300, 130);
+    ctx.fillStyle = '#b5650d';
+    ctx.font = "700 42px 'Malgun Gothic', sans-serif";
+    ctx.fillText(name ? `🔮 ${name}님의 사주팔자` : '🔮 나의 사주팔자', 540, 290);
+
+    drawPillBadge(
+      ctx, `일간 ${pillars.day.stemChar}${pillars.day.stemHanja} · ${detail.keyword}`,
+      540, 385, ELEMENT_INFO[pillars.day.stemElement].color
+    );
+
+    const cols = [
+      { label: '년주', p: pillars.year },
+      { label: '월주', p: pillars.month },
+      { label: '일주', p: pillars.day },
+      { label: '시주', p: pillars.hour },
+    ];
+    const startX = 260, stepX = 190;
+    cols.forEach((c, i) => {
+      if (!c.p) return;
+      drawPillarChipCanvas(ctx, startX + stepX * i, 490, c.label, c.p);
+    });
+
+    let y = 880;
+    drawGradientDivider(ctx, y, 460); y += 40;
+    y = drawLabeledParagraph(ctx, '💭 기본 성향', detail.trait, y, 3);
+    y += 18; drawGradientDivider(ctx, y, 460); y += 40;
+    y = drawLabeledParagraph(ctx, '💪 강점', detail.strength, y, 3);
+    y += 18; drawGradientDivider(ctx, y, 460); y += 40;
+    y = drawLabeledParagraph(ctx, '⚠️ 유의할 점', detail.caution, y, 3);
+
+    drawStoryWatermark(ctx);
+  } else {
+    let titleText, emoji, namesText, score, tier, reasonText = null, extraLines = [];
+
+    if (kind === 'name') {
+      const r = lastNameResult;
+      const a1 = analyzeName(r.name1), a2 = analyzeName(r.name2);
+      titleText = '💞 이름 궁합'; emoji = r.tier.emoji;
+      namesText = `${r.name1}  💕  ${r.name2}`;
+      score = r.score; tier = r.tier;
+      reasonText = `${r.name1}님은 총 ${a1.total}획, ${r.name2}님은 총 ${a2.total}획이에요. 두 이름의 글자별 획수를 번갈아 배열한 뒤 피라미드처럼 더해 내려가는 전통 이름 궁합 계산법으로 산출했어요.`;
+    } else if (kind === 'sajuCompat') {
+      const r = lastSajuCompatResult;
+      titleText = '🀄 사주 궁합'; emoji = r.tier.emoji;
+      namesText = `${r.name1}  💕  ${r.name2}`;
+      score = r.score; tier = r.tier;
+      reasonText = `${r.ilganText} ${r.iljiText}`;
+    } else if (kind === 'zodiac') {
+      const r = lastZodiacResult;
+      titleText = '⭐ 별자리 궁합'; emoji = r.tier.emoji;
+      namesText = `${r.sign1.emoji} ${r.name1}  ×  ${r.name2} ${r.sign2.emoji}`;
+      score = r.matchup.score; tier = r.tier;
+      reasonText = `${r.sign1.name}와 ${r.sign2.name}의 조합: ${r.matchup.desc}`;
+    } else if (kind === 'blood') {
+      const r = lastBloodResult;
+      titleText = '🩸 혈액형 궁합'; emoji = r.tier.emoji;
+      namesText = `${r.n1}(${r.t1}형)  ×  ${r.n2}(${r.t2}형)`;
+      score = r.matchup.score; tier = r.tier;
+      reasonText = `${r.t1}형과 ${r.t2}형의 조합: ${r.matchup.desc}`;
+    } else if (kind === 'mbti') {
+      const r = lastMbtiResult;
+      titleText = '🧩 MBTI 궁합'; emoji = r.tier.emoji;
+      namesText = `${r.n1}(${r.type1})  ×  ${r.n2}(${r.type2})`;
+      score = r.result.score; tier = r.tier;
+      reasonText = r.result.special
+        ? r.result.special.text
+        : `${r.result.reasons.SN} ${r.result.reasons.JP}`;
+    } else if (kind === 'combo') {
+      const r = lastComboResult;
+      titleText = '💫 종합 궁합'; emoji = r.tier.emoji;
+      namesText = `${r.name1}  💕  ${r.name2}`;
+      score = r.overall; tier = r.tier;
+      extraLines = r.breakdown.map(b => `${b.label} ${b.score}점`);
+      const sorted = [...r.breakdown].sort((a, b) => b.score - a.score);
+      const best = sorted[0], worst = sorted[sorted.length - 1];
+      reasonText = `이름·사주·별자리·혈액형·MBTI 5가지 궁합 점수를 평균내어 산출했어요. ${best.label}(${best.score}점)이 가장 높았고, ${worst.label}(${worst.score}점)이 가장 낮았어요.`;
+    }
+
+    const tierIdx = tierIndexFromScore(score);
+    const theme = THEME_BY_TIER[tierIdx];
+    drawStoryBackground(ctx, theme);
+    drawStoryCardFrame(ctx);
+    drawScoreCardHeader(ctx, titleText, emoji, tierIdx);
+    drawScoreCardBody(ctx, namesText, score, tier, reasonText, extraLines);
+    drawStoryWatermark(ctx, tierIdx);
+  }
+
+  return canvas.toDataURL('image/png');
+}
+
+async function openStoryModal(kind) {
+  const dataUrl = renderStoryCard(kind);
+  document.getElementById('storyPreviewImg').src = dataUrl;
+  document.getElementById('storyDownloadBtn').href = dataUrl;
+  document.getElementById('storyModal').classList.add('show');
+}
+
+document.getElementById('storyCloseBtn').addEventListener('click', () => {
+  document.getElementById('storyModal').classList.remove('show');
+});
+document.getElementById('storyModal').addEventListener('click', (e) => {
+  if (e.target.id === 'storyModal') document.getElementById('storyModal').classList.remove('show');
+});
+
+document.getElementById('nameStoryBtn').addEventListener('click', () => openStoryModal('name'));
+document.getElementById('sajuStoryBtn').addEventListener('click', () => openStoryModal('saju'));
+document.getElementById('sajuCompatStoryBtn').addEventListener('click', () => openStoryModal('sajuCompat'));
+document.getElementById('zodiacStoryBtn').addEventListener('click', () => openStoryModal('zodiac'));
+document.getElementById('bloodStoryBtn').addEventListener('click', () => openStoryModal('blood'));
+document.getElementById('mbtiStoryBtn').addEventListener('click', () => openStoryModal('mbti'));
+document.getElementById('comboStoryBtn').addEventListener('click', () => openStoryModal('combo'));
+
+// ============================================================
+// 결과 텍스트 복사하기 (카카오톡 등으로 바로 공유할 수 있도록)
+// ============================================================
+function buildResultText(kind) {
+  const FOOTER = '\n\n🐥 삐약궁합에서 확인했어요';
+
+  if (kind === 'name') {
+    const r = lastNameResult;
+    return `💞 이름 궁합\n${r.name1} 💕 ${r.name2}\n\n${r.score}점 · ${r.tier.title}\n${r.tier.desc}${FOOTER}`;
+  }
+  if (kind === 'saju') {
+    const r = lastSajuResult;
+    const p = r.pillars;
+    const nameLine = r.name ? `${r.name}님의 사주팔자` : '나의 사주팔자';
+    const pillarLine = `년주 ${p.year.stemChar}${p.year.branchChar} · 월주 ${p.month.stemChar}${p.month.branchChar} · 일주 ${p.day.stemChar}${p.day.branchChar}` + (p.hour ? ` · 시주 ${p.hour.stemChar}${p.hour.branchChar}` : '');
+    return `🔮 ${nameLine}\n일간 ${p.day.stemChar}${p.day.stemHanja} · ${r.detail.keyword}\n${pillarLine}\n\n${r.detail.desc}${FOOTER}`;
+  }
+  if (kind === 'sajuCompat') {
+    const r = lastSajuCompatResult;
+    return `🀄 사주 궁합\n${r.name1} 💕 ${r.name2}\n\n${r.score}점 · ${r.tier.title}\n${r.ilganText}\n${r.iljiText}${FOOTER}`;
+  }
+  if (kind === 'zodiac') {
+    const r = lastZodiacResult;
+    return `⭐ 별자리 궁합\n${r.sign1.emoji} ${r.name1} × ${r.name2} ${r.sign2.emoji}\n\n${r.matchup.score}점 · ${r.tier.title}\n${r.sign1.name}와 ${r.sign2.name}: ${r.matchup.desc}${FOOTER}`;
+  }
+  if (kind === 'blood') {
+    const r = lastBloodResult;
+    return `🩸 혈액형 궁합\n${r.n1}(${r.t1}형) × ${r.n2}(${r.t2}형)\n\n${r.matchup.score}점 · ${r.tier.title}\n${r.matchup.desc}${FOOTER}`;
+  }
+  if (kind === 'mbti') {
+    const r = lastMbtiResult;
+    const line = r.result.special ? `${r.result.special.title}\n${r.result.special.text}` : `${r.result.reasons.SN}\n${r.result.reasons.JP}`;
+    return `🧩 MBTI 궁합\n${r.n1}(${r.type1}) × ${r.n2}(${r.type2})\n\n${r.result.score}점 · ${r.tier.title}\n${line}${FOOTER}`;
+  }
+  if (kind === 'combo') {
+    const r = lastComboResult;
+    const lines = r.breakdown.map(b => `${b.label} ${b.score}점`).join('\n');
+    return `💫 종합 궁합\n${r.name1} 💕 ${r.name2}\n\n${r.overall}점 · ${r.tier.title}\n${lines}${FOOTER}`;
+  }
+  return '';
+}
+
+async function copyResultText(kind, btn) {
+  const text = buildResultText(kind);
+  const original = btn.textContent;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    btn.textContent = '✅ 복사완료!';
+    btn.classList.add('copied');
+  } catch (e) {
+    btn.textContent = '복사 실패 😢';
+  }
+  setTimeout(() => {
+    btn.textContent = original;
+    btn.classList.remove('copied');
+  }, 1600);
+}
+
+document.getElementById('nameCopyBtn').addEventListener('click', (e) => copyResultText('name', e.currentTarget));
+document.getElementById('sajuCopyBtn').addEventListener('click', (e) => copyResultText('saju', e.currentTarget));
+document.getElementById('sajuCompatCopyBtn').addEventListener('click', (e) => copyResultText('sajuCompat', e.currentTarget));
+document.getElementById('zodiacCopyBtn').addEventListener('click', (e) => copyResultText('zodiac', e.currentTarget));
+document.getElementById('bloodCopyBtn').addEventListener('click', (e) => copyResultText('blood', e.currentTarget));
+document.getElementById('mbtiCopyBtn').addEventListener('click', (e) => copyResultText('mbti', e.currentTarget));
+document.getElementById('comboCopyBtn').addEventListener('click', (e) => copyResultText('combo', e.currentTarget));
+
+// ============================================================
+// 귀여운 배경음악 (Web Audio API로 즉석 생성한 뮤직박스 멜로디)
+// ============================================================
+const NOTE_FREQ = {
+  C4: 261.63, D4: 293.66, E4: 329.63, G4: 392.00, A4: 440.00,
+  C5: 523.25, D5: 587.33, E5: 659.25, G5: 783.99, A5: 880.00, C6: 1046.50,
+};
+const CUTE_MELODY = [
+  { n: 'C5', d: 0.28 }, { n: 'E5', d: 0.28 }, { n: 'G5', d: 0.28 }, { n: 'E5', d: 0.28 },
+  { n: 'A5', d: 0.28 }, { n: 'G5', d: 0.28 }, { n: 'E5', d: 0.28 }, { n: 'D5', d: 0.28 },
+  { n: 'C5', d: 0.28 }, { n: 'D5', d: 0.28 }, { n: 'E5', d: 0.28 }, { n: 'C5', d: 0.56 },
+];
+const MELODY_TOTAL = CUTE_MELODY.reduce((s, n) => s + n.d, 0);
+
+let audioCtx = null;
+let musicGain = null; // 배경음악 전용 마스터 볼륨 (꺼짐 즉시 모든 예약음을 묵음 처리하기 위함)
+let musicPlaying = false;
+let musicTimer = null;
+let activeOscillators = []; // 현재 예약된 배경음악 오실레이터 (꺼질 때 강제 정지시켜 겹침 방지)
+
+function playMusicBoxNote(ctx, freq, time, dur, destNode, trackArr) {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0.0001, time);
+  gain.gain.exponentialRampToValueAtTime(0.16, time + 0.015);
+  gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+  osc.connect(gain).connect(destNode || ctx.destination);
+  osc.start(time);
+  osc.stop(time + dur + 0.05);
+  if (trackArr) trackArr.push(osc);
+}
+
+// 점수 등급별 결과 효과음 (TIERS 순서: 90+, 75+, 60+, 45+, 30+, 0+)
+const SFX_BY_TIER = [
+  [{ n: 'C5', d: 0.09 }, { n: 'E5', d: 0.09 }, { n: 'G5', d: 0.09 }, { n: 'C6', d: 0.32 }],   // 천생연분: 반짝이는 팡파레
+  [{ n: 'C5', d: 0.11 }, { n: 'E5', d: 0.11 }, { n: 'G5', d: 0.28 }],                          // 아주 좋은 궁합: 밝은 3음
+  [{ n: 'E5', d: 0.13 }, { n: 'G5', d: 0.26 }],                                                // 좋은 궁합: 산뜻한 2음
+  [{ n: 'E5', d: 0.16 }, { n: 'E5', d: 0.22 }],                                                // 무난한 궁합: 담담한 반복음
+  [{ n: 'G5', d: 0.14 }, { n: 'E5', d: 0.26 }],                                                // 노력이 필요한 궁합: 살짝 처지는 2음
+  [{ n: 'G5', d: 0.1 }, { n: 'E5', d: 0.1 }, { n: 'C5', d: 0.1 }, { n: 'G4', d: 0.34 }],       // 신중이 필요한 궁합: 능청스러운 하강음
+];
+
+function ensureAudioCtx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    musicGain = audioCtx.createGain();
+    musicGain.gain.value = 1;
+    musicGain.connect(audioCtx.destination);
+  }
+  return audioCtx;
+}
+
+async function playScoreSfx(score) {
+  const ctx = ensureAudioCtx();
+  if (ctx.state === 'suspended') await ctx.resume();
+  const seq = SFX_BY_TIER[tierIndexFromScore(score)];
+  let t = ctx.currentTime + 0.02;
+  seq.forEach(note => {
+    playMusicBoxNote(ctx, NOTE_FREQ[note.n], t, note.d * 0.95);
+    t += note.d;
+  });
+}
+
+function scheduleMelodyLoop() {
+  if (!musicPlaying) return;
+  activeOscillators = [];
+  const startAt = audioCtx.currentTime + 0.05;
+  let t = startAt;
+  CUTE_MELODY.forEach(note => {
+    playMusicBoxNote(audioCtx, NOTE_FREQ[note.n], t, note.d * 0.9, musicGain, activeOscillators);
+    t += note.d;
+  });
+  musicTimer = setTimeout(scheduleMelodyLoop, MELODY_TOTAL * 1000);
+}
+
+function stopAllMelodyNotes() {
+  activeOscillators.forEach(osc => {
+    try { osc.stop(); } catch (e) { /* 이미 정지된 노드는 무시 */ }
+  });
+  activeOscillators = [];
+}
+
+document.getElementById('musicToggleBtn').addEventListener('click', async () => {
+  ensureAudioCtx();
+  const btn = document.getElementById('musicToggleBtn');
+  if (musicPlaying) {
+    musicPlaying = false;
+    clearTimeout(musicTimer);
+    btn.textContent = '🔇';
+    btn.classList.remove('playing');
+    // 볼륨을 짧게 0으로 내려 클릭음 없이 즉시 조용하게 만들고,
+    // 예약돼 있던 오실레이터는 완전히 stop()시켜서 나중에 다시 켤 때 겹쳐 들리지 않게 함
+    const now = audioCtx.currentTime;
+    musicGain.gain.cancelScheduledValues(now);
+    musicGain.gain.setValueAtTime(musicGain.gain.value, now);
+    musicGain.gain.linearRampToValueAtTime(0, now + 0.03);
+    stopAllMelodyNotes();
+  } else {
+    musicPlaying = true;
+    btn.textContent = '🔊';
+    btn.classList.add('playing');
+    // resume()이 끝나기 전에 currentTime 기준으로 스케줄링하면 첫 소리가 씹힐 수 있어 반드시 await
+    await audioCtx.resume();
+    const now = audioCtx.currentTime;
+    musicGain.gain.cancelScheduledValues(now);
+    musicGain.gain.setValueAtTime(1, now);
+    scheduleMelodyLoop();
+  }
+});
+
+// ============================================================
+// PWA: 서비스 워커 등록 · 설치 유도 · 업데이트 안내 · 이미지 공유
+// (전역 이름이 많은 파일이라 즉시실행 함수로 감싸 충돌을 막음)
+// ============================================================
+(function setupPwa() {
+  const DISMISS_KEY = 'ppiyak-install-dismissed-at';
+  const DISMISS_DAYS = 7;
+
+  const banner = document.getElementById('pwaInstallBanner');
+  const installBtn = document.getElementById('pwaInstallBtn');
+  const dismissBtn = document.getElementById('pwaDismissBtn');
+  const iosGuide = document.getElementById('pwaIosGuide');
+  const iosCloseBtn = document.getElementById('pwaIosCloseBtn');
+  const updateToast = document.getElementById('pwaUpdateToast');
+  const reloadBtn = document.getElementById('pwaReloadBtn');
+
+  const ua = navigator.userAgent;
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  // iPadOS 13+ 는 UA를 Macintosh로 보내므로 터치 지원 여부로 함께 판별
+  const isIos = /iP(hone|ad|od)/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  // 카톡·인스타 등 인앱 브라우저는 홈 화면 추가 자체가 불가능하므로 안내를 띄우지 않음
+  const isInAppBrowser = /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line\/|DaumApps|everytimeApp/i.test(ua);
+
+  function dismissedRecently() {
+    try {
+      const at = Number(localStorage.getItem(DISMISS_KEY));
+      return !!at && Date.now() - at < DISMISS_DAYS * 24 * 60 * 60 * 1000;
+    } catch (e) {
+      return false; // 시크릿 모드 등 localStorage 차단 환경
+    }
+  }
+  function rememberDismiss() {
+    try { localStorage.setItem(DISMISS_KEY, String(Date.now())); } catch (e) { /* 저장 못 해도 동작에는 영향 없음 */ }
+  }
+
+  function showBanner() {
+    if (isStandalone || isInAppBrowser || dismissedRecently()) return;
+    banner.hidden = false;
+  }
+  function hideBanner() {
+    banner.hidden = true;
+  }
+
+  // ---- 안드로이드·데스크톱 크롬: 브라우저가 설치 가능하다고 알려줄 때만 배너 노출 ----
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault(); // 브라우저 기본 미니 인포바 대신 우리 배너를 쓴다
+    deferredPrompt = e;
+    showBanner();
+  });
+
+  installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      hideBanner();
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      if (choice.outcome !== 'accepted') rememberDismiss();
+      return;
+    }
+    // iOS 사파리에는 설치 API가 없어서 수동 안내 시트를 띄운다
+    iosGuide.hidden = false;
+  });
+
+  dismissBtn.addEventListener('click', () => {
+    rememberDismiss();
+    hideBanner();
+  });
+  iosCloseBtn.addEventListener('click', () => { iosGuide.hidden = true; });
+  iosGuide.addEventListener('click', (e) => {
+    if (e.target === iosGuide) iosGuide.hidden = true;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    deferredPrompt = null;
+    hideBanner();
+    try { localStorage.removeItem(DISMISS_KEY); } catch (e) { /* 무시 */ }
+  });
+
+  // iOS는 beforeinstallprompt가 없으니, 사파리로 처음 들어온 경우 잠깐 뒤 배너를 직접 띄움
+  if (isIos && !isStandalone) setTimeout(showBanner, 2500);
+
+  // ---- 서비스 워커 등록 (오프라인 실행 + 업데이트 안내) ----
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    window.addEventListener('load', async () => {
+      try {
+        const reg = await navigator.serviceWorker.register('sw.js', { scope: './' });
+
+        function notifyUpdate(worker) {
+          // 이미 페이지를 제어하는 워커가 있을 때만 '새 버전' 안내 (첫 설치는 조용히 지나감)
+          if (!navigator.serviceWorker.controller) return;
+          // 설치 배너가 떠 있으면 토스트를 그 위로 올려 겹치지 않게 한다
+          if (!banner.hidden) updateToast.style.bottom = 'calc(104px + env(safe-area-inset-bottom))';
+          updateToast.hidden = false;
+          reloadBtn.onclick = () => {
+            reloadBtn.disabled = true;
+            worker.postMessage({ type: 'SKIP_WAITING' });
+          };
+        }
+
+        if (reg.waiting) notifyUpdate(reg.waiting);
+        reg.addEventListener('updatefound', () => {
+          const incoming = reg.installing;
+          if (!incoming) return;
+          incoming.addEventListener('statechange', () => {
+            if (incoming.state === 'installed') notifyUpdate(incoming);
+          });
+        });
+
+        // 앱으로 다시 돌아올 때마다 새 버전이 올라왔는지 조용히 확인
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') reg.update().catch(() => {});
+        });
+      } catch (e) {
+        console.warn('서비스 워커 등록 실패:', e);
+      }
+    });
+
+    // 새 워커가 페이지를 넘겨받으면 한 번만 새로고침
+    let reloadedForUpdate = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (reloadedForUpdate) return;
+      reloadedForUpdate = true;
+      location.reload();
+    });
+  }
+
+  // ---- 스토리 이미지: 폰에서 바로 공유 (다운로드가 막히는 iOS 홈 화면 앱 대비) ----
+  const shareBtn = document.getElementById('storyShareBtn');
+  const previewImg = document.getElementById('storyPreviewImg');
+
+  function makeProbeFile() {
+    return new File([new Blob([new Uint8Array([1])], { type: 'image/png' })], 'probe.png', { type: 'image/png' });
+  }
+  let canShareImage = false;
+  try {
+    canShareImage = !!(navigator.canShare && navigator.share && navigator.canShare({ files: [makeProbeFile()] }));
+  } catch (e) {
+    canShareImage = false;
+  }
+  if (canShareImage) shareBtn.hidden = false;
+
+  // data URL을 동기로 Blob으로 바꿔둔다 (await를 끼우면 사파리가 사용자 제스처를 잃어버려 공유가 차단됨)
+  function dataUrlToFile(dataUrl, filename) {
+    const base64 = dataUrl.split(',')[1];
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return new File([bytes], filename, { type: 'image/png' });
+  }
+
+  shareBtn.addEventListener('click', async () => {
+    if (!previewImg.src || previewImg.src.indexOf('data:image') !== 0) return;
+    try {
+      const file = dataUrlToFile(previewImg.src, '삐약궁합_스토리.png');
+      await navigator.share({
+        files: [file],
+        title: '삐약궁합 결과',
+        text: '우리 둘의 궁합 결과 나왔어요! 🐥',
+      });
+    } catch (e) {
+      if (e && e.name === 'AbortError') return; // 사용자가 공유 시트를 닫은 경우
+      console.warn('공유 실패:', e);
+    }
+  });
+})();
+</script>
+</body>
+</html>
