@@ -687,6 +687,52 @@
   .copy-btn:active { transform: scale(0.98); }
   .copy-btn.copied { background: #fff8e4; color: #8f5c00; border-color: #ffd876; }
 
+  .name-swap-wrap { position: relative; }
+  .like-hint { font-weight: 500; color: var(--muted); font-size: 12px; }
+  .swap-btn {
+    position: absolute;
+    right: 0;
+    top: 100px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    margin: 0;
+    border-radius: 50%;
+    border: 2px solid #ffe9a8;
+    background: #fff;
+    color: var(--purple);
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1;
+    box-shadow: 0 4px 10px rgba(224,150,0,0.2);
+    transform: translateY(-50%);
+    transition: transform .15s;
+  }
+  .swap-btn:active { transform: translateY(-50%) rotate(180deg) scale(0.92); }
+
+  .like-direction {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--purple);
+    margin: 0 0 8px;
+  }
+
+  .retry-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 13px;
+    border: none;
+    border-radius: 12px;
+    background: #f3f0ff;
+    color: #7a5cb0;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .1s, opacity .15s;
+  }
+  .retry-btn:active { transform: scale(0.98); }
+
   .story-modal {
     display: none;
     position: fixed;
@@ -1037,18 +1083,22 @@
 
   <div class="tab-panel active" id="tabName">
   <div class="card">
-    <div class="field">
-      <label for="name1">첫 번째 이름</label>
-      <input type="text" id="name1" placeholder="예: 뜨아거" maxlength="10">
-    </div>
-    <div class="field">
-      <label for="name2">두 번째 이름</label>
-      <input type="text" id="name2" placeholder="예: 케로피" maxlength="10">
+    <div class="name-swap-wrap">
+      <div class="field">
+        <label for="name1">첫 번째 이름 <span class="like-hint">(좋아하는 사람)</span></label>
+        <input type="text" id="name1" placeholder="예: 뜨아거" maxlength="10">
+      </div>
+      <div class="field">
+        <label for="name2">두 번째 이름 <span class="like-hint">(짝사랑 상대)</span></label>
+        <input type="text" id="name2" placeholder="예: 케로피" maxlength="10">
+      </div>
+      <button type="button" id="swapNamesBtn" class="swap-btn" title="순서 바꾸기" aria-label="이름 순서 바꾸기">⇅</button>
     </div>
     <button id="checkBtn">궁합 보기</button>
     <p class="error" aria-live="polite" id="errorMsg">이름은 한글로 1자 이상 입력해주세요.</p>
 
     <div class="result" id="result">
+      <p class="like-direction" id="likeDirection"></p>
       <div class="score-circle" id="scoreCircle">
         <div class="score-inner">
           <div class="num" id="scoreNum">0</div>
@@ -1076,10 +1126,11 @@
         <button class="story-btn" id="nameStoryBtn">📸 스토리 이미지</button>
         <button class="copy-btn" id="nameCopyBtn">📋 결과 복사</button>
       </div>
+      <button type="button" class="retry-btn" id="nameRetryBtn">🔄 다시하기</button>
     </div>
   </div>
 
-  <p class="disclaimer">* 이 결과는 두 이름의 한글 획수를 번갈아 배열해 피라미드처럼 더해 내려가는 전통 이름 궁합 계산법(획수 감산법)을 이용한 재미용 콘텐츠이며,<br>과학적·통계적 근거가 없습니다.</p>
+  <p class="disclaimer">* 이 결과는 첫 번째 이름이 두 번째 이름을 좋아하는 마음을 두 이름의 한글 획수를 번갈아 배열해 피라미드처럼 더해 내려가는 전통 이름 궁합 계산법(획수 감산법)으로 산출한 재미용 콘텐츠이며,<br>순서를 바꾸면 결과가 달라질 수 있어요(⇅ 버튼으로 순서 변경). 과학적·통계적 근거가 없습니다.</p>
   </div>
 
   <div class="tab-panel" id="tabSaju">
@@ -1959,6 +2010,8 @@ function showResult(name1, name2) {
 
   document.getElementById('errorMsg').style.display = 'none';
 
+  document.getElementById('likeDirection').textContent = `💌 ${name1}님이 ${name2}님을 좋아하는 마음 점수예요`;
+
   const circle = document.getElementById('scoreCircle');
   circle.style.setProperty('--pct', score);
   document.getElementById('scoreNum').textContent = score;
@@ -1999,6 +2052,25 @@ document.getElementById('checkBtn').addEventListener('click', () => {
   input.addEventListener('keydown', e => {
     if (e.key === 'Enter') document.getElementById('checkBtn').click();
   });
+});
+
+document.getElementById('swapNamesBtn').addEventListener('click', () => {
+  const n1 = document.getElementById('name1');
+  const n2 = document.getElementById('name2');
+  const tmp = n1.value;
+  n1.value = n2.value;
+  n2.value = tmp;
+  if (document.getElementById('result').classList.contains('show')) {
+    document.getElementById('checkBtn').click();
+  }
+});
+
+document.getElementById('nameRetryBtn').addEventListener('click', () => {
+  document.getElementById('name1').value = '';
+  document.getElementById('name2').value = '';
+  document.getElementById('result').classList.remove('show');
+  document.getElementById('errorMsg').style.display = 'none';
+  document.getElementById('name1').focus();
 });
 
 // ============================================================
@@ -3804,10 +3876,10 @@ function renderStoryCard(kind) {
     if (kind === 'name') {
       const r = lastNameResult;
       const a1 = analyzeName(r.name1), a2 = analyzeName(r.name2);
-      titleText = '💞 이름 궁합'; emoji = r.tier.emoji;
-      namesText = `${r.name1}  💕  ${r.name2}`;
+      titleText = '💌 이름 궁합'; emoji = r.tier.emoji;
+      namesText = `${r.name1}  ➡️  ${r.name2}`;
       score = r.score; tier = r.tier;
-      reasonText = `${r.name1}님은 총 ${a1.total}획, ${r.name2}님은 총 ${a2.total}획이에요. 두 이름의 글자별 획수를 번갈아 배열한 뒤 피라미드처럼 더해 내려가는 전통 이름 궁합 계산법으로 산출했어요.`;
+      reasonText = `${r.name1}님이 ${r.name2}님을 좋아하는 마음 점수예요. ${r.name1}님은 총 ${a1.total}획, ${r.name2}님은 총 ${a2.total}획이에요. 두 이름의 글자별 획수를 번갈아 배열한 뒤 피라미드처럼 더해 내려가는 전통 이름 궁합 계산법으로 산출했어요.`;
     } else if (kind === 'sajuCompat') {
       const r = lastSajuCompatResult;
       titleText = '🀄 사주 궁합'; emoji = r.tier.emoji;
@@ -3887,7 +3959,7 @@ function buildResultText(kind) {
 
   if (kind === 'name') {
     const r = lastNameResult;
-    return `💞 이름 궁합\n${r.name1} 💕 ${r.name2}\n\n${r.score}점 · ${r.tier.title}\n${r.tier.desc}${FOOTER}`;
+    return `💌 이름 궁합\n${r.name1}님이 ${r.name2}님을 좋아하는 마음\n\n${r.score}점 · ${r.tier.title}\n${r.tier.desc}${FOOTER}`;
   }
   if (kind === 'saju') {
     const r = lastSajuResult;
