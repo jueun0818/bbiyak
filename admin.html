@@ -288,8 +288,10 @@ function render(data) {
   const vidColor = (vid) => `hsl(${hashHue(vid)}, 60%, 55%)`;
 
   $('logList').innerHTML = logs.map((l) => {
-    const n1 = esc(l.n1 || '?');
-    const n2 = esc(l.n2 || '?');
+    const n1 = esc(l.n1 || '이름 없음');
+    const pairHtml = l.n2
+      ? `${n1}<span class="sep">×</span>${esc(l.n2)}`
+      : `${n1}`;
     const vid = l.v || '';
     const total = vid ? vidCounts[vid] : 0;
     const visitorBadge = vid
@@ -301,7 +303,7 @@ function render(data) {
     return `<div class="log-row">
       <div class="log-row-inner">
         <div class="log-row-top">
-          <span class="log-pair"><span class="log-tab">${esc(l.label)}</span>${n1}<span class="sep">×</span>${n2}</span>
+          <span class="log-pair"><span class="log-tab">${esc(l.label)}</span>${pairHtml}</span>
           <span class="log-meta">${relTime(l.t)}</span>
         </div>
         ${visitorBadge}

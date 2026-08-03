@@ -2931,7 +2931,7 @@ document.getElementById('todayBtn').addEventListener('click', () => {
     return;
   }
   errEl.style.display = 'none';
-  trackEvent('tab_action', 'today');
+  trackEvent('tab_action', 'today', document.getElementById('todayName').value.trim());
 
   const [y, m, dd] = d.split('-').map(Number);
   const result = computeTodayFortune(y, m, dd);
