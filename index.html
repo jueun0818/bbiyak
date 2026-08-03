@@ -2873,13 +2873,18 @@ function getTodayTier(score) {
   return TODAY_TIERS.find(t => score >= t.min);
 }
 
-const LUCKY_BY_ELEMENT = {
-  wood:  { color: '초록색', number: 3, item: '식물 화분' },
-  fire:  { color: '빨간색', number: 2, item: '립밤' },
-  earth: { color: '황토색', number: 5, item: '손수건' },
-  metal: { color: '흰색',   number: 7, item: '이어폰' },
-  water: { color: '남색',   number: 1, item: '텀블러' },
-};
+const LUCKY_COLORS = ['빨간색', '주황색', '노란색', '초록색', '청록색', '파란색', '남색', '보라색', '핑크색', '흰색', '황토색', '검정색'];
+const LUCKY_ITEMS = ['텀블러', '이어폰', '손수건', '립밤', '우산', '볼펜', '머리끈', '열쇠고리', '마스크', '장갑', '수첩', '에코백', '식물 화분', '향수'];
+
+function hashSeed(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+function branchLabel(p) {
+  return `${p.branchChar}${p.branchHanja}(${p.animal}띠)`;
+}
 
 function computeTodayFortune(y, m, d) {
   const birth = calcSaju(y, m, d, null);
@@ -2904,8 +2909,27 @@ function computeTodayFortune(y, m, d) {
 
   const meLabel = `${birth.day.stemChar}${birth.day.stemHanja}(${ELEMENT_INFO[birth.day.stemElement].label})`;
   const tdLabel = `${todayPillar.stemChar}${todayPillar.stemHanja}(${ELEMENT_INFO[todayPillar.stemElement].label})`;
-  const reasonText = info.text(meLabel, tdLabel);
-  const lucky = LUCKY_BY_ELEMENT[todayPillar.stemElement];
+
+  let flavor = '';
+  if (iljiRel === 'same') {
+    flavor = ` 일지도 ${branchLabel(birth.day)}로 오늘과 똑같아서 컨디션이 안정적인 하루예요.`;
+  } else if (iljiRel === 'hap') {
+    flavor = ` 일지 ${branchLabel(birth.day)}가 오늘 ${branchLabel(todayPillar)}와 육합을 이루어 주변 사람과 손발이 잘 맞는 날이에요.`;
+  } else if (iljiRel === 'samhap') {
+    const label = samhapLabelOf(birth.day.branchIdx, todayPillar.branchIdx);
+    flavor = ` 일지 ${branchLabel(birth.day)}가 오늘 ${branchLabel(todayPillar)}와 삼합(${label})을 이루어 뜻밖의 시너지가 생기기 쉬워요.`;
+  } else if (iljiRel === 'chung') {
+    flavor = ` 다만 일지 ${branchLabel(birth.day)}가 오늘 ${branchLabel(todayPillar)}와 충(沖)을 이루니, 갑작스러운 변수에는 대비해두세요.`;
+  }
+  const reasonText = info.text(meLabel, tdLabel) + flavor;
+
+  const luckySeed = hashSeed(`${birth.day.stemIdx}-${birth.day.branchIdx}-${todayPillar.stemIdx}-${todayPillar.branchIdx}`);
+  const lucky = {
+    color: LUCKY_COLORS[luckySeed % LUCKY_COLORS.length],
+    number: ((luckySeed >>> 8) % 9) + 1,
+    item: LUCKY_ITEMS[(luckySeed >>> 16) % LUCKY_ITEMS.length],
+  };
+
   const dateLabel = `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일 (${'일월화수목금토'[now.getDay()]}) · 오늘은 ${todayPillar.stemChar}${todayPillar.branchChar}일(${todayPillar.stemHanja}${todayPillar.branchHanja}日)`;
 
   return { birth, todayPillar, overall, love, money, health, reasonText, sipsungLabel: info.label, lucky, dateLabel };
