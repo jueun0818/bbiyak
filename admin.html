@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>삐약궁합 관리자</title>
+<style>
+  :root {
+    --bg: #f6f5f2;
+    --card: #ffffff;
+    --text: #2a2a33;
+    --muted: #767686;
+    --accent: #b5650d;
+    --accent-soft: #fff3d6;
+    --border: #e8e4da;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17171c;
+      --card: #212127;
+      --text: #ececf1;
+      --muted: #9797a3;
+      --accent: #ffb74d;
+      --accent-soft: #3a2f1c;
+      --border: #34343c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17171c; --card: #212127; --text: #ececf1; --muted: #9797a3; --accent: #ffb74d; --accent-soft: #3a2f1c; --border: #34343c;
+  }
+  :root[data-theme="light"] {
+    --bg: #f6f5f2; --card: #ffffff; --text: #2a2a33; --muted: #767686; --accent: #b5650d; --accent-soft: #fff3d6; --border: #e8e4da;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px 64px;
+  }
+  .wrap { width: 100%; max-width: 640px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: 14px; margin: 0 0 28px; }
+
+  #loginCard {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+  }
+  #loginCard label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+  #loginCard input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+  #loginCard button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  #loginError { color: #e0245e; font-size: 13px; margin-top: 8px; display: none; }
+
+  #dashboard { display: none; }
+  .summary-row { display: flex; gap: 12px; margin-bottom: 20px; }
+  .stat-card {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+  }
+  .stat-card .label { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .stat-card .value { font-size: 28px; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+
+  .section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .section h2 { font-size: 15px; margin: 0 0 16px; color: var(--muted); font-weight: 700; }
+
+  .day-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; }
+  .day-row .day-label { width: 64px; color: var(--muted); flex-shrink: 0; font-variant-numeric: tabular-nums; }
+  .day-row .bar-track { flex: 1; height: 18px; background: var(--accent-soft); border-radius: 6px; overflow: hidden; }
+  .day-row .bar-fill { height: 100%; background: var(--accent); border-radius: 6px; min-width: 2px; }
+  .day-row .day-count { width: 32px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  .tab-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 14px; }
+  .tab-row .tab-label { width: 92px; flex-shrink: 0; }
+  .tab-row .bar-track { flex: 1; height: 20px; background: var(--accent-soft); border-radius: 6px; overflow: hidden; }
+  .tab-row .bar-fill { height: 100%; background: var(--accent); border-radius: 6px; min-width: 2px; }
+  .tab-row .tab-count { width: 36px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  #refreshBtn {
+    display: block;
+    margin: 0 auto 20px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--card);
+    color: var(--text);
+    font-size: 13px;
+    cursor: pointer;
+  }
+  #dashError { color: #e0245e; font-size: 13px; text-align: center; display: none; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🐥 삐약궁합 관리자</h1>
+  <p class="sub">방문·기능별 사용 통계</p>
+
+  <div id="loginCard">
+    <label for="pwInput">관리자 비밀번호</label>
+    <input type="password" id="pwInput" placeholder="비밀번호 입력">
+    <button id="loginBtn">확인</button>
+    <p id="loginError">비밀번호가 올바르지 않아요.</p>
+  </div>
+
+  <div id="dashboard">
+    <button id="refreshBtn">🔄 새로고침</button>
+    <p id="dashError">통계를 불러오지 못했어요.</p>
+
+    <div class="summary-row">
+      <div class="stat-card">
+        <div class="label">누적 방문</div>
+        <div class="value" id="totalVisits">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">오늘 방문</div>
+        <div class="value" id="todayVisits">-</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>최근 7일 방문</h2>
+      <div id="dailyChart"></div>
+    </div>
+
+    <div class="section">
+      <h2>기능별 조회수 (많은 순)</h2>
+      <div id="tabChart"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+
+async function login() {
+  const pw = $('pwInput').value;
+  if (!pw) return;
+  $('loginError').style.display = 'none';
+  await loadStats(pw);
+}
+
+async function loadStats(pw) {
+  $('dashError').style.display = 'none';
+  try {
+    const res = await fetch('/api/stats?password=' + encodeURIComponent(pw));
+    if (res.status === 401) {
+      $('loginError').style.display = 'block';
+      return;
+    }
+    if (!res.ok) throw new Error('failed');
+    const data = await res.json();
+    sessionStorage.setItem('bbiyak_admin_pw', pw);
+    render(data);
+    $('loginCard').style.display = 'none';
+    $('dashboard').style.display = 'block';
+  } catch (e) {
+    $('dashError').style.display = 'block';
+  }
+}
+
+function render(data) {
+  $('totalVisits').textContent = data.totalVisits.toLocaleString();
+  const today = data.dailyVisits[data.dailyVisits.length - 1];
+  $('todayVisits').textContent = today ? today.count.toLocaleString() : '0';
+
+  const maxDaily = Math.max(1, ...data.dailyVisits.map((d) => d.count));
+  $('dailyChart').innerHTML = data.dailyVisits.map((d) => {
+    const label = d.date.slice(5).replace('-', '/');
+    const pct = Math.round((d.count / maxDaily) * 100);
+    return `<div class="day-row">
+      <span class="day-label">${label}</span>
+      <span class="bar-track"><span class="bar-fill" style="width:${pct}%"></span></span>
+      <span class="day-count">${d.count}</span>
+    </div>`;
+  }).join('');
+
+  const maxTab = Math.max(1, ...data.tabClicks.map((t) => t.count));
+  $('tabChart').innerHTML = data.tabClicks.map((t) => {
+    const pct = Math.round((t.count / maxTab) * 100);
+    return `<div class="tab-row">
+      <span class="tab-label">${t.label}</span>
+      <span class="bar-track"><span class="bar-fill" style="width:${pct}%"></span></span>
+      <span class="tab-count">${t.count}</span>
+    </div>`;
+  }).join('');
+}
+
+$('loginBtn').addEventListener('click', login);
+$('pwInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') login(); });
+$('refreshBtn').addEventListener('click', () => {
+  const pw = sessionStorage.getItem('bbiyak_admin_pw');
+  if (pw) loadStats(pw);
+});
+
+const savedPw = sessionStorage.getItem('bbiyak_admin_pw');
+if (savedPw) loadStats(savedPw);
+</script>
+</body>
+</html>

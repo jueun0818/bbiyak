@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /admin.html
+Disallow: /api/
 
 Sitemap: https://bbiyak-6ou7.vercel.app/sitemap.xml
