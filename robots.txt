@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://jueun0818.github.io/bbiyak/sitemap.xml
+Sitemap: https://bbiyak-6ou7.vercel.app/sitemap.xml
