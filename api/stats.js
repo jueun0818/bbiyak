@@ -64,7 +64,7 @@ export default async function handler(req, res) {
     const recentLogs = (rawLogs || [])
       .map((s) => { try { return JSON.parse(s); } catch { return null; } })
       .filter(Boolean)
-      .map((e) => ({ tab: e.tab, label: TAB_LABELS[e.tab] || e.tab, n1: e.n1 || '', n2: e.n2 || '', t: e.t }));
+      .map((e) => ({ tab: e.tab, label: TAB_LABELS[e.tab] || e.tab, n1: e.n1 || '', n2: e.n2 || '', t: e.t, v: e.v || '' }));
 
     res.status(200).json({ totalVisits, dailyVisits, tabClicks, recentLogs });
   } catch (e) {

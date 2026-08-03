@@ -135,6 +135,19 @@
   }
   #emptyLog { color: var(--muted); font-size: 13px; text-align: center; padding: 12px 0; display: none; }
 
+  .log-row-inner { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+  .log-row-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .visitor-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .visitor-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .visitor-repeat { color: var(--accent); font-weight: 700; }
+
   #refreshBtn {
     display: block;
     margin: 0 auto 20px;
@@ -268,14 +281,39 @@ function render(data) {
 
   const logs = data.recentLogs || [];
   $('emptyLog').style.display = logs.length ? 'none' : 'block';
+
+  // 방문자 ID별 총 등장 횟수(전체 로그 기준)와 색상 배정
+  const vidCounts = {};
+  logs.forEach((l) => { if (l.v) vidCounts[l.v] = (vidCounts[l.v] || 0) + 1; });
+  const vidColor = (vid) => `hsl(${hashHue(vid)}, 60%, 55%)`;
+
   $('logList').innerHTML = logs.map((l) => {
     const n1 = esc(l.n1 || '?');
     const n2 = esc(l.n2 || '?');
+    const vid = l.v || '';
+    const total = vid ? vidCounts[vid] : 0;
+    const visitorBadge = vid
+      ? `<span class="visitor-badge">
+           <span class="visitor-dot" style="background:${vidColor(vid)}"></span>
+           방문자 #${esc(vid.slice(-4))}${total > 1 ? ` <span class="visitor-repeat">· 이 목록에서 ${total}회</span>` : ''}
+         </span>`
+      : `<span class="visitor-badge">방문자 정보 없음</span>`;
     return `<div class="log-row">
-      <span class="log-pair"><span class="log-tab">${esc(l.label)}</span>${n1}<span class="sep">×</span>${n2}</span>
-      <span class="log-meta">${relTime(l.t)}</span>
+      <div class="log-row-inner">
+        <div class="log-row-top">
+          <span class="log-pair"><span class="log-tab">${esc(l.label)}</span>${n1}<span class="sep">×</span>${n2}</span>
+          <span class="log-meta">${relTime(l.t)}</span>
+        </div>
+        ${visitorBadge}
+      </div>
     </div>`;
   }).join('');
+}
+
+function hashHue(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+  return h % 360;
 }
 
 $('loginBtn').addEventListener('click', login);

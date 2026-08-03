@@ -1710,9 +1710,22 @@
 // ============================================================
 // 방문/사용 통계 (관리자 페이지용, 실패해도 앱 동작에는 영향 없음)
 // ============================================================
+function getVisitorId() {
+  try {
+    let vid = localStorage.getItem('bbiyak_vid');
+    if (!vid) {
+      vid = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('v-' + Math.random().toString(36).slice(2) + Date.now().toString(36));
+      localStorage.setItem('bbiyak_vid', vid);
+    }
+    return vid;
+  } catch (e) {
+    return '';
+  }
+}
+
 function trackEvent(event, tab, name1, name2) {
   try {
-    const payload = { event };
+    const payload = { event, v: getVisitorId() };
     if (tab) payload.tab = tab;
     if (name1) payload.name1 = name1;
     if (name2) payload.name2 = name2;

@@ -14,6 +14,10 @@ function safeName(s) {
   return typeof s === 'string' ? s.trim().slice(0, 20) : '';
 }
 
+function safeVid(s) {
+  return typeof s === 'string' ? s.replace(/[^a-zA-Z0-9-]/g, '').slice(0, 40) : '';
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'method not allowed' });
@@ -34,6 +38,7 @@ export default async function handler(req, res) {
   const tab = body && body.tab;
   const n1 = safeName(body && body.name1);
   const n2 = safeName(body && body.name2);
+  const v = safeVid(body && body.v);
 
   const incrKeys = [];
   if (event === 'pageview') {
@@ -50,7 +55,7 @@ export default async function handler(req, res) {
     await Promise.all(incrKeys.map((key) => redisCmd(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, ['INCR', key])));
 
     if (event === 'tab_action' && (n1 || n2)) {
-      const entry = JSON.stringify({ tab, n1, n2, t: Date.now() });
+      const entry = JSON.stringify({ tab, n1, n2, t: Date.now(), v });
       await redisCmd(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, ['LPUSH', 'stats:log', entry]);
       await redisCmd(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, ['LTRIM', 'stats:log', '0', String(LOG_MAX - 1)]);
     }
