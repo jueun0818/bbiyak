@@ -9,13 +9,16 @@ const TAB_LABELS = {
   mbti: 'MBTI 궁합',
   combo: '종합 궁합',
 };
+const LOG_FETCH_COUNT = 50;
 
-async function getKey(baseUrl, token, key) {
-  const r = await fetch(`${baseUrl}/get/${encodeURIComponent(key)}`, {
-    headers: { Authorization: `Bearer ${token}` },
+async function redisCmd(url, token, cmd) {
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(cmd),
   });
   const data = await r.json();
-  return Number(data.result) || 0;
+  return data.result;
 }
 
 export default async function handler(req, res) {
@@ -39,20 +42,31 @@ export default async function handler(req, res) {
   }
 
   try {
-    const totalVisits = await getKey(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, 'stats:visits:total');
+    const totalVisitsRaw = await redisCmd(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, ['GET', 'stats:visits:total']);
+    const totalVisits = Number(totalVisitsRaw) || 0;
+
     const dailyVisits = await Promise.all(
-      days.map(async (d) => ({ date: d, count: await getKey(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, `stats:visits:${d}`) }))
+      days.map(async (d) => {
+        const v = await redisCmd(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, ['GET', `stats:visits:${d}`]);
+        return { date: d, count: Number(v) || 0 };
+      })
     );
+
     const tabClicks = await Promise.all(
-      TAB_KEYS.map(async (t) => ({
-        tab: t,
-        label: TAB_LABELS[t],
-        count: await getKey(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, `stats:tab:${t}`),
-      }))
+      TAB_KEYS.map(async (t) => {
+        const v = await redisCmd(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, ['GET', `stats:tab:${t}`]);
+        return { tab: t, label: TAB_LABELS[t], count: Number(v) || 0 };
+      })
     );
     tabClicks.sort((a, b) => b.count - a.count);
 
-    res.status(200).json({ totalVisits, dailyVisits, tabClicks });
+    const rawLogs = await redisCmd(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, ['LRANGE', 'stats:log', '0', String(LOG_FETCH_COUNT - 1)]);
+    const recentLogs = (rawLogs || [])
+      .map((s) => { try { return JSON.parse(s); } catch { return null; } })
+      .filter(Boolean)
+      .map((e) => ({ tab: e.tab, label: TAB_LABELS[e.tab] || e.tab, n1: e.n1 || '', n2: e.n2 || '', t: e.t }));
+
+    res.status(200).json({ totalVisits, dailyVisits, tabClicks, recentLogs });
   } catch (e) {
     res.status(500).json({ error: 'failed' });
   }

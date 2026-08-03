@@ -110,6 +110,31 @@
   .tab-row .bar-fill { height: 100%; background: var(--accent); border-radius: 6px; min-width: 2px; }
   .tab-row .tab-count { width: 36px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
 
+  .log-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .log-row:last-child { border-bottom: none; }
+  .log-row .log-pair { font-weight: 600; }
+  .log-row .log-pair .sep { color: var(--muted); font-weight: 400; margin: 0 4px; }
+  .log-row .log-meta { color: var(--muted); font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+  .log-row .log-tab {
+    display: inline-block;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-right: 8px;
+  }
+  #emptyLog { color: var(--muted); font-size: 13px; text-align: center; padding: 12px 0; display: none; }
+
   #refreshBtn {
     display: block;
     margin: 0 auto 20px;
@@ -160,6 +185,12 @@
       <h2>기능별 조회수 (많은 순)</h2>
       <div id="tabChart"></div>
     </div>
+
+    <div class="section">
+      <h2>최근 궁합 기록 (누가 누구랑 봤는지)</h2>
+      <div id="logList"></div>
+      <p id="emptyLog">아직 기록이 없어요.</p>
+    </div>
   </div>
 </div>
 
@@ -192,6 +223,23 @@ async function loadStats(pw) {
   }
 }
 
+function relTime(ts) {
+  const diffMs = Date.now() - ts;
+  const min = Math.floor(diffMs / 60000);
+  if (min < 1) return '방금 전';
+  if (min < 60) return `${min}분 전`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr}시간 전`;
+  const day = Math.floor(hr / 24);
+  return `${day}일 전`;
+}
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
 function render(data) {
   $('totalVisits').textContent = data.totalVisits.toLocaleString();
   const today = data.dailyVisits[data.dailyVisits.length - 1];
@@ -215,6 +263,17 @@ function render(data) {
       <span class="tab-label">${t.label}</span>
       <span class="bar-track"><span class="bar-fill" style="width:${pct}%"></span></span>
       <span class="tab-count">${t.count}</span>
+    </div>`;
+  }).join('');
+
+  const logs = data.recentLogs || [];
+  $('emptyLog').style.display = logs.length ? 'none' : 'block';
+  $('logList').innerHTML = logs.map((l) => {
+    const n1 = esc(l.n1 || '?');
+    const n2 = esc(l.n2 || '?');
+    return `<div class="log-row">
+      <span class="log-pair"><span class="log-tab">${esc(l.label)}</span>${n1}<span class="sep">×</span>${n2}</span>
+      <span class="log-meta">${relTime(l.t)}</span>
     </div>`;
   }).join('');
 }

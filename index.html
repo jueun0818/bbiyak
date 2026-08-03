@@ -1710,12 +1710,16 @@
 // ============================================================
 // 방문/사용 통계 (관리자 페이지용, 실패해도 앱 동작에는 영향 없음)
 // ============================================================
-function trackEvent(event, tab) {
+function trackEvent(event, tab, name1, name2) {
   try {
+    const payload = { event };
+    if (tab) payload.tab = tab;
+    if (name1) payload.name1 = name1;
+    if (name2) payload.name2 = name2;
     fetch('/api/track', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(tab ? { event, tab } : { event }),
+      body: JSON.stringify(payload),
       keepalive: true,
     }).catch(() => {});
   } catch (e) {}
@@ -2137,7 +2141,7 @@ document.getElementById('checkBtn').addEventListener('click', () => {
     document.getElementById('result').classList.remove('show');
     return;
   }
-  trackEvent('tab_action', 'name');
+  trackEvent('tab_action', 'name', name1, name2);
   showResult(name1, name2);
 });
 
@@ -2786,7 +2790,7 @@ document.getElementById('sajuCompatBtn').addEventListener('click', () => {
     return;
   }
   errEl.style.display = 'none';
-  trackEvent('tab_action', 'sajuCompat');
+  trackEvent('tab_action', 'sajuCompat', document.getElementById('scName1').value.trim(), document.getElementById('scName2').value.trim());
 
   const [y1, m1, dd1] = d1.split('-').map(Number);
   const [y2, m2, dd2] = d2.split('-').map(Number);
@@ -3015,7 +3019,7 @@ document.getElementById('zodiacBtn').addEventListener('click', () => {
     return;
   }
   errEl.style.display = 'none';
-  trackEvent('tab_action', 'zodiac');
+  trackEvent('tab_action', 'zodiac', document.getElementById('zName1').value.trim(), document.getElementById('zName2').value.trim());
 
   const [, m1, dd1] = d1.split('-').map(Number);
   const [, m2, dd2] = d2.split('-').map(Number);
@@ -3068,11 +3072,11 @@ function getBloodMatchup(t1, t2) {
 }
 
 document.getElementById('bloodBtn').addEventListener('click', () => {
-  trackEvent('tab_action', 'blood');
   const t1 = document.getElementById('bType1').value;
   const t2 = document.getElementById('bType2').value;
   const n1 = document.getElementById('bName1').value.trim() || '첫 번째 분';
   const n2 = document.getElementById('bName2').value.trim() || '두 번째 분';
+  trackEvent('tab_action', 'blood', n1, n2);
   const matchup = getBloodMatchup(t1, t2);
 
   const tier = renderScoreUI('blood', matchup.score);
@@ -3191,11 +3195,11 @@ function computeMbtiCompat(type1, type2) {
 }
 
 document.getElementById('mbtiBtn').addEventListener('click', () => {
-  trackEvent('tab_action', 'mbti');
   const type1 = document.getElementById('mType1').value;
   const type2 = document.getElementById('mType2').value;
   const n1 = document.getElementById('mName1').value.trim() || '첫 번째 분';
   const n2 = document.getElementById('mName2').value.trim() || '두 번째 분';
+  trackEvent('tab_action', 'mbti', n1, n2);
   const result = computeMbtiCompat(type1, type2);
 
   const tier = renderScoreUI('mbti', result.score);
@@ -3256,7 +3260,7 @@ document.getElementById('comboBtn').addEventListener('click', () => {
     return;
   }
   errEl.style.display = 'none';
-  trackEvent('tab_action', 'combo');
+  trackEvent('tab_action', 'combo', name1, name2);
 
   // 1) 이름 궁합
   const a1 = analyzeName(name1), a2 = analyzeName(name2);
