@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="description" content="이름, 사주팔자, 별자리, 혈액형, MBTI로 보는 우리 둘의 궁합을 재미로 확인하고 인스타 스토리용 이미지로 저장해보세요.">
+<meta name="naver-site-verification" content="20068583c040c0765b7f26d04e26fd5f2f681c26" />
 
 <!-- ===== PWA (홈 화면 설치 / 오프라인 실행) ===== -->
 <link rel="manifest" href="manifest.webmanifest">
@@ -362,14 +363,6 @@
   }
   .tab-btn .tab-icon { font-size: 21px; line-height: 1; }
   .tab-btn .tab-label { line-height: 1.1; }
-  /* 마지막 '종합 궁합'은 홀로 남는 줄이라 가로로 꽉 채워 의도적인 배치로 보이게 */
-  .tab-btn:last-child {
-    flex: 1 1 100%;
-    flex-direction: row;
-    gap: 7px;
-    padding: 10px 4px;
-  }
-  .tab-btn:last-child .tab-icon { font-size: 18px; }
   .tab-btn.active {
     background: var(--grad-amber);
     color: #fff;
@@ -521,6 +514,33 @@
     margin-bottom: 10px;
   }
   .saju-name-title:empty { display: none; margin: 0; }
+
+  .today-date-badge {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: #9c6b0a;
+    background: var(--panel);
+    border-radius: 999px;
+    padding: 8px 14px;
+    margin: 0 auto 16px;
+    display: table;
+  }
+
+  .lucky-row {
+    display: flex;
+    gap: 8px;
+    margin: 4px 0 6px;
+  }
+  .lucky-chip {
+    flex: 1;
+    text-align: center;
+    background: var(--panel);
+    border-radius: 12px;
+    padding: 10px 4px;
+  }
+  .lucky-chip .lucky-label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 3px; }
+  .lucky-chip .lucky-value { display: block; font-size: 15px; font-weight: 700; color: var(--purple); }
 
   /* ---- 두 사람 입력 (사주궁합/별자리궁합/혈액형궁합 공통) ---- */
   .person-form {
@@ -1074,6 +1094,7 @@
   <div class="tabs">
     <button class="tab-btn active" id="tabBtnName"><span class="tab-icon">💞</span><span class="tab-label">이름 궁합</span></button>
     <button class="tab-btn" id="tabBtnSaju"><span class="tab-icon">🔮</span><span class="tab-label">사주팔자</span></button>
+    <button class="tab-btn" id="tabBtnToday"><span class="tab-icon">🌅</span><span class="tab-label">오늘의 운세</span></button>
     <button class="tab-btn" id="tabBtnSajuCompat"><span class="tab-icon">🀄</span><span class="tab-label">사주 궁합</span></button>
     <button class="tab-btn" id="tabBtnZodiac"><span class="tab-icon">⭐</span><span class="tab-label">별자리 궁합</span></button>
     <button class="tab-btn" id="tabBtnBlood"><span class="tab-icon">🩸</span><span class="tab-label">혈액형 궁합</span></button>
@@ -1180,10 +1201,61 @@
         <button class="story-btn" id="sajuStoryBtn">📸 스토리 이미지</button>
         <button class="copy-btn" id="sajuCopyBtn">📋 결과 복사</button>
       </div>
+      <button type="button" class="retry-btn" id="sajuRetryBtn">🔄 다시하기</button>
     </div>
   </div>
 
   <p class="disclaimer">* 사주팔자는 절기(입춘 등) 기준 근사 날짜와 일반적인 계산법으로 산출한 재미용 콘텐츠입니다.<br>절기 경계일(전후 1일) 출생, 서머타임, 진태양시(출생지 경도 보정)는 반영되지 않아 정통 만세력과 다를 수 있습니다.</p>
+  </div>
+
+  <div class="tab-panel" id="tabToday">
+  <div class="card">
+    <div class="field">
+      <label for="todayName">이름 (선택)</label>
+      <input type="text" id="todayName" placeholder="예: 뜨아거" maxlength="10">
+    </div>
+    <div class="field">
+      <label>생년월일 (양력)</label>
+      <div class="date-select-row">
+        <select id="todayDate_y"></select>
+        <select id="todayDate_m"></select>
+        <select id="todayDate_d"></select>
+      </div>
+    </div>
+    <button id="todayBtn">오늘의 운세 보기</button>
+    <p class="error" aria-live="polite" id="todayErrorMsg">생년월일을 입력해주세요.</p>
+
+    <div class="result" id="todayResult">
+      <p class="today-date-badge" id="todayDateBadge"></p>
+
+      <div class="score-circle" id="todayScoreCircle">
+        <div class="score-inner">
+          <div class="num" id="todayScoreNum">0</div>
+          <div class="pct-sign">점</div>
+        </div>
+      </div>
+      <div class="tier-emoji" id="todayTierEmoji"></div>
+      <div class="tier-title" id="todayTierTitle"></div>
+      <div class="tier-desc" id="todayTierDesc"></div>
+
+      <div id="todayBreakdown"></div>
+
+      <div class="reason-box">
+        <h4>🔮 오늘의 기운 풀이</h4>
+        <p id="todayReasonText"></p>
+      </div>
+
+      <div class="lucky-row" id="todayLuckyRow"></div>
+
+      <div class="action-row">
+        <button class="story-btn" id="todayStoryBtn">📸 스토리 이미지</button>
+        <button class="copy-btn" id="todayCopyBtn">📋 결과 복사</button>
+      </div>
+      <button type="button" class="retry-btn" id="todayRetryBtn">🔄 다시하기</button>
+    </div>
+  </div>
+
+  <p class="disclaimer">* 오늘의 운세는 태어난 날의 일간(日干)·일지(日支)와 오늘 날짜 일진(日辰)의 오행 관계(십성)를 바탕으로 산출한 재미용 콘텐츠입니다.<br>실제 명리학에서는 대운·세운 등 훨씬 많은 요소를 함께 봅니다.</p>
   </div>
 
   <div class="tab-panel" id="tabSajuCompat">
@@ -1256,6 +1328,7 @@
         <button class="story-btn" id="sajuCompatStoryBtn">📸 스토리 이미지</button>
         <button class="copy-btn" id="sajuCompatCopyBtn">📋 결과 복사</button>
       </div>
+      <button type="button" class="retry-btn" id="sajuCompatRetryBtn">🔄 다시하기</button>
     </div>
   </div>
 
@@ -1322,6 +1395,7 @@
         <button class="story-btn" id="zodiacStoryBtn">📸 스토리 이미지</button>
         <button class="copy-btn" id="zodiacCopyBtn">📋 결과 복사</button>
       </div>
+      <button type="button" class="retry-btn" id="zodiacRetryBtn">🔄 다시하기</button>
     </div>
   </div>
 
@@ -1392,6 +1466,7 @@
         <button class="story-btn" id="bloodStoryBtn">📸 스토리 이미지</button>
         <button class="copy-btn" id="bloodCopyBtn">📋 결과 복사</button>
       </div>
+      <button type="button" class="retry-btn" id="bloodRetryBtn">🔄 다시하기</button>
     </div>
   </div>
 
@@ -1479,6 +1554,7 @@
         <button class="story-btn" id="mbtiStoryBtn">📸 스토리 이미지</button>
         <button class="copy-btn" id="mbtiCopyBtn">📋 결과 복사</button>
       </div>
+      <button type="button" class="retry-btn" id="mbtiRetryBtn">🔄 다시하기</button>
     </div>
   </div>
 
@@ -1581,6 +1657,7 @@
         <button class="story-btn" id="comboStoryBtn">📸 스토리 이미지</button>
         <button class="copy-btn" id="comboCopyBtn">📋 결과 복사</button>
       </div>
+      <button type="button" class="retry-btn" id="comboRetryBtn">🔄 다시하기</button>
     </div>
   </div>
 
@@ -2079,6 +2156,7 @@ document.getElementById('nameRetryBtn').addEventListener('click', () => {
 const TAB_LINKS = [
   ['tabBtnName', 'tabName'],
   ['tabBtnSaju', 'tabSaju'],
+  ['tabBtnToday', 'tabToday'],
   ['tabBtnSajuCompat', 'tabSajuCompat'],
   ['tabBtnZodiac', 'tabZodiac'],
   ['tabBtnBlood', 'tabBlood'],
@@ -2104,6 +2182,7 @@ TAB_LINKS.forEach(([btnId]) => {
 const TAB_BY_PARAM = {
   name: 'tabBtnName',
   saju: 'tabBtnSaju',
+  today: 'tabBtnToday',
   sajucompat: 'tabBtnSajuCompat',
   zodiac: 'tabBtnZodiac',
   blood: 'tabBtnBlood',
@@ -2481,6 +2560,34 @@ function showBox(id) {
   el.classList.add('show');
 }
 
+function resetTabForm(panelId, resultId, errorId) {
+  const panel = document.getElementById(panelId);
+  panel.querySelectorAll('input[type=text]').forEach(inp => { inp.value = ''; });
+  panel.querySelectorAll('select').forEach(sel => {
+    const blankIdx = [...sel.options].findIndex(o => o.value === '' || o.value === 'unknown');
+    sel.selectedIndex = blankIdx >= 0 ? blankIdx : 0;
+  });
+  document.getElementById(resultId).classList.remove('show');
+  if (errorId) {
+    const errEl = document.getElementById(errorId);
+    if (errEl) errEl.style.display = 'none';
+  }
+  const firstInput = panel.querySelector('input[type=text]');
+  if (firstInput) firstInput.focus();
+}
+
+function wireRetryBtn(btnId, panelId, resultId, errorId) {
+  document.getElementById(btnId).addEventListener('click', () => resetTabForm(panelId, resultId, errorId));
+}
+
+wireRetryBtn('sajuRetryBtn', 'tabSaju', 'sajuResult', 'sajuErrorMsg');
+wireRetryBtn('todayRetryBtn', 'tabToday', 'todayResult', 'todayErrorMsg');
+wireRetryBtn('sajuCompatRetryBtn', 'tabSajuCompat', 'sajuCompatResult', 'sajuCompatErrorMsg');
+wireRetryBtn('zodiacRetryBtn', 'tabZodiac', 'zodiacResult', 'zodiacErrorMsg');
+wireRetryBtn('bloodRetryBtn', 'tabBlood', 'bloodResult', null);
+wireRetryBtn('mbtiRetryBtn', 'tabMbti', 'mbtiResult', null);
+wireRetryBtn('comboRetryBtn', 'tabCombo', 'comboResult', 'comboErrorMsg');
+
 function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
 
 // ============================================================
@@ -2682,6 +2789,135 @@ document.getElementById('sajuCompatBtn').addEventListener('click', () => {
   const n2 = document.getElementById('scName2').value.trim() || '두 번째 분';
   lastSajuCompatResult = { ...result, tier, name1: n1, name2: n2 };
   playScoreSfx(result.score);
+});
+
+// ============================================================
+// 오늘의 운세 (태어난 날 일간·일지 vs 오늘 일진의 오행 관계 = 십성)
+// ============================================================
+initDateSelect('todayDate');
+
+const SIPSUNG_INFO = {
+  same: {
+    label: '비화(比和)',
+    overall: 66, love: 56, money: 50, health: 76,
+    text: (me, td) => `오늘은 나(${me})와 같은 기운인 ${td}의 날이에요. 비화(比和)의 기운으로 내 색깔과 고집이 뚜렷하게 드러나요. 주도적으로 움직이기엔 좋지만, 남 얘기가 잘 안 들릴 수 있으니 한 박자 쉬어가세요.`,
+  },
+  a_generates_b: {
+    label: '식상(食傷)',
+    overall: 74, love: 78, money: 54, health: 58,
+    text: (me, td) => `오늘은 내(${me}) 기운을 밖으로 쏟아내는 ${td}의 날이에요. 식상(食傷)의 기운이라 표현력과 아이디어가 반짝여요. 다만 에너지 소모가 커서 체력 관리가 필요해요.`,
+  },
+  b_generates_a: {
+    label: '인성(印星)',
+    overall: 83, love: 70, money: 58, health: 86,
+    text: (me, td) => `오늘은 ${td} 기운이 나(${me})를 채워주는 인성(印星)의 날이에요. 주변의 도움이나 좋은 정보가 들어오기 쉽고, 배우거나 쉬기에도 좋은 흐름이에요.`,
+  },
+  a_overcomes_b: {
+    label: '재성(財星)',
+    overall: 80, love: 68, money: 90, health: 60,
+    text: (me, td) => `오늘은 내(${me})가 ${td} 기운을 다스리는 재성(財星)의 날이에요. 추진력과 결단력이 좋아지고, 특히 재물·성과와 관련된 일에 좋은 흐름이에요.`,
+  },
+  b_overcomes_a: {
+    label: '관성(官星)',
+    overall: 50, love: 44, money: 40, health: 38,
+    text: (me, td) => `오늘은 ${td} 기운이 나(${me})를 누르는 관성(官星)의 날이에요. 책임과 규율이 강조되는 흐름이라 조금 무겁게 느껴질 수 있어요. 무리하지 말고 신중하게 움직이는 게 좋아요.`,
+  },
+};
+
+const TODAY_TIERS = [
+  { min: 85, emoji: '🌟', title: '삐약! 오늘은 완전 럭키데이', desc: '무슨 일을 해도 술술 풀리는 날이에요. 미뤄뒀던 일이 있다면 오늘 시작해보세요!' },
+  { min: 70, emoji: '😊', title: '무난하게 좋은 하루', desc: '전반적으로 순조로운 기운이 흘러요. 평소 하던 대로만 해도 괜찮은 결과가 따라와요.' },
+  { min: 55, emoji: '🙂', title: '평범한 하루, 무리만 안 하면 OK', desc: '특별히 나쁘지도 좋지도 않은 잔잔한 하루예요. 컨디션에 맞게 페이스를 조절해보세요.' },
+  { min: 40, emoji: '😅', title: '살짝 삐끗대는 하루', desc: '작은 실수나 엇박자가 생기기 쉬운 날이에요. 중요한 결정은 잠시 미뤄두는 게 좋아요.' },
+  { min: 0,  emoji: '😵‍💫', title: '오늘은 조심조심 모드', desc: '긴장되는 일이 생기기 쉬운 날이에요. 무리한 도전보다는 컨디션 관리에 집중하세요.' },
+];
+
+function getTodayTier(score) {
+  return TODAY_TIERS.find(t => score >= t.min);
+}
+
+const LUCKY_BY_ELEMENT = {
+  wood:  { color: '초록색', number: 3, item: '식물 화분' },
+  fire:  { color: '빨간색', number: 2, item: '립밤' },
+  earth: { color: '황토색', number: 5, item: '손수건' },
+  metal: { color: '흰색',   number: 7, item: '이어폰' },
+  water: { color: '남색',   number: 1, item: '텀블러' },
+};
+
+function computeTodayFortune(y, m, d) {
+  const birth = calcSaju(y, m, d, null);
+  const now = new Date();
+  const td = dayGanzi(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  const todayPillar = buildPillar(td.stem, td.branch);
+
+  const rel = ohengRelation(birth.day.stemElement, todayPillar.stemElement);
+  const info = SIPSUNG_INFO[rel.type];
+  const iljiRel = branchRelation(birth.day.branchIdx, todayPillar.branchIdx);
+
+  let bonus = 0;
+  if (iljiRel === 'hap') bonus = 9;
+  else if (iljiRel === 'samhap') bonus = 6;
+  else if (iljiRel === 'same') bonus = 3;
+  else if (iljiRel === 'chung') bonus = -14;
+
+  const overall = clamp(Math.round(info.overall + bonus), 5, 98);
+  const love = clamp(Math.round(info.love + bonus), 5, 98);
+  const money = clamp(Math.round(info.money + bonus * 0.6), 5, 98);
+  const health = clamp(Math.round(info.health + bonus * 0.6), 5, 98);
+
+  const meLabel = `${birth.day.stemChar}${birth.day.stemHanja}(${ELEMENT_INFO[birth.day.stemElement].label})`;
+  const tdLabel = `${todayPillar.stemChar}${todayPillar.stemHanja}(${ELEMENT_INFO[todayPillar.stemElement].label})`;
+  const reasonText = info.text(meLabel, tdLabel);
+  const lucky = LUCKY_BY_ELEMENT[todayPillar.stemElement];
+  const dateLabel = `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일 (${'일월화수목금토'[now.getDay()]}) · 오늘은 ${todayPillar.stemChar}${todayPillar.branchChar}일(${todayPillar.stemHanja}${todayPillar.branchHanja}日)`;
+
+  return { birth, todayPillar, overall, love, money, health, reasonText, sipsungLabel: info.label, lucky, dateLabel };
+}
+
+function renderLuckyRow(containerId, lucky) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = `
+    <div class="lucky-chip"><span class="lucky-label">행운의 색</span><span class="lucky-value">${lucky.color}</span></div>
+    <div class="lucky-chip"><span class="lucky-label">행운의 숫자</span><span class="lucky-value">${lucky.number}</span></div>
+    <div class="lucky-chip"><span class="lucky-label">행운의 아이템</span><span class="lucky-value">${lucky.item}</span></div>
+  `;
+}
+
+let lastTodayResult = null;
+
+document.getElementById('todayBtn').addEventListener('click', () => {
+  const d = getDateValue('todayDate');
+  const errEl = document.getElementById('todayErrorMsg');
+  if (!d) {
+    errEl.style.display = 'block';
+    document.getElementById('todayResult').classList.remove('show');
+    return;
+  }
+  errEl.style.display = 'none';
+
+  const [y, m, dd] = d.split('-').map(Number);
+  const result = computeTodayFortune(y, m, dd);
+  const tier = getTodayTier(result.overall);
+  const name = document.getElementById('todayName').value.trim() || '나';
+
+  document.getElementById('todayDateBadge').textContent = result.dateLabel;
+  const circle = document.getElementById('todayScoreCircle');
+  circle.style.setProperty('--pct', result.overall);
+  document.getElementById('todayScoreNum').textContent = result.overall;
+  document.getElementById('todayTierEmoji').textContent = tier.emoji;
+  document.getElementById('todayTierTitle').textContent = tier.title;
+  document.getElementById('todayTierDesc').textContent = tier.desc;
+  document.getElementById('todayReasonText').textContent = result.reasonText;
+  renderCategoryRows('todayBreakdown', [
+    { icon: '💕', label: '애정운', score: result.love, desc: result.love >= 65 ? '마음이 잘 통하고 표현하기 좋은 날이에요.' : result.love >= 45 ? '무난한 흐름이에요. 작은 배려가 관계를 더 좋게 만들어요.' : '오해가 생기기 쉬우니 말 한마디 더 신경 써보세요.' },
+    { icon: '💰', label: '재물운', score: result.money, desc: result.money >= 65 ? '뜻밖의 수입이나 좋은 성과가 따라올 수 있어요.' : result.money >= 45 ? '큰 변동 없이 무난하게 지나가는 흐름이에요.' : '오늘은 큰 지출이나 투자는 신중하게 결정하세요.' },
+    { icon: '💪', label: '건강운', score: result.health, desc: result.health >= 65 ? '컨디션이 좋고 활력이 넘치는 날이에요.' : result.health >= 45 ? '평소 컨디션을 유지하는 무난한 하루예요.' : '무리하지 말고 충분한 휴식을 챙기세요.' },
+  ]);
+  renderLuckyRow('todayLuckyRow', result.lucky);
+  showBox('todayResult');
+
+  lastTodayResult = { ...result, tier, name };
+  playScoreSfx(result.overall);
 });
 
 // ============================================================
@@ -2969,8 +3205,8 @@ document.getElementById('mbtiBtn').addEventListener('click', () => {
 populateHourSelect(document.getElementById('cbHour1'));
 populateHourSelect(document.getElementById('cbHour2'));
 
-function renderComboBreakdown(items) {
-  const el = document.getElementById('comboBreakdown');
+function renderCategoryRows(containerId, items) {
+  const el = document.getElementById(containerId);
   el.innerHTML = '';
   items.forEach(item => {
     const row = document.createElement('div');
@@ -3030,7 +3266,7 @@ document.getElementById('comboBtn').addEventListener('click', () => {
   const overall = Math.round((nameScore + sajuRes.score + zodiacMatch.score + bloodMatch.score + mbtiRes.score) / 5);
 
   const tier = renderScoreUI('combo', overall);
-  renderComboBreakdown([
+  renderCategoryRows('comboBreakdown', [
     { icon: '💞', label: '이름 궁합', score: nameScore, desc: `총 획수 ${a1.total}획과 ${a2.total}획을 전통 이름 궁합 계산법(피라미드 획수 감산법)으로 계산한 점수예요.` },
     { icon: '🀄', label: '사주 궁합', score: sajuRes.score, desc: sajuRes.ilganText },
     { icon: sign1.emoji + sign2.emoji, label: '별자리 궁합', score: zodiacMatch.score, desc: `${sign1.name}와 ${sign2.name}: ${zodiacMatch.desc}` },
@@ -3072,6 +3308,7 @@ const THEME_BY_TIER = [
   { bgFrom: '#e0bd6b', bgTo: '#b8873a', stickers: ['😬','🌙','⭐','✨','🔮','🌌','💫'] },
 ];
 const SAJU_THEME = { bgFrom: '#ffe9a8', bgTo: '#ffca28', stickers: ['🔮','✨','⭐','🌙','💫','🀄','🐥'] };
+const TODAY_THEME = { bgFrom: '#ffe0a3', bgTo: '#ffb74d', stickers: ['🌅','✨','⭐','🍀','💫','🔮','🐥'] };
 
 const STICKER_SPOTS = [
   { x: 120, y: 180, size: 100, rot: -18 },
@@ -3870,6 +4107,74 @@ function renderStoryCard(kind) {
     y = drawLabeledParagraph(ctx, '⚠️ 유의할 점', detail.caution, y, 3);
 
     drawStoryWatermark(ctx);
+  } else if (kind === 'today') {
+    const r = lastTodayResult;
+    drawStoryBackground(ctx, TODAY_THEME);
+    drawStoryCardFrame(ctx);
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    drawEmojiGlow(ctx, 540, 300, 130);
+    ctx.fillStyle = '#b5650d';
+    ctx.font = "700 42px 'Malgun Gothic', sans-serif";
+    ctx.fillText(`🌅 ${r.name}님의 오늘의 운세`, 540, 290);
+
+    drawPillBadge(ctx, r.dateLabel, 540, 380, '#ffb300');
+
+    ctx.font = "96px 'Malgun Gothic', sans-serif";
+    ctx.fillText(r.tier.emoji, 540, 500);
+
+    {
+      const scoreText = String(r.overall);
+      const scoreFont = "800 150px 'Malgun Gothic', sans-serif";
+      const ptFont = "600 40px 'Malgun Gothic', sans-serif";
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+      ctx.font = scoreFont;
+      const scoreWidth = ctx.measureText(scoreText).width;
+      ctx.font = ptFont;
+      const ptWidth = ctx.measureText('점').width;
+      const gap = 14;
+      const totalWidth = scoreWidth + gap + ptWidth;
+      const startX = 540 - totalWidth / 2;
+      const baselineY = 660;
+      ctx.fillStyle = '#ff5c8a';
+      ctx.font = scoreFont;
+      ctx.fillText(scoreText, startX, baselineY);
+      ctx.fillStyle = '#aa88cc';
+      ctx.font = ptFont;
+      ctx.fillText('점', startX + scoreWidth + gap, baselineY);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+    }
+
+    ctx.fillStyle = '#333344';
+    ctx.font = "700 46px 'Malgun Gothic', sans-serif";
+    ctx.fillText(r.tier.title, 540, 730);
+
+    ctx.fillStyle = '#666677';
+    ctx.font = "400 29px 'Malgun Gothic', sans-serif";
+    let ty = wrapCanvasText(ctx, r.tier.desc, 540, 795, 780, 40, 2);
+
+    ty += 20; drawGradientDivider(ctx, ty, 460); ty += 40;
+    ty = drawLabeledParagraph(ctx, '🔮 오늘의 기운 풀이', r.reasonText, ty, 4);
+
+    ty += 18; drawGradientDivider(ctx, ty, 460); ty += 44;
+    ctx.fillStyle = '#aa53a8';
+    ctx.font = "700 30px 'Malgun Gothic', sans-serif";
+    ctx.fillText('💕 애정운 · 💰 재물운 · 💪 건강운', 540, ty);
+    ty += 50;
+    ctx.font = "700 34px 'Malgun Gothic', sans-serif";
+    ctx.fillStyle = '#333344';
+    ctx.fillText(`${r.love}점  ·  ${r.money}점  ·  ${r.health}점`, 540, ty);
+
+    ty += 56;
+    ctx.fillStyle = '#b5650d';
+    ctx.font = "600 28px 'Malgun Gothic', sans-serif";
+    ctx.fillText(`🍀 오늘의 행운: ${r.lucky.color} · 숫자 ${r.lucky.number} · ${r.lucky.item}`, 540, ty);
+
+    const wIdx = r.overall >= 85 ? 0 : r.overall >= 70 ? 1 : r.overall >= 55 ? 2 : r.overall >= 40 ? 3 : 5;
+    drawStoryWatermark(ctx, wIdx);
   } else {
     let titleText, emoji, namesText, score, tier, reasonText = null, extraLines = [];
 
@@ -3945,6 +4250,7 @@ document.getElementById('storyModal').addEventListener('click', (e) => {
 
 document.getElementById('nameStoryBtn').addEventListener('click', () => openStoryModal('name'));
 document.getElementById('sajuStoryBtn').addEventListener('click', () => openStoryModal('saju'));
+document.getElementById('todayStoryBtn').addEventListener('click', () => openStoryModal('today'));
 document.getElementById('sajuCompatStoryBtn').addEventListener('click', () => openStoryModal('sajuCompat'));
 document.getElementById('zodiacStoryBtn').addEventListener('click', () => openStoryModal('zodiac'));
 document.getElementById('bloodStoryBtn').addEventListener('click', () => openStoryModal('blood'));
@@ -3967,6 +4273,10 @@ function buildResultText(kind) {
     const nameLine = r.name ? `${r.name}님의 사주팔자` : '나의 사주팔자';
     const pillarLine = `년주 ${p.year.stemChar}${p.year.branchChar} · 월주 ${p.month.stemChar}${p.month.branchChar} · 일주 ${p.day.stemChar}${p.day.branchChar}` + (p.hour ? ` · 시주 ${p.hour.stemChar}${p.hour.branchChar}` : '');
     return `🔮 ${nameLine}\n일간 ${p.day.stemChar}${p.day.stemHanja} · ${r.detail.keyword}\n${pillarLine}\n\n${r.detail.desc}${FOOTER}`;
+  }
+  if (kind === 'today') {
+    const r = lastTodayResult;
+    return `🌅 ${r.name}님의 오늘의 운세\n${r.dateLabel}\n\n${r.overall}점 · ${r.tier.title}\n${r.tier.desc}\n\n${r.reasonText}\n\n💕 애정운 ${r.love}점 · 💰 재물운 ${r.money}점 · 💪 건강운 ${r.health}점\n🍀 행운의 색 ${r.lucky.color} · 숫자 ${r.lucky.number} · ${r.lucky.item}${FOOTER}`;
   }
   if (kind === 'sajuCompat') {
     const r = lastSajuCompatResult;
@@ -4022,6 +4332,7 @@ async function copyResultText(kind, btn) {
 
 document.getElementById('nameCopyBtn').addEventListener('click', (e) => copyResultText('name', e.currentTarget));
 document.getElementById('sajuCopyBtn').addEventListener('click', (e) => copyResultText('saju', e.currentTarget));
+document.getElementById('todayCopyBtn').addEventListener('click', (e) => copyResultText('today', e.currentTarget));
 document.getElementById('sajuCompatCopyBtn').addEventListener('click', (e) => copyResultText('sajuCompat', e.currentTarget));
 document.getElementById('zodiacCopyBtn').addEventListener('click', (e) => copyResultText('zodiac', e.currentTarget));
 document.getElementById('bloodCopyBtn').addEventListener('click', (e) => copyResultText('blood', e.currentTarget));

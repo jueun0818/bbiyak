@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://jueun0818.github.io/bbiyak/sitemap.xml
