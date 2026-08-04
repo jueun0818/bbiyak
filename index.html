@@ -2837,27 +2837,47 @@ const SIPSUNG_INFO = {
   same: {
     label: '비화(比和)',
     overall: 66, love: 56, money: 50, health: 76,
-    text: (me, td) => `오늘은 나(${me})와 같은 기운인 ${td}의 날이에요. 비화(比和)의 기운으로 내 색깔과 고집이 뚜렷하게 드러나요. 주도적으로 움직이기엔 좋지만, 남 얘기가 잘 안 들릴 수 있으니 한 박자 쉬어가세요.`,
+    texts: [
+      (me, td) => `오늘은 나(${me})와 같은 기운인 ${td}의 날이에요. 비화(比和)의 기운으로 내 색깔과 고집이 뚜렷하게 드러나요. 주도적으로 움직이기엔 좋지만, 남 얘기가 잘 안 들릴 수 있으니 한 박자 쉬어가세요.`,
+      (me, td) => `${me}인 내 기운과 오늘의 ${td} 기운이 똑같이 겹치는 비화(比和)의 날이에요. 평소보다 자기 주장이 강해지고 승부욕도 커지는 편이라, 협업보다는 혼자 몰두하는 일이 잘 풀려요.`,
+      (me, td) => `오늘 하루는 ${td} 기운이 ${me}인 나와 나란히 서는 비화(比和)의 흐름이에요. 익숙한 방식, 익숙한 사람들과 함께할 때 편안함을 느끼는 날이니 새로운 시도는 다음으로 미뤄도 괜찮아요.`,
+    ],
   },
   a_generates_b: {
     label: '식상(食傷)',
     overall: 74, love: 78, money: 54, health: 58,
-    text: (me, td) => `오늘은 내(${me}) 기운을 밖으로 쏟아내는 ${td}의 날이에요. 식상(食傷)의 기운이라 표현력과 아이디어가 반짝여요. 다만 에너지 소모가 커서 체력 관리가 필요해요.`,
+    texts: [
+      (me, td) => `오늘은 내(${me}) 기운을 밖으로 쏟아내는 ${td}의 날이에요. 식상(食傷)의 기운이라 표현력과 아이디어가 반짝여요. 다만 에너지 소모가 커서 체력 관리가 필요해요.`,
+      (me, td) => `${me}인 내가 오늘의 ${td} 기운을 만들어내는 식상(食傷)의 흐름이에요. 말이든 글이든 창작이든, 뭔가를 표현하는 일에서 특히 빛을 발하는 날이니 SNS나 대화에서 적극적으로 나서보세요.`,
+      (me, td) => `오늘은 ${me}인 나의 기운이 ${td}를 향해 흘러나가는 식상(食傷)의 날이에요. 아이디어는 잘 떠오르지만 산만해지기도 쉬우니, 한 가지에 집중하면 훨씬 좋은 결과가 따라와요.`,
+    ],
   },
   b_generates_a: {
     label: '인성(印星)',
     overall: 83, love: 70, money: 58, health: 86,
-    text: (me, td) => `오늘은 ${td} 기운이 나(${me})를 채워주는 인성(印星)의 날이에요. 주변의 도움이나 좋은 정보가 들어오기 쉽고, 배우거나 쉬기에도 좋은 흐름이에요.`,
+    texts: [
+      (me, td) => `오늘은 ${td} 기운이 나(${me})를 채워주는 인성(印星)의 날이에요. 주변의 도움이나 좋은 정보가 들어오기 쉽고, 배우거나 쉬기에도 좋은 흐름이에요.`,
+      (me, td) => `오늘의 ${td} 기운이 ${me}인 나를 든든하게 받쳐주는 인성(印星)의 흐름이에요. 귀인의 조언이나 뜻밖의 좋은 소식이 들어올 수 있으니, 주변 이야기에 귀 기울여보세요.`,
+      (me, td) => `${td} 기운이 ${me}인 나에게 스며드는 인성(印星)의 날이에요. 무리해서 밀어붙이기보다 한 박자 쉬면서 재충전하면, 오늘 받은 기운이 며칠 뒤 더 큰 힘이 되어줄 거예요.`,
+    ],
   },
   a_overcomes_b: {
     label: '재성(財星)',
     overall: 80, love: 68, money: 90, health: 60,
-    text: (me, td) => `오늘은 내(${me})가 ${td} 기운을 다스리는 재성(財星)의 날이에요. 추진력과 결단력이 좋아지고, 특히 재물·성과와 관련된 일에 좋은 흐름이에요.`,
+    texts: [
+      (me, td) => `오늘은 내(${me})가 ${td} 기운을 다스리는 재성(財星)의 날이에요. 추진력과 결단력이 좋아지고, 특히 재물·성과와 관련된 일에 좋은 흐름이에요.`,
+      (me, td) => `${me}인 내가 오늘의 ${td} 기운을 손에 쥐고 움직이는 재성(財星)의 흐름이에요. 협상, 거래, 계약처럼 결과가 명확한 일에서 특히 유리하니 미뤄뒀던 일이 있다면 오늘 매듭지어보세요.`,
+      (me, td) => `오늘은 ${me}인 내가 ${td} 기운을 주도적으로 이끄는 재성(財星)의 날이에요. 목표를 세우고 밀어붙이면 성과가 따라오는 흐름이라, 자신감 있게 움직여도 좋아요.`,
+    ],
   },
   b_overcomes_a: {
     label: '관성(官星)',
     overall: 50, love: 44, money: 40, health: 38,
-    text: (me, td) => `오늘은 ${td} 기운이 나(${me})를 누르는 관성(官星)의 날이에요. 책임과 규율이 강조되는 흐름이라 조금 무겁게 느껴질 수 있어요. 무리하지 말고 신중하게 움직이는 게 좋아요.`,
+    texts: [
+      (me, td) => `오늘은 ${td} 기운이 나(${me})를 누르는 관성(官星)의 날이에요. 책임과 규율이 강조되는 흐름이라 조금 무겁게 느껴질 수 있어요. 무리하지 말고 신중하게 움직이는 게 좋아요.`,
+      (me, td) => `${td} 기운이 ${me}인 나를 압박하는 관성(官星)의 흐름이에요. 윗사람이나 규칙, 마감처럼 통제받는 느낌이 드는 날이지만, 그만큼 책임감 있게 해내면 인정받기 쉬운 하루이기도 해요.`,
+      (me, td) => `오늘은 ${td} 기운이 ${me}인 나를 시험하는 관성(官星)의 날이에요. 뜻대로 안 풀리는 순간이 있어도 감정적으로 대응하지 말고, 원칙대로 차근차근 처리하면 무난히 넘어갈 수 있어요.`,
+    ],
   },
 };
 
@@ -2910,20 +2930,32 @@ function computeTodayFortune(y, m, d) {
   const meLabel = `${birth.day.stemChar}${birth.day.stemHanja}(${ELEMENT_INFO[birth.day.stemElement].label})`;
   const tdLabel = `${todayPillar.stemChar}${todayPillar.stemHanja}(${ELEMENT_INFO[todayPillar.stemElement].label})`;
 
+  const luckySeed = hashSeed(`${birth.day.stemIdx}-${birth.day.branchIdx}-${todayPillar.stemIdx}-${todayPillar.branchIdx}`);
+  const textVariant = luckySeed % info.texts.length;
+  const flavorVariant = (luckySeed >>> 24) % 2;
+
+  const b1 = branchLabel(birth.day), b2 = branchLabel(todayPillar);
   let flavor = '';
   if (iljiRel === 'same') {
-    flavor = ` 일지도 ${branchLabel(birth.day)}로 오늘과 똑같아서 컨디션이 안정적인 하루예요.`;
+    flavor = flavorVariant === 0
+      ? ` 일지도 ${b1}로 오늘과 똑같아서 컨디션이 안정적인 하루예요.`
+      : ` 게다가 일지까지 ${b1}로 겹쳐서, 평소 내 리듬 그대로 움직이면 되는 편안한 날이에요.`;
   } else if (iljiRel === 'hap') {
-    flavor = ` 일지 ${branchLabel(birth.day)}가 오늘 ${branchLabel(todayPillar)}와 육합을 이루어 주변 사람과 손발이 잘 맞는 날이에요.`;
+    flavor = flavorVariant === 0
+      ? ` 일지 ${b1}가 오늘 ${b2}와 육합을 이루어 주변 사람과 손발이 잘 맞는 날이에요.`
+      : ` 일지 ${b1}와 오늘의 ${b2}가 육합으로 이어져, 약속이나 만남을 잡기에도 좋은 흐름이에요.`;
   } else if (iljiRel === 'samhap') {
     const label = samhapLabelOf(birth.day.branchIdx, todayPillar.branchIdx);
-    flavor = ` 일지 ${branchLabel(birth.day)}가 오늘 ${branchLabel(todayPillar)}와 삼합(${label})을 이루어 뜻밖의 시너지가 생기기 쉬워요.`;
+    flavor = flavorVariant === 0
+      ? ` 일지 ${b1}가 오늘 ${b2}와 삼합(${label})을 이루어 뜻밖의 시너지가 생기기 쉬워요.`
+      : ` 일지 ${b1}와 오늘의 ${b2}가 삼합(${label})으로 뭉쳐서, 여럿이 함께하는 일에서 특히 좋은 결과가 나올 수 있어요.`;
   } else if (iljiRel === 'chung') {
-    flavor = ` 다만 일지 ${branchLabel(birth.day)}가 오늘 ${branchLabel(todayPillar)}와 충(沖)을 이루니, 갑작스러운 변수에는 대비해두세요.`;
+    flavor = flavorVariant === 0
+      ? ` 다만 일지 ${b1}가 오늘 ${b2}와 충(沖)을 이루니, 갑작스러운 변수에는 대비해두세요.`
+      : ` 다만 일지 ${b1}와 오늘의 ${b2}가 충(沖)으로 부딪히니, 평소보다 감정 기복이 있을 수 있어 여유를 갖고 넘기세요.`;
   }
-  const reasonText = info.text(meLabel, tdLabel) + flavor;
+  const reasonText = info.texts[textVariant](meLabel, tdLabel) + flavor;
 
-  const luckySeed = hashSeed(`${birth.day.stemIdx}-${birth.day.branchIdx}-${todayPillar.stemIdx}-${todayPillar.branchIdx}`);
   const lucky = {
     color: LUCKY_COLORS[luckySeed % LUCKY_COLORS.length],
     number: ((luckySeed >>> 8) % 9) + 1,
