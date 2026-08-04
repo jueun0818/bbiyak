@@ -247,6 +247,12 @@ function relTime(ts) {
   return `${day}일 전`;
 }
 
+function absTime(ts) {
+  const d = new Date(ts);
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 function esc(s) {
   const d = document.createElement('div');
   d.textContent = s;
@@ -304,7 +310,7 @@ function render(data) {
       <div class="log-row-inner">
         <div class="log-row-top">
           <span class="log-pair"><span class="log-tab">${esc(l.label)}</span>${pairHtml}</span>
-          <span class="log-meta">${relTime(l.t)}</span>
+          <span class="log-meta">${relTime(l.t)} · ${absTime(l.t)}</span>
         </div>
         ${visitorBadge}
       </div>
