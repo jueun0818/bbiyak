@@ -50,7 +50,7 @@
   }
   * { box-sizing: border-box; }
   html {
-    background: linear-gradient(168deg, #fffdf2 0%, #fff6d4 38%, #ffeeb4 100%);
+    background: linear-gradient(168deg, #fffbea 0%, #ffedad 38%, #ffd966 100%);
   }
   body {
     margin: 0;
@@ -58,11 +58,11 @@
     font-family: "Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
-    /* 겹겹의 방사형 그라데이션 6장을 2장으로 줄여 밝기는 유지하고 탁한 느낌만 걷어냄 */
+    /* 포스터 톤에 맞춰 더 진하고 화사한 골드-옐로우로 */
     background:
-      radial-gradient(120% 80% at 15% 0%, rgba(255,236,150,0.85) 0%, rgba(255,236,150,0) 55%),
-      radial-gradient(100% 70% at 92% 100%, rgba(255,205,80,0.42) 0%, rgba(255,205,80,0) 55%),
-      linear-gradient(168deg, #fffdf2 0%, #fff6d4 38%, #ffeeb4 100%);
+      radial-gradient(120% 80% at 15% 0%, rgba(255,224,110,0.9) 0%, rgba(255,224,110,0) 55%),
+      radial-gradient(100% 70% at 92% 100%, rgba(255,183,40,0.5) 0%, rgba(255,183,40,0) 55%),
+      linear-gradient(168deg, #fffbea 0%, #ffedad 38%, #ffd966 100%);
     background-attachment: fixed;
     color: var(--text);
     display: flex;
@@ -1073,6 +1073,27 @@
     font-weight: 700;
     cursor: pointer;
   }
+  .story-share-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .story-secondary-btn {
+    flex: 1;
+    padding: 13px 8px;
+    border: 2px solid rgba(255,255,255,0.6);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.14);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .story-secondary-btn.copied {
+    background: #fff;
+    color: #8f5c00;
+    border-color: #fff;
+  }
 </style>
 </head>
 <body>
@@ -1150,6 +1171,7 @@
         <button class="copy-btn" id="nameCopyBtn">📋 결과 복사</button>
       </div>
       <button type="button" class="retry-btn" id="nameRetryBtn">🔄 다시하기</button>
+      <ins class="adsbygoogle bbiyak-ad" style="display:block; margin-top:16px" data-ad-client="ca-pub-4697935900449471" data-ad-slot="0000000000" data-ad-format="auto" data-full-width-responsive="true"></ins>
     </div>
   </div>
 
@@ -1204,6 +1226,7 @@
         <button class="copy-btn" id="sajuCopyBtn">📋 결과 복사</button>
       </div>
       <button type="button" class="retry-btn" id="sajuRetryBtn">🔄 다시하기</button>
+      <ins class="adsbygoogle bbiyak-ad" style="display:block; margin-top:16px" data-ad-client="ca-pub-4697935900449471" data-ad-slot="0000000000" data-ad-format="auto" data-full-width-responsive="true"></ins>
     </div>
   </div>
 
@@ -1254,6 +1277,7 @@
         <button class="copy-btn" id="todayCopyBtn">📋 결과 복사</button>
       </div>
       <button type="button" class="retry-btn" id="todayRetryBtn">🔄 다시하기</button>
+      <ins class="adsbygoogle bbiyak-ad" style="display:block; margin-top:16px" data-ad-client="ca-pub-4697935900449471" data-ad-slot="0000000000" data-ad-format="auto" data-full-width-responsive="true"></ins>
     </div>
   </div>
 
@@ -1331,6 +1355,7 @@
         <button class="copy-btn" id="sajuCompatCopyBtn">📋 결과 복사</button>
       </div>
       <button type="button" class="retry-btn" id="sajuCompatRetryBtn">🔄 다시하기</button>
+      <ins class="adsbygoogle bbiyak-ad" style="display:block; margin-top:16px" data-ad-client="ca-pub-4697935900449471" data-ad-slot="0000000000" data-ad-format="auto" data-full-width-responsive="true"></ins>
     </div>
   </div>
 
@@ -1398,6 +1423,7 @@
         <button class="copy-btn" id="zodiacCopyBtn">📋 결과 복사</button>
       </div>
       <button type="button" class="retry-btn" id="zodiacRetryBtn">🔄 다시하기</button>
+      <ins class="adsbygoogle bbiyak-ad" style="display:block; margin-top:16px" data-ad-client="ca-pub-4697935900449471" data-ad-slot="0000000000" data-ad-format="auto" data-full-width-responsive="true"></ins>
     </div>
   </div>
 
@@ -1469,6 +1495,7 @@
         <button class="copy-btn" id="bloodCopyBtn">📋 결과 복사</button>
       </div>
       <button type="button" class="retry-btn" id="bloodRetryBtn">🔄 다시하기</button>
+      <ins class="adsbygoogle bbiyak-ad" style="display:block; margin-top:16px" data-ad-client="ca-pub-4697935900449471" data-ad-slot="0000000000" data-ad-format="auto" data-full-width-responsive="true"></ins>
     </div>
   </div>
 
@@ -1557,6 +1584,7 @@
         <button class="copy-btn" id="mbtiCopyBtn">📋 결과 복사</button>
       </div>
       <button type="button" class="retry-btn" id="mbtiRetryBtn">🔄 다시하기</button>
+      <ins class="adsbygoogle bbiyak-ad" style="display:block; margin-top:16px" data-ad-client="ca-pub-4697935900449471" data-ad-slot="0000000000" data-ad-format="auto" data-full-width-responsive="true"></ins>
     </div>
   </div>
 
@@ -1660,6 +1688,7 @@
         <button class="copy-btn" id="comboCopyBtn">📋 결과 복사</button>
       </div>
       <button type="button" class="retry-btn" id="comboRetryBtn">🔄 다시하기</button>
+      <ins class="adsbygoogle bbiyak-ad" style="display:block; margin-top:16px" data-ad-client="ca-pub-4697935900449471" data-ad-slot="0000000000" data-ad-format="auto" data-full-width-responsive="true"></ins>
     </div>
   </div>
 
@@ -1673,6 +1702,10 @@
     <img id="storyPreviewImg" alt="스토리 이미지 미리보기">
     <a id="storyDownloadBtn" download="삐약궁합_스토리.png">📥 이미지 저장하기</a>
     <button id="storyShareBtn" hidden>📤 바로 공유하기</button>
+    <div class="story-share-row">
+      <button class="story-secondary-btn" id="storyCopyTextBtn">📋 결과 복사</button>
+      <button class="story-secondary-btn" id="storyCopyLinkBtn">🔗 링크 복사</button>
+    </div>
     <p class="story-hint">길게 눌러 저장하거나, 저장 버튼을 눌러주세요</p>
   </div>
 </div>
@@ -2141,6 +2174,7 @@ function showResult(name1, name2) {
   resultEl.classList.remove('show');
   void resultEl.offsetWidth; // reflow to restart animation
   resultEl.classList.add('show');
+  pushBbiyakAd('result');
 
   lastNameResult = { name1, name2, score, tier };
   playScoreSfx(score);
@@ -2571,6 +2605,7 @@ document.getElementById('sajuBtn').addEventListener('click', () => {
   resultEl.classList.remove('show');
   void resultEl.offsetWidth;
   resultEl.classList.add('show');
+  pushBbiyakAd('sajuResult');
 
   lastSajuResult = { pillars, detail, name };
 });
@@ -2594,6 +2629,17 @@ function showBox(id) {
   el.classList.remove('show');
   void el.offsetWidth;
   el.classList.add('show');
+  pushBbiyakAd(id);
+}
+
+// 결과 화면(실제 콘텐츠)이 보일 때만 광고를 push한다 — 빈 화면에 광고가 뜨는 걸 막기 위함.
+// 같은 <ins> 슬롯에 두 번 push하면 애드센스가 에러를 던지므로 슬롯당 한 번만 실행한다.
+function pushBbiyakAd(resultId) {
+  const ins = document.querySelector('#' + resultId + ' .bbiyak-ad');
+  if (ins && !ins.dataset.pushed) {
+    ins.dataset.pushed = '1';
+    (window.adsbygoogle = window.adsbygoogle || []).push({});
+  }
 }
 
 function resetTabForm(panelId, resultId, errorId) {
@@ -2836,47 +2882,47 @@ initDateSelect('todayDate');
 const SIPSUNG_INFO = {
   same: {
     label: '비화(比和)',
-    overall: 66, love: 56, money: 50, health: 76,
+    overall: 72, love: 62, money: 56, health: 80,
     texts: [
-      (me, td) => `오늘은 나(${me})와 같은 기운인 ${td}의 날이에요. 비화(比和)의 기운으로 내 색깔과 고집이 뚜렷하게 드러나요. 주도적으로 움직이기엔 좋지만, 남 얘기가 잘 안 들릴 수 있으니 한 박자 쉬어가세요.`,
-      (me, td) => `${me}인 내 기운과 오늘의 ${td} 기운이 똑같이 겹치는 비화(比和)의 날이에요. 평소보다 자기 주장이 강해지고 승부욕도 커지는 편이라, 협업보다는 혼자 몰두하는 일이 잘 풀려요.`,
-      (me, td) => `오늘 하루는 ${td} 기운이 ${me}인 나와 나란히 서는 비화(比和)의 흐름이에요. 익숙한 방식, 익숙한 사람들과 함께할 때 편안함을 느끼는 날이니 새로운 시도는 다음으로 미뤄도 괜찮아요.`,
+      (me, td) => `오늘은 나(${me})와 기운이 꼭 닮은 ${td}의 날이에요. 비화(比和)의 흐름이라 내 색깔과 고집이 유독 또렷하게 드러나요. 주도적으로 움직이기엔 좋지만, 가끔은 남 얘기에도 귀를 열어보세요.`,
+      (me, td) => `승부욕이 스멀스멀 올라오는 하루예요. ${me}인 내 기운과 오늘의 ${td} 기운이 똑같이 겹치는 비화(比和)라, 협업보다는 혼자 몰두하는 일이 유독 잘 풀려요.`,
+      (me, td) => `낯익은 얼굴, 낯익은 방식이 유난히 편안하게 느껴지는 날이에요. ${td} 기운이 ${me}인 나와 나란히 서는 비화(比和)의 흐름이라, 새로운 시도는 다음으로 미뤄도 좋아요.`,
     ],
   },
   a_generates_b: {
     label: '식상(食傷)',
-    overall: 74, love: 78, money: 54, health: 58,
+    overall: 78, love: 82, money: 60, health: 64,
     texts: [
-      (me, td) => `오늘은 내(${me}) 기운을 밖으로 쏟아내는 ${td}의 날이에요. 식상(食傷)의 기운이라 표현력과 아이디어가 반짝여요. 다만 에너지 소모가 커서 체력 관리가 필요해요.`,
-      (me, td) => `${me}인 내가 오늘의 ${td} 기운을 만들어내는 식상(食傷)의 흐름이에요. 말이든 글이든 창작이든, 뭔가를 표현하는 일에서 특히 빛을 발하는 날이니 SNS나 대화에서 적극적으로 나서보세요.`,
-      (me, td) => `오늘은 ${me}인 나의 기운이 ${td}를 향해 흘러나가는 식상(食傷)의 날이에요. 아이디어는 잘 떠오르지만 산만해지기도 쉬우니, 한 가지에 집중하면 훨씬 좋은 결과가 따라와요.`,
+      (me, td) => `오늘은 내(${me}) 안의 끼가 밖으로 터져 나오는 날이에요. ${td}를 향해 뻗어가는 식상(食傷)의 기운 덕분에 표현력과 아이디어가 반짝여요. 다만 에너지 소모가 커서 체력 관리가 필요해요.`,
+      (me, td) => `말이든 글이든 창작이든, 뭔가를 표현하는 일에서 특히 빛을 발하는 날이에요. ${me}인 내가 ${td} 기운을 만들어내는 식상(食傷)의 흐름이니, SNS나 대화에서 적극적으로 나서보세요.`,
+      (me, td) => `머릿속에 아이디어가 샘솟는 하루예요. ${me}인 나의 기운이 ${td}를 향해 흘러나가는 식상(食傷)의 날이라 산만해지기도 쉬우니, 한 가지에 집중하면 훨씬 좋은 결과가 따라와요.`,
     ],
   },
   b_generates_a: {
     label: '인성(印星)',
-    overall: 83, love: 70, money: 58, health: 86,
+    overall: 86, love: 76, money: 64, health: 90,
     texts: [
-      (me, td) => `오늘은 ${td} 기운이 나(${me})를 채워주는 인성(印星)의 날이에요. 주변의 도움이나 좋은 정보가 들어오기 쉽고, 배우거나 쉬기에도 좋은 흐름이에요.`,
-      (me, td) => `오늘의 ${td} 기운이 ${me}인 나를 든든하게 받쳐주는 인성(印星)의 흐름이에요. 귀인의 조언이나 뜻밖의 좋은 소식이 들어올 수 있으니, 주변 이야기에 귀 기울여보세요.`,
-      (me, td) => `${td} 기운이 ${me}인 나에게 스며드는 인성(印星)의 날이에요. 무리해서 밀어붙이기보다 한 박자 쉬면서 재충전하면, 오늘 받은 기운이 며칠 뒤 더 큰 힘이 되어줄 거예요.`,
+      (me, td) => `오늘은 ${td} 기운이 나(${me})를 든든하게 채워주는 인성(印星)의 날이에요. 주변의 도움이나 좋은 정보가 자연스럽게 들어오고, 배우거나 쉬기에도 좋은 흐름이에요.`,
+      (me, td) => `귀인의 조언이나 뜻밖의 좋은 소식이 찾아올 수 있는 하루예요. 오늘의 ${td} 기운이 ${me}인 나를 받쳐주는 인성(印星)의 흐름이니, 주변 이야기에 귀 기울여보세요.`,
+      (me, td) => `무리해서 밀어붙이기보다 한 박자 쉬면서 재충전하기 좋은 날이에요. ${td} 기운이 ${me}인 나에게 스며드는 인성(印星)이라, 오늘 받은 기운이 며칠 뒤 더 큰 힘이 되어줄 거예요.`,
     ],
   },
   a_overcomes_b: {
     label: '재성(財星)',
-    overall: 80, love: 68, money: 90, health: 60,
+    overall: 85, love: 74, money: 94, health: 66,
     texts: [
-      (me, td) => `오늘은 내(${me})가 ${td} 기운을 다스리는 재성(財星)의 날이에요. 추진력과 결단력이 좋아지고, 특히 재물·성과와 관련된 일에 좋은 흐름이에요.`,
-      (me, td) => `${me}인 내가 오늘의 ${td} 기운을 손에 쥐고 움직이는 재성(財星)의 흐름이에요. 협상, 거래, 계약처럼 결과가 명확한 일에서 특히 유리하니 미뤄뒀던 일이 있다면 오늘 매듭지어보세요.`,
-      (me, td) => `오늘은 ${me}인 내가 ${td} 기운을 주도적으로 이끄는 재성(財星)의 날이에요. 목표를 세우고 밀어붙이면 성과가 따라오는 흐름이라, 자신감 있게 움직여도 좋아요.`,
+      (me, td) => `오늘은 내(${me})가 ${td} 기운을 손에 쥐고 움직이는 재성(財星)의 날이에요. 추진력과 결단력이 좋아지고, 특히 재물·성과와 관련된 일에 유독 좋은 흐름이에요.`,
+      (me, td) => `협상, 거래, 계약처럼 결과가 명확한 일에서 유리한 하루예요. ${me}인 내가 오늘의 ${td} 기운을 다스리는 재성(財星)의 흐름이니, 미뤄뒀던 일이 있다면 오늘 매듭지어보세요.`,
+      (me, td) => `목표를 세우고 밀어붙이면 성과가 따라오는 날이에요. ${me}인 내가 ${td} 기운을 주도적으로 이끄는 재성(財星)의 흐름이라, 자신감 있게 움직여도 좋아요.`,
     ],
   },
   b_overcomes_a: {
     label: '관성(官星)',
-    overall: 50, love: 44, money: 40, health: 38,
+    overall: 60, love: 54, money: 50, health: 48,
     texts: [
-      (me, td) => `오늘은 ${td} 기운이 나(${me})를 누르는 관성(官星)의 날이에요. 책임과 규율이 강조되는 흐름이라 조금 무겁게 느껴질 수 있어요. 무리하지 말고 신중하게 움직이는 게 좋아요.`,
-      (me, td) => `${td} 기운이 ${me}인 나를 압박하는 관성(官星)의 흐름이에요. 윗사람이나 규칙, 마감처럼 통제받는 느낌이 드는 날이지만, 그만큼 책임감 있게 해내면 인정받기 쉬운 하루이기도 해요.`,
-      (me, td) => `오늘은 ${td} 기운이 ${me}인 나를 시험하는 관성(官星)의 날이에요. 뜻대로 안 풀리는 순간이 있어도 감정적으로 대응하지 말고, 원칙대로 차근차근 처리하면 무난히 넘어갈 수 있어요.`,
+      (me, td) => `오늘은 ${td} 기운이 나(${me})를 지그시 눌러보는 관성(官星)의 날이에요. 책임과 규율이 은근히 강조되는 흐름이라 어깨가 살짝 무거울 수 있어요. 서두르지 말고 한 걸음씩 신중하게 움직여보세요.`,
+      (me, td) => `신경 쓸 일이 은근히 많게 느껴지는 하루예요. ${td} 기운이 ${me}인 나를 살짝 조여오는 관성(官星)의 흐름이지만, 차근차근 해내면 그만큼 인정받기 좋은 날이기도 해요.`,
+      (me, td) => `마음처럼 술술 안 풀리는 순간이 있을 수 있는 날이에요. ${td} 기운이 ${me}인 나를 넌지시 시험해보는 관성(官星)이니, 너무 정색하지 말고 원칙대로 차근차근 풀어가면 무난히 넘어갈 수 있어요.`,
     ],
   },
 };
@@ -2884,9 +2930,9 @@ const SIPSUNG_INFO = {
 const TODAY_TIERS = [
   { min: 85, emoji: '🌟', title: '삐약! 오늘은 완전 럭키데이', desc: '무슨 일을 해도 술술 풀리는 날이에요. 미뤄뒀던 일이 있다면 오늘 시작해보세요!' },
   { min: 70, emoji: '😊', title: '무난하게 좋은 하루', desc: '전반적으로 순조로운 기운이 흘러요. 평소 하던 대로만 해도 괜찮은 결과가 따라와요.' },
-  { min: 55, emoji: '🙂', title: '평범한 하루, 무리만 안 하면 OK', desc: '특별히 나쁘지도 좋지도 않은 잔잔한 하루예요. 컨디션에 맞게 페이스를 조절해보세요.' },
-  { min: 40, emoji: '😅', title: '살짝 삐끗대는 하루', desc: '작은 실수나 엇박자가 생기기 쉬운 날이에요. 중요한 결정은 잠시 미뤄두는 게 좋아요.' },
-  { min: 0,  emoji: '😵‍💫', title: '오늘은 조심조심 모드', desc: '긴장되는 일이 생기기 쉬운 날이에요. 무리한 도전보다는 컨디션 관리에 집중하세요.' },
+  { min: 55, emoji: '🙂', title: '평범한 하루, 무리만 안 하면 OK', desc: '이렇다 할 굴곡 없이 잔잔하게 흘러가는 하루예요. 컨디션에 맞게 페이스를 조절해보세요.' },
+  { min: 40, emoji: '😅', title: '살짝 삐끗대는 하루', desc: '사소한 것들이 조금씩 어긋날 수 있는 날이에요. 중요한 결정은 잠시 미뤄두는 게 좋아요.' },
+  { min: 0,  emoji: '😵‍💫', title: '오늘은 한 박자 쉬어가는 날', desc: '뜻밖의 변수가 슬쩍 끼어들 수 있는 흐름이에요. 무리한 도전보다는 컨디션 관리에 마음을 써보세요.' },
 ];
 
 function getTodayTier(score) {
@@ -2917,15 +2963,15 @@ function computeTodayFortune(y, m, d) {
   const iljiRel = branchRelation(birth.day.branchIdx, todayPillar.branchIdx);
 
   let bonus = 0;
-  if (iljiRel === 'hap') bonus = 9;
-  else if (iljiRel === 'samhap') bonus = 6;
-  else if (iljiRel === 'same') bonus = 3;
-  else if (iljiRel === 'chung') bonus = -14;
+  if (iljiRel === 'hap') bonus = 10;
+  else if (iljiRel === 'samhap') bonus = 7;
+  else if (iljiRel === 'same') bonus = 4;
+  else if (iljiRel === 'chung') bonus = -8;
 
-  const overall = clamp(Math.round(info.overall + bonus), 5, 98);
-  const love = clamp(Math.round(info.love + bonus), 5, 98);
-  const money = clamp(Math.round(info.money + bonus * 0.6), 5, 98);
-  const health = clamp(Math.round(info.health + bonus * 0.6), 5, 98);
+  const overall = clamp(Math.round(info.overall + bonus), 20, 98);
+  const love = clamp(Math.round(info.love + bonus), 20, 98);
+  const money = clamp(Math.round(info.money + bonus * 0.6), 20, 98);
+  const health = clamp(Math.round(info.health + bonus * 0.6), 20, 98);
 
   const meLabel = `${birth.day.stemChar}${birth.day.stemHanja}(${ELEMENT_INFO[birth.day.stemElement].label})`;
   const tdLabel = `${todayPillar.stemChar}${todayPillar.stemHanja}(${ELEMENT_INFO[todayPillar.stemElement].label})`;
@@ -3398,15 +3444,15 @@ let lastMbtiResult = null;
 let lastComboResult = null;
 
 const THEME_BY_TIER = [
-  { bgFrom: '#fff176', bgTo: '#ffca28', stickers: ['🐥','✨','💕','🌼','⭐','🐣','✨'] },
-  { bgFrom: '#ffe082', bgTo: '#ffb300', stickers: ['🐥','🌻','✨','🐤','🌼','💫','⭐'] },
-  { bgFrom: '#fff9c4', bgTo: '#ffe57f', stickers: ['😊','🌼','☀️','✨','🍀','🐥','⭐'] },
-  { bgFrom: '#ffecb3', bgTo: '#ffca80', stickers: ['🙂','☁️','💧','🌾','✨','🐤','⭐'] },
-  { bgFrom: '#f2dd9a', bgTo: '#d9b35c', stickers: ['😅','🌧️','🍂','💭','✨','🌙','⭐'] },
-  { bgFrom: '#e0bd6b', bgTo: '#b8873a', stickers: ['😬','🌙','⭐','✨','🔮','🌌','💫'] },
+  { bgFrom: '#fff9c4', bgTo: '#ffd54f', stickers: ['🐥','✨','💕','🌼','⭐','🐣','✨'] },
+  { bgFrom: '#fff3b0', bgTo: '#ffca28', stickers: ['🐥','🌻','✨','🐤','🌼','💫','⭐'] },
+  { bgFrom: '#fffde7', bgTo: '#fff59d', stickers: ['😊','🌼','☀️','✨','🍀','🐥','⭐'] },
+  { bgFrom: '#fff8dc', bgTo: '#ffe082', stickers: ['🙂','☁️','💧','🌾','✨','🐤','⭐'] },
+  { bgFrom: '#fff3c4', bgTo: '#ffca28', stickers: ['😅','🌙','💭','✨','🍀','🐥','⭐'] },
+  { bgFrom: '#ffe082', bgTo: '#f0b429', stickers: ['😬','🌙','⭐','✨','🔮','🐥','💫'] },
 ];
-const SAJU_THEME = { bgFrom: '#ffe9a8', bgTo: '#ffca28', stickers: ['🔮','✨','⭐','🌙','💫','🀄','🐥'] };
-const TODAY_THEME = { bgFrom: '#ffe0a3', bgTo: '#ffb74d', stickers: ['🌅','✨','⭐','🍀','💫','🔮','🐥'] };
+const SAJU_THEME = { bgFrom: '#fff3c4', bgTo: '#ffd54f', stickers: ['🔮','✨','⭐','🌙','💫','🀄','🐥'] };
+const TODAY_THEME = { bgFrom: '#fff9c4', bgTo: '#ffd54f', stickers: ['🌅','✨','⭐','🍀','💫','🔮','🐥'] };
 
 const STICKER_SPOTS = [
   { x: 120, y: 180, size: 100, rot: -18 },
@@ -3466,7 +3512,7 @@ function drawStoryBackground(ctx, theme) {
   ctx.fillRect(0, 0, 1080, 1920);
 
   ctx.save();
-  ctx.globalAlpha = 0.32;
+  ctx.globalAlpha = 0.18;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   STICKER_SPOTS.forEach((spot, i) => {
@@ -3610,6 +3656,16 @@ function drawEmojiGlow(ctx, cx, cy, radius) {
   ctx.beginPath();
   ctx.arc(cx, cy, radius, 0, Math.PI * 2);
   ctx.fill();
+}
+
+function drawBurstGlow(ctx, cx, cy) {
+  ctx.save();
+  const burst = ctx.createRadialGradient(cx, cy, 0, cx, cy, 520);
+  burst.addColorStop(0, 'rgba(255,253,240,0.85)');
+  burst.addColorStop(1, 'rgba(255,253,240,0)');
+  ctx.fillStyle = burst;
+  ctx.fillRect(0, 0, 1080, 1920);
+  ctx.restore();
 }
 
 function drawGradientDivider(ctx, y, width) {
@@ -3945,7 +4001,7 @@ function drawBow(ctx, cx, cy, scale) {
   ctx.restore();
 }
 
-function drawOrnateMedallion(ctx, cx, cy, r, emoji, tierIdx) {
+function drawMedallionRing(ctx, cx, cy, r) {
   drawEmojiGlow(ctx, cx, cy, r * 1.9);
 
   const ringGrad = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
@@ -3984,37 +4040,9 @@ function drawOrnateMedallion(ctx, cx, cy, r, emoji, tierIdx) {
   ctx.lineWidth = 3;
   ctx.strokeStyle = 'rgba(255,255,255,0.85)';
   ctx.stroke();
+}
 
-  if (tierIdx != null) {
-    const cr = r * 0.82;
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(cx, cy, cr, 0, Math.PI * 2);
-    ctx.clip();
-    drawChickScene(ctx, cx, cy, cr * 0.92, tierIdx);
-    ctx.restore();
-
-    const badgeR = r * 0.32;
-    const badgeCx = cx + r * 0.62, badgeCy = cy + r * 0.62;
-    ctx.save();
-    ctx.shadowColor = 'rgba(80,40,90,0.25)';
-    ctx.shadowBlur = 10;
-    ctx.beginPath();
-    ctx.arc(badgeCx, badgeCy, badgeR, 0, Math.PI * 2);
-    ctx.fillStyle = '#fff';
-    ctx.fill();
-    ctx.restore();
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = `${Math.round(badgeR * 1.3)}px 'Malgun Gothic', sans-serif`;
-    ctx.fillText(emoji, badgeCx, badgeCy + badgeR * 0.05);
-  } else {
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = `${Math.round(r * 1.1)}px 'Malgun Gothic', sans-serif`;
-    ctx.fillText(emoji, cx, cy + r * 0.04);
-  }
-
+function drawMedallionSparkle(ctx, cx, cy, r) {
   drawBow(ctx, cx, cy - r * 1.08, 1);
 
   ctx.font = `${Math.round(r * 0.32)}px 'Malgun Gothic', sans-serif`;
@@ -4025,24 +4053,98 @@ function drawOrnateMedallion(ctx, cx, cy, r, emoji, tierIdx) {
   ctx.fillText('💫', cx + r * 1.1, cy + r * 0.75);
 }
 
+function drawChickAvatar(ctx, cx, cy, r, expression) {
+  drawEmojiGlow(ctx, cx, cy, r * 1.55);
+
+  const chickH = r * 1.62;
+  drawKawaiiChick(ctx, cx, cy - chickH * 0.46, chickH, chickH, '#ffd54f', expression || 'happy');
+
+  const badgeR = r * 0.32;
+  const badgeCx = cx + r * 0.68, badgeCy = cy + r * 0.42;
+  ctx.save();
+  ctx.shadowColor = 'rgba(80,40,20,0.25)';
+  ctx.shadowBlur = 10;
+  ctx.beginPath();
+  ctx.arc(badgeCx, badgeCy, badgeR, 0, Math.PI * 2);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+  ctx.restore();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = `${Math.round(badgeR * 1.3)}px 'Malgun Gothic', sans-serif`;
+  ctx.fillText('😊', badgeCx, badgeCy + badgeR * 0.05);
+}
+
+function drawStatCard(ctx, x, y, w, h, emoji, label, score, color, bgColor, desc, footerEmoji) {
+  roundRectPath(ctx, x, y, w, h, 26);
+  ctx.fillStyle = bgColor;
+  ctx.fill();
+
+  const cx = x + w / 2;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  ctx.fillStyle = color;
+  ctx.font = "700 25px 'Malgun Gothic', sans-serif";
+  ctx.fillText(`${emoji} ${label}`, cx, y + 38);
+
+  ctx.font = "800 54px 'Malgun Gothic', sans-serif";
+  ctx.fillText(`${score}점`, cx, y + 100);
+
+  ctx.fillStyle = '#6b5d47';
+  ctx.font = "400 20px 'Malgun Gothic', sans-serif";
+  wrapCanvasText(ctx, desc, cx, y + 150, w - 30, 25, 2);
+
+  ctx.font = "26px 'Malgun Gothic', sans-serif";
+  ctx.fillText(footerEmoji, cx, y + h - 18);
+}
+
+function drawCoupleAvatar(ctx, cx, cy, size, emoji, tierIdx) {
+  drawEmojiGlow(ctx, cx, cy, size * 1.9);
+
+  if (tierIdx != null) {
+    drawChickScene(ctx, cx, cy, size, tierIdx);
+  } else {
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `${Math.round(size * 1.3)}px 'Malgun Gothic', sans-serif`;
+    ctx.fillText(emoji, cx, cy + size * 0.04);
+  }
+
+  const badgeR = size * 0.32;
+  const badgeCx = cx + size * 0.88, badgeCy = cy + size * 0.5;
+  ctx.save();
+  ctx.shadowColor = 'rgba(80,40,20,0.22)';
+  ctx.shadowBlur = 10;
+  ctx.beginPath();
+  ctx.arc(badgeCx, badgeCy, badgeR, 0, Math.PI * 2);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+  ctx.restore();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = `${Math.round(badgeR * 1.3)}px 'Malgun Gothic', sans-serif`;
+  ctx.fillText(emoji, badgeCx, badgeCy + badgeR * 0.05);
+}
+
 function drawScoreCardHeader(ctx, titleText, emoji, tierIdx) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillStyle = '#b5650d';
-  ctx.font = "700 40px 'Malgun Gothic', sans-serif";
-  ctx.fillText(titleText, 540, 250);
-  drawOrnateMedallion(ctx, 540, 460, 140, emoji, tierIdx);
+  ctx.fillStyle = '#6b3410';
+  ctx.font = "800 58px 'Malgun Gothic', sans-serif";
+  ctx.fillText(titleText, 540, 110);
+  drawCoupleAvatar(ctx, 540, 390, 215, emoji, tierIdx);
 }
 
 function drawScoreCardBody(ctx, namesText, score, tier, reasonText, extraLines) {
-  ctx.fillStyle = '#333344';
-  ctx.font = "700 44px 'Malgun Gothic', sans-serif";
-  ctx.fillText(namesText, 540, 650);
+  ctx.fillStyle = '#6b4a2b';
+  ctx.font = "700 50px 'Malgun Gothic', sans-serif";
+  ctx.fillText(namesText, 540, 655);
 
   {
     const scoreText = String(score);
-    const scoreFont = "800 168px 'Malgun Gothic', sans-serif";
-    const ptFont = "600 44px 'Malgun Gothic', sans-serif";
+    const scoreFont = "800 178px 'Malgun Gothic', sans-serif";
+    const ptFont = "600 46px 'Malgun Gothic', sans-serif";
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic';
     ctx.font = scoreFont;
@@ -4054,11 +4156,11 @@ function drawScoreCardBody(ctx, namesText, score, tier, reasonText, extraLines) 
     const startX = 540 - totalWidth / 2;
     const baselineY = 860;
 
-    ctx.fillStyle = '#ff5c8a';
+    ctx.fillStyle = '#f57c00';
     ctx.font = scoreFont;
     ctx.fillText(scoreText, startX, baselineY);
 
-    ctx.fillStyle = '#aa88cc';
+    ctx.fillStyle = '#c9860f';
     ctx.font = ptFont;
     ctx.fillText('점', startX + scoreWidth + gap, baselineY);
 
@@ -4066,34 +4168,34 @@ function drawScoreCardBody(ctx, namesText, score, tier, reasonText, extraLines) 
     ctx.textBaseline = 'middle';
   }
 
-  ctx.fillStyle = '#333344';
-  ctx.font = "700 52px 'Malgun Gothic', sans-serif";
-  ctx.fillText(tier.title, 540, 990);
+  ctx.fillStyle = '#6b3410';
+  ctx.font = "700 58px 'Malgun Gothic', sans-serif";
+  ctx.fillText(tier.title, 540, 992);
 
-  ctx.fillStyle = '#666677';
-  ctx.font = "400 31px 'Malgun Gothic', sans-serif";
-  let y = wrapCanvasText(ctx, tier.desc, 540, 1060, 760, 44, 3);
+  ctx.fillStyle = '#8a6d52';
+  ctx.font = "400 34px 'Malgun Gothic', sans-serif";
+  let y = wrapCanvasText(ctx, tier.desc, 540, 1068, 760, 48, 3);
 
   if (reasonText) {
     y += 18;
     drawGradientDivider(ctx, y, 460);
     y += 40;
-    ctx.fillStyle = '#aa53a8';
-    ctx.font = "700 30px 'Malgun Gothic', sans-serif";
+    ctx.fillStyle = '#c9770b';
+    ctx.font = "700 34px 'Malgun Gothic', sans-serif";
     ctx.fillText('💡 왜 이 점수일까요?', 540, y);
-    y += 46;
-    ctx.fillStyle = '#555566';
-    ctx.font = "400 28px 'Malgun Gothic', sans-serif";
-    y = wrapCanvasText(ctx, reasonText, 540, y, 800, 38, 9);
+    y += 50;
+    ctx.fillStyle = '#7a5c42';
+    ctx.font = "400 31px 'Malgun Gothic', sans-serif";
+    y = wrapCanvasText(ctx, reasonText, 540, y, 800, 42, 9);
   }
 
   if (extraLines && extraLines.length) {
     y += 20;
     extraLines.forEach(line => {
       ctx.fillStyle = '#b5650d';
-      ctx.font = "700 30px 'Malgun Gothic', sans-serif";
+      ctx.font = "700 34px 'Malgun Gothic', sans-serif";
       ctx.fillText(line, 540, y);
-      y += 44;
+      y += 48;
     });
   }
 }
@@ -4132,7 +4234,7 @@ function drawPillarChipCanvas(ctx, cx, topY, label, p) {
 }
 
 function drawPillBadge(ctx, text, cx, cy, bgColor) {
-  const font = "700 38px 'Malgun Gothic', sans-serif";
+  const font = "700 42px 'Malgun Gothic', sans-serif";
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.font = font;
@@ -4153,13 +4255,13 @@ function drawPillBadge(ctx, text, cx, cy, bgColor) {
 function drawLabeledParagraph(ctx, label, text, y, maxLines) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillStyle = '#aa53a8';
-  ctx.font = "700 30px 'Malgun Gothic', sans-serif";
+  ctx.fillStyle = '#c9770b';
+  ctx.font = "700 34px 'Malgun Gothic', sans-serif";
   ctx.fillText(label, CARD_CX, y);
-  y += 42;
-  ctx.fillStyle = '#555566';
-  ctx.font = "400 30px 'Malgun Gothic', sans-serif";
-  return wrapCanvasText(ctx, text, CARD_CX, y, 780, 42, maxLines);
+  y += 46;
+  ctx.fillStyle = '#7a5c42';
+  ctx.font = "400 33px 'Malgun Gothic', sans-serif";
+  return wrapCanvasText(ctx, text, CARD_CX, y, 780, 46, maxLines);
 }
 
 function renderStoryCard(kind) {
@@ -4170,18 +4272,27 @@ function renderStoryCard(kind) {
   if (kind === 'saju') {
     const { pillars, detail, name } = lastSajuResult;
     drawStoryBackground(ctx, SAJU_THEME);
-    drawStoryCardFrame(ctx);
+    drawBurstGlow(ctx, 540, 260);
 
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    drawEmojiGlow(ctx, 540, 300, 130);
-    ctx.fillStyle = '#b5650d';
-    ctx.font = "700 42px 'Malgun Gothic', sans-serif";
-    ctx.fillText(name ? `🔮 ${name}님의 사주팔자` : '🔮 나의 사주팔자', 540, 290);
+    drawEmojiGlow(ctx, 540, 250, 160);
+    ctx.fillStyle = '#6b3410';
+    ctx.font = "800 54px 'Malgun Gothic', sans-serif";
+    ctx.fillText(name ? `🔮 ${name}님의 사주팔자` : '🔮 나의 사주팔자', 540, 240);
+
+    roundRectPath(ctx, 80, 400, 920, 1300, 40);
+    ctx.save();
+    ctx.shadowColor = 'rgba(150,110,30,0.18)';
+    ctx.shadowBlur = 30;
+    ctx.shadowOffsetY = 10;
+    ctx.fillStyle = '#fffdf7';
+    ctx.fill();
+    ctx.restore();
 
     drawPillBadge(
       ctx, `일간 ${pillars.day.stemChar}${pillars.day.stemHanja} · ${detail.keyword}`,
-      540, 385, ELEMENT_INFO[pillars.day.stemElement].color
+      540, 480, ELEMENT_INFO[pillars.day.stemElement].color
     );
 
     const cols = [
@@ -4193,10 +4304,10 @@ function renderStoryCard(kind) {
     const startX = 260, stepX = 190;
     cols.forEach((c, i) => {
       if (!c.p) return;
-      drawPillarChipCanvas(ctx, startX + stepX * i, 490, c.label, c.p);
+      drawPillarChipCanvas(ctx, startX + stepX * i, 585, c.label, c.p);
     });
 
-    let y = 880;
+    let y = 975;
     drawGradientDivider(ctx, y, 460); y += 40;
     y = drawLabeledParagraph(ctx, '💭 기본 성향', detail.trait, y, 3);
     y += 18; drawGradientDivider(ctx, y, 460); y += 40;
@@ -4208,24 +4319,40 @@ function renderStoryCard(kind) {
   } else if (kind === 'today') {
     const r = lastTodayResult;
     drawStoryBackground(ctx, TODAY_THEME);
-    drawStoryCardFrame(ctx);
+    drawBurstGlow(ctx, 540, 260);
+
+    drawChickAvatar(ctx, 205, 245, 165, 'happy');
 
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    drawEmojiGlow(ctx, 540, 300, 130);
-    ctx.fillStyle = '#b5650d';
-    ctx.font = "700 42px 'Malgun Gothic', sans-serif";
-    ctx.fillText(`🌅 ${r.name}님의 오늘의 운세`, 540, 290);
+    ctx.fillStyle = '#6b4a2b';
+    ctx.font = "700 44px 'Malgun Gothic', sans-serif";
+    ctx.fillText(`${r.name}님의`, 700, 112);
+    ctx.fillStyle = '#6b3410';
+    ctx.font = "800 86px 'Malgun Gothic', sans-serif";
+    ctx.fillText('오늘의 운세', 700, 212);
+    ctx.font = '48px \'Malgun Gothic\', sans-serif';
+    ctx.fillText('🍀', 995, 130);
 
-    drawPillBadge(ctx, r.dateLabel, 540, 380, '#ffb300');
+    drawPillBadge(ctx, r.dateLabel, 540, 520, '#ff9f1c');
 
-    ctx.font = "96px 'Malgun Gothic', sans-serif";
-    ctx.fillText(r.tier.emoji, 540, 500);
+    roundRectPath(ctx, 80, 596, 920, 830, 40);
+    ctx.save();
+    ctx.shadowColor = 'rgba(150,110,30,0.18)';
+    ctx.shadowBlur = 30;
+    ctx.shadowOffsetY = 10;
+    ctx.fillStyle = '#fffdf7';
+    ctx.fill();
+    ctx.restore();
+
+    ctx.font = "34px 'Malgun Gothic', sans-serif";
+    ctx.fillText('✨', 330, 730);
+    ctx.fillText('✨', 750, 730);
 
     {
       const scoreText = String(r.overall);
-      const scoreFont = "800 150px 'Malgun Gothic', sans-serif";
-      const ptFont = "600 40px 'Malgun Gothic', sans-serif";
+      const scoreFont = "800 164px 'Malgun Gothic', sans-serif";
+      const ptFont = "600 42px 'Malgun Gothic', sans-serif";
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
       ctx.font = scoreFont;
@@ -4235,44 +4362,44 @@ function renderStoryCard(kind) {
       const gap = 14;
       const totalWidth = scoreWidth + gap + ptWidth;
       const startX = 540 - totalWidth / 2;
-      const baselineY = 660;
-      ctx.fillStyle = '#ff5c8a';
+      const baselineY = 790;
+      ctx.fillStyle = '#f57c00';
       ctx.font = scoreFont;
       ctx.fillText(scoreText, startX, baselineY);
-      ctx.fillStyle = '#aa88cc';
+      ctx.fillStyle = '#f57c00';
       ctx.font = ptFont;
       ctx.fillText('점', startX + scoreWidth + gap, baselineY);
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
     }
 
-    ctx.fillStyle = '#333344';
-    ctx.font = "700 46px 'Malgun Gothic', sans-serif";
-    ctx.fillText(r.tier.title, 540, 730);
+    ctx.fillStyle = '#6b4a2b';
+    ctx.font = "700 56px 'Malgun Gothic', sans-serif";
+    ctx.fillText(r.tier.title, 540, 886);
 
-    ctx.fillStyle = '#666677';
-    ctx.font = "400 29px 'Malgun Gothic', sans-serif";
-    let ty = wrapCanvasText(ctx, r.tier.desc, 540, 795, 780, 40, 2);
+    ctx.fillStyle = '#8a6d52';
+    ctx.font = "400 32px 'Malgun Gothic', sans-serif";
+    let ty = wrapCanvasText(ctx, r.tier.desc, 540, 948, 780, 42, 2);
 
-    ty += 20; drawGradientDivider(ctx, ty, 460); ty += 40;
-    ty = drawLabeledParagraph(ctx, '🔮 오늘의 기운 풀이', r.reasonText, ty, 4);
+    ty += 16; drawGradientDivider(ctx, ty, 460); ty += 38;
+    ty = drawLabeledParagraph(ctx, '🌤️ 오늘의 기운 풀이', r.reasonText, ty, 5);
 
-    ty += 18; drawGradientDivider(ctx, ty, 460); ty += 44;
-    ctx.fillStyle = '#aa53a8';
-    ctx.font = "700 30px 'Malgun Gothic', sans-serif";
-    ctx.fillText('💕 애정운 · 💰 재물운 · 💪 건강운', 540, ty);
-    ty += 50;
-    ctx.font = "700 34px 'Malgun Gothic', sans-serif";
-    ctx.fillStyle = '#333344';
-    ctx.fillText(`${r.love}점  ·  ${r.money}점  ·  ${r.health}점`, 540, ty);
+    const cardY = 1460, cardH = 220, cardW = 290, gap = 25;
+    drawStatCard(ctx, 80, cardY, cardW, cardH, '❤️', '애정운', r.love, '#e0507a', '#ffe3ea',
+      r.love >= 65 ? '마음이 잘 통하는 날이에요' : r.love >= 45 ? '따뜻한 말 한마디가 도움돼요' : '말 한마디 더 신경 써보세요', '❤️');
+    drawStatCard(ctx, 80 + cardW + gap, cardY, cardW, cardH, '💰', '재물운', r.money, '#e08a1c', '#fff3d6',
+      r.money >= 65 ? '뜻밖의 수입이 생길 수 있어요' : r.money >= 45 ? '지출은 신중하게 결정하세요' : '큰 지출은 피하는 게 좋아요', '🪙');
+    drawStatCard(ctx, 80 + (cardW + gap) * 2, cardY, cardW, cardH, '🍀', '건강운', r.health, '#4caf6d', '#e3f5e0',
+      r.health >= 65 ? '컨디션 최고, 활력 넘쳐요' : r.health >= 45 ? '몸과 마음이 안정적이에요' : '무리 말고 푹 쉬어주세요', '🌿');
 
-    ty += 56;
-    ctx.fillStyle = '#b5650d';
-    ctx.font = "600 28px 'Malgun Gothic', sans-serif";
-    ctx.fillText(`🍀 오늘의 행운: ${r.lucky.color} · 숫자 ${r.lucky.number} · ${r.lucky.item}`, 540, ty);
+    drawPillBadge(ctx, `🍀 오늘의 행운 · ${r.lucky.color} · 숫자 ${r.lucky.number} · ${r.lucky.item}`, 540, 1774, '#ff9f1c');
 
-    const wIdx = r.overall >= 85 ? 0 : r.overall >= 70 ? 1 : r.overall >= 55 ? 2 : r.overall >= 40 ? 3 : 5;
-    drawStoryWatermark(ctx, wIdx);
+    ctx.font = "70px 'Malgun Gothic', sans-serif";
+    ctx.fillText('🌼', 150, 1858);
+    ctx.fillText('⭐', 930, 1858);
+    ctx.fillStyle = 'rgba(107,74,43,0.85)';
+    ctx.font = "700 27px 'Malgun Gothic', sans-serif";
+    ctx.fillText('🐥 삐약궁합', 540, 1900);
   } else {
     let titleText, emoji, namesText, score, tier, reasonText = null, extraLines = [];
 
@@ -4323,7 +4450,17 @@ function renderStoryCard(kind) {
     const tierIdx = tierIndexFromScore(score);
     const theme = THEME_BY_TIER[tierIdx];
     drawStoryBackground(ctx, theme);
-    drawStoryCardFrame(ctx);
+    drawBurstGlow(ctx, 540, 260);
+
+    roundRectPath(ctx, 80, 600, 920, 1090, 40);
+    ctx.save();
+    ctx.shadowColor = 'rgba(150,110,30,0.18)';
+    ctx.shadowBlur = 30;
+    ctx.shadowOffsetY = 10;
+    ctx.fillStyle = '#fffdf7';
+    ctx.fill();
+    ctx.restore();
+
     drawScoreCardHeader(ctx, titleText, emoji, tierIdx);
     drawScoreCardBody(ctx, namesText, score, tier, reasonText, extraLines);
     drawStoryWatermark(ctx, tierIdx);
@@ -4332,7 +4469,10 @@ function renderStoryCard(kind) {
   return canvas.toDataURL('image/png');
 }
 
+let currentStoryKind = null;
+
 async function openStoryModal(kind) {
+  currentStoryKind = kind;
   const dataUrl = renderStoryCard(kind);
   document.getElementById('storyPreviewImg').src = dataUrl;
   document.getElementById('storyDownloadBtn').href = dataUrl;
@@ -4436,6 +4576,39 @@ document.getElementById('zodiacCopyBtn').addEventListener('click', (e) => copyRe
 document.getElementById('bloodCopyBtn').addEventListener('click', (e) => copyResultText('blood', e.currentTarget));
 document.getElementById('mbtiCopyBtn').addEventListener('click', (e) => copyResultText('mbti', e.currentTarget));
 document.getElementById('comboCopyBtn').addEventListener('click', (e) => copyResultText('combo', e.currentTarget));
+
+document.getElementById('storyCopyTextBtn').addEventListener('click', (e) => {
+  if (currentStoryKind) copyResultText(currentStoryKind, e.currentTarget);
+});
+
+async function copySiteLink(btn) {
+  const url = location.origin + location.pathname;
+  const original = btn.textContent;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(url);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = url;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    btn.textContent = '✅ 복사완료!';
+    btn.classList.add('copied');
+  } catch (e) {
+    btn.textContent = '복사 실패 😢';
+  }
+  setTimeout(() => {
+    btn.textContent = original;
+    btn.classList.remove('copied');
+  }, 1600);
+}
+
+document.getElementById('storyCopyLinkBtn').addEventListener('click', (e) => copySiteLink(e.currentTarget));
 
 // ============================================================
 // 귀여운 배경음악 (Web Audio API로 즉석 생성한 뮤직박스 멜로디)
