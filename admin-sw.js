@@ -4,19 +4,19 @@
 // - 페이지(admin.html)만 네트워크 우선 + 오프라인 폴백으로 캐시
 // 파일 내용을 고칠 때마다 VERSION을 올리면 기존 방문자에게 업데이트 배너가 뜬다.
 // ============================================================
-const VERSION = 'v1.0.0';
+const VERSION = 'v1.0.1';
 const CACHE_NAME = 'ppiyak-admin-' + VERSION;
 const CACHE_PREFIX = 'ppiyak-admin-';
 
 const PRECACHE_URLS = [
   './admin.html',
   './admin-manifest.webmanifest',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-  './icons/icon-maskable-192.png',
-  './icons/icon-maskable-512.png',
-  './icons/apple-touch-icon.png',
-  './icons/favicon-32.png',
+  './icons/admin-icon-192.png',
+  './icons/admin-icon-512.png',
+  './icons/admin-icon-maskable-192.png',
+  './icons/admin-icon-maskable-512.png',
+  './icons/admin-apple-touch-icon.png',
+  './icons/admin-favicon-32.png',
 ];
 
 self.addEventListener('install', (event) => {
