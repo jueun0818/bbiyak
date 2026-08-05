@@ -1784,6 +1784,31 @@ function trackEvent(event, tab, name1, name2) {
 }
 trackEvent('pageview');
 
+// ---- 이름 점수 조작(관리자 설정 오버라이드) ----
+// 관리자 페이지에서 특정 이름(또는 이름 조합)에 점수를 고정해두면,
+// 아래 목록과 일치하는 궁합은 피라미드 획수 감산법 대신 그 점수를 그대로 보여준다.
+// 실패해도 기본 계산법으로 동작하므로 조용히 무시한다.
+let scoreOverrides = [];
+(async () => {
+  try {
+    const res = await fetch('/api/overrides');
+    if (!res.ok) return;
+    const data = await res.json();
+    if (Array.isArray(data.rules)) scoreOverrides = data.rules;
+  } catch (e) { /* 무시 */ }
+})();
+
+function findScoreOverride(name1, name2) {
+  const a = (name1 || '').trim();
+  const b = (name2 || '').trim();
+  if (!a && !b) return null;
+  // 이름 두 개가 모두 지정된 규칙: 순서 상관없이 정확히 일치할 때 우선 적용
+  const pairMatch = scoreOverrides.find((r) => r.n2 && ((r.n1 === a && r.n2 === b) || (r.n1 === b && r.n2 === a)));
+  if (pairMatch) return pairMatch;
+  // 이름 하나만 지정된 규칙: 그 이름이 어느 쪽이든 포함되면 적용(상대는 누구든 상관없음)
+  return scoreOverrides.find((r) => !r.n2 && (r.n1 === a || r.n1 === b)) || null;
+}
+
 // ---- 한글 획수 테이블 ----
 // 자음 기본 획수 (겹자음은 이 값의 조합/2배로 파생)
 const CONS_BASE = { 'ㄱ':2,'ㄴ':2,'ㄷ':3,'ㄹ':5,'ㅁ':4,'ㅂ':4,'ㅅ':2,'ㅇ':1,'ㅈ':3,'ㅊ':4,'ㅋ':3,'ㅌ':4,'ㅍ':4,'ㅎ':3 };
@@ -2159,7 +2184,8 @@ function renderChars(containerId, breakdown) {
 function showResult(name1, name2) {
   const a1 = analyzeName(name1);
   const a2 = analyzeName(name2);
-  const score = computeScore(a1.breakdown, a2.breakdown);
+  const override = findScoreOverride(name1, name2);
+  const score = override ? override.score : computeScore(a1.breakdown, a2.breakdown);
   const tier = getTier(score);
 
   document.getElementById('errorMsg').style.display = 'none';
@@ -3439,7 +3465,8 @@ document.getElementById('comboBtn').addEventListener('click', () => {
 
   // 1) 이름 궁합
   const a1 = analyzeName(name1), a2 = analyzeName(name2);
-  const nameScore = computeScore(a1.breakdown, a2.breakdown);
+  const nameOverride = findScoreOverride(name1, name2);
+  const nameScore = nameOverride ? nameOverride.score : computeScore(a1.breakdown, a2.breakdown);
 
   // 2) 사주 궁합
   const [y1, m1, dd1] = d1.split('-').map(Number);

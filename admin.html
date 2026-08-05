@@ -175,6 +175,70 @@
   }
   #dashError { color: #e0245e; font-size: 13px; text-align: center; display: none; margin-bottom: 12px; }
 
+  .override-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+  .override-form .row { display: flex; gap: 8px; }
+  .override-form input {
+    flex: 1;
+    min-width: 0;
+    padding: 11px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+  }
+  .override-form input#ovScore { flex: 0 0 84px; }
+  .override-form .hint { font-size: 12px; color: var(--muted); margin: -2px 0 0; }
+  .override-form button {
+    padding: 11px;
+    border: none;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  #ovError { color: #e0245e; font-size: 13px; display: none; margin: -2px 0 0; }
+
+  .override-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .override-row:last-child { border-bottom: none; }
+  .override-row .ov-pair { font-weight: 600; }
+  .override-row .ov-pair .sep { color: var(--muted); font-weight: 400; margin: 0 4px; }
+  .override-row .ov-wild { color: var(--muted); font-weight: 400; }
+  .override-row .ov-score {
+    display: inline-block;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 13px;
+    font-weight: 800;
+    margin-left: 8px;
+  }
+  .override-row .ov-note { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .override-row .ov-del {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--card);
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+  }
+  #emptyOverrides { color: var(--muted); font-size: 13px; text-align: center; padding: 8px 0; display: none; }
+
   /* ===== PWA: 설치 배너 / iOS 안내 시트 / 업데이트 토스트 ===== */
   .pwa-banner[hidden], .pwa-guide[hidden], .pwa-toast[hidden] { display: none !important; }
 
@@ -372,6 +436,23 @@
     </div>
 
     <div class="section">
+      <h2>이름 점수 조작</h2>
+      <div class="override-form">
+        <div class="row">
+          <input type="text" id="ovName1" placeholder="이름1 (필수)" maxlength="20">
+          <input type="text" id="ovName2" placeholder="이름2 (비우면 상대 무관)" maxlength="20">
+          <input type="number" id="ovScore" placeholder="점수" min="0" max="99">
+        </div>
+        <input type="text" id="ovNote" placeholder="메모 (선택, 나만 보임)" maxlength="60">
+        <p class="hint">이름2를 비워두면 그 이름이 들어간 모든 궁합에 이 점수가 적용돼요.</p>
+        <p id="ovError">이름과 점수(0~99)를 입력해주세요.</p>
+        <button id="ovAddBtn">➕ 규칙 추가</button>
+      </div>
+      <div id="overrideList"></div>
+      <p id="emptyOverrides">설정된 규칙이 없어요.</p>
+    </div>
+
+    <div class="section">
       <h2>최근 궁합 기록 (누가 누구랑 봤는지)</h2>
       <div id="logList"></div>
       <p id="emptyLog">아직 기록이 없어요.</p>
@@ -433,6 +514,7 @@ async function loadStats(pw) {
     render(data);
     $('loginCard').style.display = 'none';
     $('dashboard').style.display = 'block';
+    loadOverrides();
   } catch (e) {
     $('dashError').style.display = 'block';
   }
@@ -525,6 +607,87 @@ function hashHue(str) {
   for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
   return h % 360;
 }
+
+// ============================================================
+// 이름 점수 조작 (특정 이름/이름 조합에 궁합 점수를 고정)
+// ============================================================
+async function loadOverrides() {
+  try {
+    const res = await fetch('/api/overrides');
+    if (!res.ok) throw new Error('failed');
+    const data = await res.json();
+    renderOverrides(data.rules || []);
+  } catch (e) {
+    $('overrideList').innerHTML = '';
+  }
+}
+
+function renderOverrides(rules) {
+  $('emptyOverrides').style.display = rules.length ? 'none' : 'block';
+  $('overrideList').innerHTML = rules.map((r) => {
+    const pairHtml = r.n2
+      ? `${esc(r.n1)}<span class="sep">×</span>${esc(r.n2)}`
+      : `${esc(r.n1)} <span class="ov-wild">(상대 무관)</span>`;
+    const noteHtml = r.note ? `<div class="ov-note">${esc(r.note)}</div>` : '';
+    return `<div class="override-row">
+      <div>
+        <span class="ov-pair">${pairHtml}<span class="ov-score">${r.score}점</span></span>
+        ${noteHtml}
+      </div>
+      <button class="ov-del" data-id="${esc(r.id)}" aria-label="삭제">✕</button>
+    </div>`;
+  }).join('');
+
+  $('overrideList').querySelectorAll('.ov-del').forEach((btn) => {
+    btn.addEventListener('click', () => deleteOverride(btn.dataset.id));
+  });
+}
+
+async function addOverride() {
+  const pw = sessionStorage.getItem('bbiyak_admin_pw');
+  if (!pw) return;
+  const name1 = $('ovName1').value.trim();
+  const name2 = $('ovName2').value.trim();
+  const score = $('ovScore').value;
+  const note = $('ovNote').value.trim();
+
+  $('ovError').style.display = 'none';
+  if (!name1 || score === '' || Number(score) < 0 || Number(score) > 99) {
+    $('ovError').style.display = 'block';
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/overrides', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw, name1, name2, score, note }),
+    });
+    if (!res.ok) throw new Error('failed');
+    $('ovName1').value = '';
+    $('ovName2').value = '';
+    $('ovScore').value = '';
+    $('ovNote').value = '';
+    loadOverrides();
+  } catch (e) {
+    $('ovError').style.display = 'block';
+  }
+}
+
+async function deleteOverride(id) {
+  const pw = sessionStorage.getItem('bbiyak_admin_pw');
+  if (!pw) return;
+  try {
+    await fetch('/api/overrides', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw, id }),
+    });
+    loadOverrides();
+  } catch (e) { /* 무시 */ }
+}
+
+$('ovAddBtn').addEventListener('click', addOverride);
 
 $('loginBtn').addEventListener('click', login);
 $('pwInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') login(); });
