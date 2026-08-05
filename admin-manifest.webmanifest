@@ -1,0 +1,43 @@
+{
+  "id": "./admin.html",
+  "name": "삐약궁합 관리자",
+  "short_name": "삐약 관리자",
+  "description": "삐약궁합 방문·기능별 사용 통계를 확인하는 관리자 대시보드",
+  "lang": "ko-KR",
+  "dir": "ltr",
+  "start_url": "./admin.html?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "portrait",
+  "background_color": "#f6f5f2",
+  "theme_color": "#b5650d",
+  "categories": ["utilities", "business"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

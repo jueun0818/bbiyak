@@ -4,6 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
+
+<!-- ===== PWA (홈 화면 설치 / 오프라인 실행) — index.html과는 별도의 manifest·서비스 워커 ===== -->
+<link rel="manifest" href="admin-manifest.webmanifest">
+<meta name="theme-color" content="#b5650d" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#17171c" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="삐약 관리자">
+<meta name="application-name" content="삐약 관리자">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+
 <title>삐약궁합 관리자</title>
 <style>
   :root {
@@ -160,6 +174,164 @@
     cursor: pointer;
   }
   #dashError { color: #e0245e; font-size: 13px; text-align: center; display: none; margin-bottom: 12px; }
+
+  /* ===== PWA: 설치 배너 / iOS 안내 시트 / 업데이트 토스트 ===== */
+  .pwa-banner[hidden], .pwa-guide[hidden], .pwa-toast[hidden] { display: none !important; }
+
+  .pwa-banner {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 536px;
+    margin: 0 auto;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--card);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+    animation: pwaBannerUp .45s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes pwaBannerUp {
+    0% { transform: translateY(120%); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  .pwa-banner-icon {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 auto;
+    border-radius: 12px;
+  }
+  .pwa-banner-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+  }
+  .pwa-banner-text strong { font-size: 14px; color: var(--text); }
+  .pwa-banner-text span { font-size: 12px; color: var(--muted); }
+  .pwa-banner-install, .pwa-banner-close, .pwa-guide-close, .pwa-toast button {
+    width: auto;
+    margin: 0;
+  }
+  .pwa-banner-install {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .pwa-banner-install:active { transform: scale(0.94); }
+  .pwa-banner-close {
+    position: absolute;
+    top: -10px;
+    right: -6px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--card);
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .pwa-guide {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0,0,0,0.5);
+  }
+  .pwa-guide-inner {
+    position: relative;
+    width: 100%;
+    max-width: 340px;
+    padding: 26px 22px 22px;
+    border-radius: 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: 0 18px 48px rgba(0,0,0,0.32);
+    text-align: center;
+    animation: pwaGuidePop .4s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes pwaGuidePop {
+    0% { transform: scale(0.86); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .pwa-guide-emoji { font-size: 40px; margin: 0 0 4px; }
+  .pwa-guide-inner h2 { margin: 0 0 16px; font-size: 18px; color: var(--text); }
+  .pwa-guide-inner ol { margin: 0; padding-left: 22px; text-align: left; font-size: 14px; color: var(--text); }
+  .pwa-guide-inner ol li { margin-bottom: 10px; }
+  .pwa-guide-inner ol strong { color: var(--accent); }
+  .pwa-guide-hint { margin: 14px 0 0; font-size: 12px; color: var(--muted); }
+  .pwa-guide-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--bg);
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .pwa-toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: max-content;
+    max-width: calc(100% - 32px);
+    padding: 11px 12px 11px 16px;
+    border-radius: 999px;
+    background: rgba(30,30,34,0.94);
+    color: #fff;
+    font-size: 13px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.28);
+    animation: pwaBannerUp .35s ease-out;
+  }
+  .pwa-toast span { white-space: nowrap; }
+  .pwa-toast button {
+    padding: 7px 13px;
+    white-space: nowrap;
+    line-height: 1.4;
+    border: none;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pwa-banner, .pwa-guide-inner, .pwa-toast { animation: none; }
+  }
 </style>
 </head>
 <body>
@@ -205,6 +377,36 @@
       <p id="emptyLog">아직 기록이 없어요.</p>
     </div>
   </div>
+</div>
+
+<!-- PWA: 설치 유도 배너 / iOS 안내 시트 / 새 버전 토스트 -->
+<div class="pwa-banner" id="pwaInstallBanner" hidden>
+  <img class="pwa-banner-icon" src="icons/icon-192.png" width="42" height="42" alt="">
+  <div class="pwa-banner-text">
+    <strong>관리자 앱으로 설치하기 🐥</strong>
+    <span>홈 화면에서 바로 통계를 확인할 수 있어요</span>
+  </div>
+  <button class="pwa-banner-install" id="pwaInstallBtn">설치</button>
+  <button class="pwa-banner-close" id="pwaDismissBtn" aria-label="설치 안내 닫기">✕</button>
+</div>
+
+<div class="pwa-guide" id="pwaIosGuide" hidden>
+  <div class="pwa-guide-inner">
+    <button class="pwa-guide-close" id="pwaIosCloseBtn" aria-label="닫기">✕</button>
+    <p class="pwa-guide-emoji">🐥</p>
+    <h2>홈 화면에 추가하기</h2>
+    <ol>
+      <li>화면 아래쪽 <strong>공유 버튼</strong>을 눌러주세요</li>
+      <li>목록을 내려서 <strong>‘홈 화면에 추가’</strong>를 선택해주세요</li>
+      <li>오른쪽 위 <strong>‘추가’</strong>를 누르면 끝이에요! 🎉</li>
+    </ol>
+    <p class="pwa-guide-hint">홈 화면에서 열면 주소창 없이 앱처럼 실행돼요</p>
+  </div>
+</div>
+
+<div class="pwa-toast" id="pwaUpdateToast" hidden>
+  <span>새 버전이 준비됐어요 🐣</span>
+  <button id="pwaReloadBtn">새로고침</button>
 </div>
 
 <script>
@@ -333,6 +535,127 @@ $('refreshBtn').addEventListener('click', () => {
 
 const savedPw = sessionStorage.getItem('bbiyak_admin_pw');
 if (savedPw) loadStats(savedPw);
+
+// ============================================================
+// PWA: 서비스 워커 등록 · 설치 유도 · 업데이트 안내
+// index.html의 것과 같은 구조이되, 캐시 키(DISMISS_KEY)와 서비스 워커 파일을 분리해
+// 두 앱을 각각 독립적으로 설치·해제할 수 있게 한다.
+// ============================================================
+(function setupPwa() {
+  const DISMISS_KEY = 'ppiyak-admin-install-dismissed-at';
+  const DISMISS_DAYS = 7;
+
+  const banner = document.getElementById('pwaInstallBanner');
+  const installBtn = document.getElementById('pwaInstallBtn');
+  const dismissBtn = document.getElementById('pwaDismissBtn');
+  const iosGuide = document.getElementById('pwaIosGuide');
+  const iosCloseBtn = document.getElementById('pwaIosCloseBtn');
+  const updateToast = document.getElementById('pwaUpdateToast');
+  const reloadBtn = document.getElementById('pwaReloadBtn');
+
+  const ua = navigator.userAgent;
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  const isIos = /iP(hone|ad|od)/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  const isInAppBrowser = /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line\/|DaumApps|everytimeApp/i.test(ua);
+
+  function dismissedRecently() {
+    try {
+      const at = Number(localStorage.getItem(DISMISS_KEY));
+      return !!at && Date.now() - at < DISMISS_DAYS * 24 * 60 * 60 * 1000;
+    } catch (e) {
+      return false;
+    }
+  }
+  function rememberDismiss() {
+    try { localStorage.setItem(DISMISS_KEY, String(Date.now())); } catch (e) { /* 무시 */ }
+  }
+
+  function showBanner() {
+    if (isStandalone || isInAppBrowser || dismissedRecently()) return;
+    banner.hidden = false;
+  }
+  function hideBanner() {
+    banner.hidden = true;
+  }
+
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    showBanner();
+  });
+
+  installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      hideBanner();
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      if (choice.outcome !== 'accepted') rememberDismiss();
+      return;
+    }
+    iosGuide.hidden = false;
+  });
+
+  dismissBtn.addEventListener('click', () => {
+    rememberDismiss();
+    hideBanner();
+  });
+  iosCloseBtn.addEventListener('click', () => { iosGuide.hidden = true; });
+  iosGuide.addEventListener('click', (e) => {
+    if (e.target === iosGuide) iosGuide.hidden = true;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    deferredPrompt = null;
+    hideBanner();
+    try { localStorage.removeItem(DISMISS_KEY); } catch (e) { /* 무시 */ }
+  });
+
+  if (isIos && !isStandalone) setTimeout(showBanner, 2500);
+
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    window.addEventListener('load', async () => {
+      try {
+        // scope를 admin.html로 좁혀 index.html의 sw.js(scope './')와 등록을 덮어쓰지 않게 한다.
+        // 두 SW가 origin 전체에서 공존하며, admin.html에서는 더 구체적인 이 scope가 우선한다.
+        const reg = await navigator.serviceWorker.register('admin-sw.js', { scope: './admin.html' });
+
+        function notifyUpdate(worker) {
+          if (!navigator.serviceWorker.controller) return;
+          if (!banner.hidden) updateToast.style.bottom = 'calc(104px + env(safe-area-inset-bottom))';
+          updateToast.hidden = false;
+          reloadBtn.onclick = () => {
+            reloadBtn.disabled = true;
+            worker.postMessage({ type: 'SKIP_WAITING' });
+          };
+        }
+
+        if (reg.waiting) notifyUpdate(reg.waiting);
+        reg.addEventListener('updatefound', () => {
+          const incoming = reg.installing;
+          if (!incoming) return;
+          incoming.addEventListener('statechange', () => {
+            if (incoming.state === 'installed') notifyUpdate(incoming);
+          });
+        });
+
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') reg.update().catch(() => {});
+        });
+      } catch (e) {
+        console.warn('서비스 워커 등록 실패:', e);
+      }
+    });
+
+    let reloadedForUpdate = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (reloadedForUpdate) return;
+      reloadedForUpdate = true;
+      location.reload();
+    });
+  }
+})();
 </script>
 </body>
 </html>
