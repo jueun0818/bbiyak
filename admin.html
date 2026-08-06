@@ -102,6 +102,12 @@
   }
   .stat-card .label { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
   .stat-card .value { font-size: 28px; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .stat-card .value-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .stat-card .sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .delta { font-size: 12px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .delta.up { color: #1a9e5c; }
+  .delta.down { color: #e0245e; }
+  .delta.flat { color: var(--muted); }
 
   .section {
     background: var(--card);
@@ -112,11 +118,18 @@
   }
   .section h2 { font-size: 15px; margin: 0 0 16px; color: var(--muted); font-weight: 700; }
 
-  .day-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; }
-  .day-row .day-label { width: 64px; color: var(--muted); flex-shrink: 0; font-variant-numeric: tabular-nums; }
-  .day-row .bar-track { flex: 1; height: 18px; background: var(--accent-soft); border-radius: 6px; overflow: hidden; }
-  .day-row .bar-fill { height: 100%; background: var(--accent); border-radius: 6px; min-width: 2px; }
-  .day-row .day-count { width: 32px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .trend-chart-wrap svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .trend-chart-wrap .trend-axis-label { font-size: 9.5px; fill: var(--muted); }
+  .trend-chart-wrap .trend-dot { fill: var(--accent); }
+  .trend-chart-wrap .trend-dot:hover { r: 5; }
+
+  .pair-row { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .pair-row:last-child { border-bottom: none; }
+  .pair-rank { width: 24px; flex-shrink: 0; text-align: center; font-weight: 800; font-size: 13px; color: var(--muted); }
+  .pair-rank.medal { font-size: 18px; }
+  .pair-name { flex: 1; font-weight: 600; }
+  .pair-name .sep { color: var(--muted); font-weight: 400; margin: 0 4px; }
+  .pair-count { font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; flex-shrink: 0; }
 
   .tab-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 14px; }
   .tab-row .tab-label { width: 92px; flex-shrink: 0; }

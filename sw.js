@@ -5,7 +5,7 @@
 // - 정적 파일: 캐시 우선 + 백그라운드 갱신(stale-while-revalidate)
 // 파일 내용을 고칠 때마다 VERSION을 올리면 기존 방문자에게 업데이트 배너가 뜬다.
 // ============================================================
-const VERSION = 'v1.2.2';
+const VERSION = 'v1.2.4';
 const CACHE_NAME = 'ppiyak-' + VERSION;
 const CACHE_PREFIX = 'ppiyak-';
 

@@ -65,6 +65,13 @@ export default async function handler(req, res) {
       await redisCmd(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, ['LTRIM', 'stats:log', '0', String(LOG_MAX - 1)]);
     }
 
+    // 두 사람 이름이 다 있는 궁합(이름/사주궁합/별자리/혈액형/MBTI/종합)만 "인기 조합"으로
+    // 집계한다. stats:log는 최근 200건만 남기지만, 이 정렬 집합(sorted set)은 전체 누적이라
+    // 서비스 오픈 이후 가장 많이 확인된 이름 조합을 언제든 순위로 조회할 수 있다.
+    if (event === 'tab_action' && n1 && n2) {
+      await redisCmd(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, ['ZINCRBY', 'stats:pairs', '1', `${n1}|${n2}`]);
+    }
+
     res.status(200).json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: 'failed' });

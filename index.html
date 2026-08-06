@@ -4146,8 +4146,8 @@ function drawStoryWatermark(ctx, tierIndex) {
   }
 
   ctx.fillStyle = 'rgba(255,255,255,0.95)';
-  ctx.font = "700 27px 'Malgun Gothic', sans-serif";
-  ctx.fillText('🐥 삐약궁합', 540, 1890);
+  ctx.font = "700 36px 'Malgun Gothic', sans-serif";
+  ctx.fillText('🐥 삐약궁합', 540, 1892);
 }
 
 function drawBow(ctx, cx, cy, scale) {
@@ -4633,12 +4633,18 @@ function renderStoryCard(kind) {
 
     ctx.fillStyle = '#8a6d52';
     ctx.font = "400 32px 'Malgun Gothic', sans-serif";
-    let ty = wrapCanvasText(ctx, r.tier.desc, 540, 948, 780, 42, 2);
+    const todayDescLines = Math.min(countWrappedLines(ctx, r.tier.desc, 780), 2);
+    let ty = wrapCanvasText(ctx, r.tier.desc, 540, 948, 780, 40, todayDescLines);
 
-    ty += 16; drawGradientDivider(ctx, ty, 460); ty += 38;
-    ty = drawLabeledParagraph(ctx, '🌤️ 오늘의 기운 풀이', r.reasonText, ty, 5);
+    ty += 10; drawGradientDivider(ctx, ty, 460); ty += 26;
+    // 사주 관계(합/충 등) 조합에 따라 이유 문구가 꽤 길어질 수 있어(최대 7줄) 고정 줄 수
+    // 대신 실제 필요한 줄 수를 재서 그리고, 아래 카드·배지·워터마크가 그만큼 따라 내려온다.
+    ctx.font = "400 33px 'Malgun Gothic', sans-serif";
+    const todayReasonLines = Math.min(countWrappedLines(ctx, r.reasonText, 780), 7);
+    ty = drawLabeledParagraph(ctx, '🌤️ 오늘의 기운 풀이', r.reasonText, ty, todayReasonLines);
 
-    const cardY = 1460, cardH = 220, cardW = 290, gap = 25;
+    ty += 30;
+    const cardY = ty, cardH = 220, cardW = 290, gap = 25;
     drawStatCard(ctx, 80, cardY, cardW, cardH, '❤️', '애정운', r.love, '#e0507a', '#ffe3ea',
       r.love >= 65 ? '마음이 잘 통하는 날이에요' : r.love >= 45 ? '따뜻한 말 한마디가 도움돼요' : '말 한마디 더 신경 써보세요', '❤️');
     drawStatCard(ctx, 80 + cardW + gap, cardY, cardW, cardH, '💰', '재물운', r.money, '#e08a1c', '#fff3d6',
@@ -4646,14 +4652,16 @@ function renderStoryCard(kind) {
     drawStatCard(ctx, 80 + (cardW + gap) * 2, cardY, cardW, cardH, '🍀', '건강운', r.health, '#4caf6d', '#e3f5e0',
       r.health >= 65 ? '컨디션 최고, 활력 넘쳐요' : r.health >= 45 ? '몸과 마음이 안정적이에요' : '무리 말고 푹 쉬어주세요', '🌿');
 
-    drawPillBadge(ctx, `🍀 오늘의 행운 · ${r.lucky.color} · 숫자 ${r.lucky.number} · ${r.lucky.item}`, 540, 1774, '#ff9f1c');
+    const pillY = cardY + cardH + 60;
+    drawPillBadge(ctx, `🍀 오늘의 행운 · ${r.lucky.color} · 숫자 ${r.lucky.number} · ${r.lucky.item}`, 540, pillY, '#ff9f1c');
 
+    const decorY = pillY + 56;
     ctx.font = "70px 'Malgun Gothic', sans-serif";
-    ctx.fillText('🌼', 150, 1858);
-    ctx.fillText('⭐', 930, 1858);
+    ctx.fillText('🌼', 150, decorY);
+    ctx.fillText('⭐', 930, decorY);
     ctx.fillStyle = 'rgba(107,74,43,0.85)';
-    ctx.font = "700 27px 'Malgun Gothic', sans-serif";
-    ctx.fillText('🐥 삐약궁합', 540, 1900);
+    ctx.font = "700 34px 'Malgun Gothic', sans-serif";
+    ctx.fillText('🐥 삐약궁합', 540, decorY + 32);
   } else {
     let titleText, emoji, namesText, score, tier, reasonText = null, infoCards = [];
     const PERSON_COLORS = [
