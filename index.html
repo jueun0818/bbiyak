@@ -3552,6 +3552,25 @@ const STICKER_SPOTS = [
   { x: 965, y: 1775, size: 110, rot: 12 },
 ];
 
+// 카드 좌우/상하 여백에 하트를 잔뜩 흩뿌려서 화면을 더 사랑스럽게 채운다.
+const HEART_EMOJIS = ['💕', '💖', '💗', '💓', '❤️', '💛'];
+const HEART_SPOTS = [
+  { x: 55, y: 55, size: 52, rot: -15 },
+  { x: 1020, y: 55, size: 48, rot: 12 },
+  { x: 220, y: 60, size: 34, rot: 20 },
+  { x: 860, y: 60, size: 34, rot: -18 },
+  { x: 40, y: 340, size: 44, rot: 10 },
+  { x: 1040, y: 400, size: 58, rot: -8 },
+  { x: 35, y: 620, size: 48, rot: -14 },
+  { x: 1045, y: 660, size: 42, rot: 16 },
+  { x: 30, y: 950, size: 52, rot: 8 },
+  { x: 1050, y: 1000, size: 46, rot: -10 },
+  { x: 45, y: 1260, size: 48, rot: 14 },
+  { x: 1040, y: 1310, size: 52, rot: -12 },
+  { x: 60, y: 1560, size: 42, rot: 10 },
+  { x: 1020, y: 1610, size: 46, rot: -15 },
+];
+
 // 카드 프레임 좌표
 const CARD_X = 70, CARD_Y = 190, CARD_W = 940, CARD_H = 1540, CARD_R = 60;
 const CARD_CX = CARD_X + CARD_W / 2; // 540
@@ -3629,6 +3648,20 @@ function drawStoryBackground(ctx, theme) {
     ctx.rotate(spot.rot * Math.PI / 180);
     ctx.font = `${spot.size}px 'Malgun Gothic', sans-serif`;
     ctx.fillText(emoji, 0, 0);
+    ctx.restore();
+  });
+  ctx.restore();
+
+  ctx.save();
+  ctx.globalAlpha = 0.32;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  HEART_SPOTS.forEach((spot, i) => {
+    ctx.save();
+    ctx.translate(spot.x, spot.y);
+    ctx.rotate(spot.rot * Math.PI / 180);
+    ctx.font = `${spot.size}px 'Malgun Gothic', sans-serif`;
+    ctx.fillText(HEART_EMOJIS[i % HEART_EMOJIS.length], 0, 0);
     ctx.restore();
   });
   ctx.restore();
