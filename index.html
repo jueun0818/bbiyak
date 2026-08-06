@@ -5,6 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="description" content="이름, 사주팔자, 별자리, 혈액형, MBTI로 보는 우리 둘의 궁합을 재미로 확인하고 인스타 스토리용 이미지로 저장해보세요.">
 <meta name="naver-site-verification" content="20068583c040c0765b7f26d04e26fd5f2f681c26" />
+
+<!-- ===== 소셜 공유 미리보기 (카카오톡·트위터·페이스북 등에 링크를 붙여넣었을 때 뜨는 카드) =====
+     이 태그가 없으면 링크 공유 시 제목/설명/이미지가 전혀 안 뜨고 맨 URL만 노출된다. -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://bbiyak-6ou7.vercel.app/">
+<meta property="og:site_name" content="삐약궁합">
+<meta property="og:title" content="삐약궁합 - 이름 · 사주 · 별자리 · MBTI 궁합">
+<meta property="og:description" content="이름, 사주팔자, 별자리, 혈액형, MBTI로 보는 우리 둘의 궁합을 재미로 확인해보세요.">
+<meta property="og:image" content="https://bbiyak-6ou7.vercel.app/icons/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="삐약궁합 - 이름 · 사주 · 별자리 · MBTI 궁합">
+<meta name="twitter:description" content="이름, 사주팔자, 별자리, 혈액형, MBTI로 보는 우리 둘의 궁합을 재미로 확인해보세요.">
+<meta name="twitter:image" content="https://bbiyak-6ou7.vercel.app/icons/og-image.jpg">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4697935900449471"
      crossorigin="anonymous"></script>
 
@@ -1930,75 +1946,76 @@ function roundRectPathGeneric(ctx, x, y, w, h, r) {
 }
 
 function drawChickEyes(ctx, s, type) {
-  const ex = s * 0.15, ey = -s * 0.04;
+  const ex = s * 0.165, ey = -s * 0.04;
   ctx.save();
   if (type === 'heart') {
+    // 더 동글동글하고 가로로 살짝 넓은 하트 — 세로 폭보다 가로 폭을 키우고 꼭짓점을 완만하게 한다.
     [-1, 1].forEach(dir => {
       const cx0 = ex * dir, cy0 = ey;
-      const hs = s * 0.075;
+      const hw = s * 0.1, hh = s * 0.084;
       ctx.beginPath();
-      ctx.moveTo(cx0, cy0 + hs * 0.65);
-      ctx.bezierCurveTo(cx0 - hs * 1.1, cy0 - hs * 0.5, cx0 - hs * 0.4, cy0 - hs * 1.3, cx0, cy0 - hs * 0.4);
-      ctx.bezierCurveTo(cx0 + hs * 0.4, cy0 - hs * 1.3, cx0 + hs * 1.1, cy0 - hs * 0.5, cx0, cy0 + hs * 0.65);
+      ctx.moveTo(cx0, cy0 + hh * 0.5);
+      ctx.bezierCurveTo(cx0 - hw * 1.15, cy0 - hh * 0.3, cx0 - hw * 0.55, cy0 - hh * 1.2, cx0, cy0 - hh * 0.25);
+      ctx.bezierCurveTo(cx0 + hw * 0.55, cy0 - hh * 1.2, cx0 + hw * 1.15, cy0 - hh * 0.3, cx0, cy0 + hh * 0.5);
       ctx.closePath();
       ctx.fillStyle = '#ff4f7b';
       ctx.fill();
     });
   } else if (type === 'happy') {
     ctx.strokeStyle = '#3a2b1a';
-    ctx.lineWidth = s * 0.032;
+    ctx.lineWidth = s * 0.036;
     ctx.lineCap = 'round';
     [-1, 1].forEach(dir => {
       ctx.beginPath();
-      ctx.arc(ex * dir, ey + s * 0.02, s * 0.06, Math.PI * 1.15, Math.PI * 1.85);
+      ctx.arc(ex * dir, ey + s * 0.02, s * 0.072, Math.PI * 1.15, Math.PI * 1.85);
       ctx.stroke();
     });
   } else if (type === 'x') {
     ctx.strokeStyle = '#3a2b1a';
-    ctx.lineWidth = s * 0.03;
+    ctx.lineWidth = s * 0.034;
     ctx.lineCap = 'round';
     [-1, 1].forEach(dir => {
       const cx0 = ex * dir;
       ctx.beginPath();
-      ctx.moveTo(cx0 - s * 0.045, ey - s * 0.045);
-      ctx.lineTo(cx0 + s * 0.045, ey + s * 0.045);
-      ctx.moveTo(cx0 + s * 0.045, ey - s * 0.045);
-      ctx.lineTo(cx0 - s * 0.045, ey + s * 0.045);
+      ctx.moveTo(cx0 - s * 0.052, ey - s * 0.052);
+      ctx.lineTo(cx0 + s * 0.052, ey + s * 0.052);
+      ctx.moveTo(cx0 + s * 0.052, ey - s * 0.052);
+      ctx.lineTo(cx0 - s * 0.052, ey + s * 0.052);
       ctx.stroke();
     });
   } else if (type === 'wink') {
     ctx.fillStyle = '#3a2b1a';
     ctx.beginPath();
-    ctx.arc(-ex, ey, s * 0.045, 0, Math.PI * 2);
+    ctx.arc(-ex, ey, s * 0.054, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
-    ctx.arc(-ex + s * 0.014, ey - s * 0.014, s * 0.014, 0, Math.PI * 2);
+    ctx.arc(-ex + s * 0.017, ey - s * 0.017, s * 0.017, 0, Math.PI * 2);
     ctx.fillStyle = '#fff';
     ctx.fill();
     ctx.strokeStyle = '#3a2b1a';
-    ctx.lineWidth = s * 0.03;
+    ctx.lineWidth = s * 0.034;
     ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.arc(ex, ey + s * 0.02, s * 0.055, Math.PI * 1.15, Math.PI * 1.85);
+    ctx.arc(ex, ey + s * 0.02, s * 0.065, Math.PI * 1.15, Math.PI * 1.85);
     ctx.stroke();
   } else if (type === 'flat') {
     ctx.strokeStyle = '#3a2b1a';
-    ctx.lineWidth = s * 0.03;
+    ctx.lineWidth = s * 0.034;
     ctx.lineCap = 'round';
     [-1, 1].forEach(dir => {
       ctx.beginPath();
-      ctx.moveTo(ex * dir - s * 0.045, ey);
-      ctx.lineTo(ex * dir + s * 0.045, ey);
+      ctx.moveTo(ex * dir - s * 0.052, ey);
+      ctx.lineTo(ex * dir + s * 0.052, ey);
       ctx.stroke();
     });
   } else {
     ctx.fillStyle = '#3a2b1a';
     [-1, 1].forEach(dir => {
       ctx.beginPath();
-      ctx.arc(ex * dir, ey, s * 0.048, 0, Math.PI * 2);
+      ctx.arc(ex * dir, ey, s * 0.058, 0, Math.PI * 2);
       ctx.fill();
       ctx.beginPath();
-      ctx.arc(ex * dir + s * 0.015, ey - s * 0.015, s * 0.015, 0, Math.PI * 2);
+      ctx.arc(ex * dir + s * 0.018, ey - s * 0.018, s * 0.018, 0, Math.PI * 2);
       ctx.fillStyle = '#fff';
       ctx.fill();
       ctx.fillStyle = '#3a2b1a';
@@ -2082,15 +2099,6 @@ function drawChick(ctx, cx, cy, s, opts) {
       ctx.fill();
     });
   }
-
-  // 부리
-  ctx.fillStyle = '#f08a1e';
-  ctx.beginPath();
-  ctx.moveTo(-s * 0.05, s * 0.08);
-  ctx.lineTo(s * 0.05, s * 0.08);
-  ctx.lineTo(0, s * 0.15);
-  ctx.closePath();
-  ctx.fill();
 
   drawChickEyes(ctx, s, o.eyes);
   drawChickMouth(ctx, s, o.mouth);
@@ -3532,16 +3540,27 @@ let lastBloodResult = null;
 let lastMbtiResult = null;
 let lastComboResult = null;
 
+// 점수 등급(tier)마다 색 온도를 다르게 줘서 "따뜻한 로맨스 → 서늘한 어긋남"으로 이어지는
+// 색 스토리를 만든다. accent=점수·포인트 색, textStrong=제목 색, cardBg=흰 카드 톤,
+// heartCount/heartAlpha=하트 장식 밀도(궁합이 안 좋을수록 하트를 줄여 의미를 담는다).
 const THEME_BY_TIER = [
-  { bgFrom: '#fff9c4', bgTo: '#ffd54f', stickers: ['🐥','✨','💕','🌼','⭐','🐣','✨'] },
-  { bgFrom: '#fff3b0', bgTo: '#ffca28', stickers: ['🐥','🌻','✨','🐤','🌼','💫','⭐'] },
-  { bgFrom: '#fffde7', bgTo: '#fff59d', stickers: ['😊','🌼','☀️','✨','🍀','🐥','⭐'] },
-  { bgFrom: '#fff8dc', bgTo: '#ffe082', stickers: ['🙂','☁️','💧','🌾','✨','🐤','⭐'] },
-  { bgFrom: '#fff3c4', bgTo: '#ffca28', stickers: ['😅','🌙','💭','✨','🍀','🐥','⭐'] },
-  { bgFrom: '#ffe082', bgTo: '#f0b429', stickers: ['😬','🌙','⭐','✨','🔮','🐥','💫'] },
+  { bgFrom: '#ffe3ec', bgTo: '#ffd54f', accent: '#ff5c7a', textStrong: '#6b3410', cardBg: '#fffaf5',
+    heartCount: 14, heartAlpha: 0.36, stickers: ['🐥','✨','💕','💘','⭐','🐣','✨'] },
+  { bgFrom: '#fff3b0', bgTo: '#ffb74d', accent: '#f2711a', textStrong: '#6b3410', cardBg: '#fffdf7',
+    heartCount: 10, heartAlpha: 0.30, stickers: ['🐥','🌻','✨','🐤','💕','💫','⭐'] },
+  { bgFrom: '#fffde7', bgTo: '#ffe57f', accent: '#f9a825', textStrong: '#6b3410', cardBg: '#fffdf7',
+    heartCount: 7, heartAlpha: 0.26, stickers: ['😊','🌼','☀️','✨','🍀','🐥','⭐'] },
+  { bgFrom: '#fff3e0', bgTo: '#ffd166', accent: '#e0784f', textStrong: '#6b3410', cardBg: '#fffaf5',
+    heartCount: 4, heartAlpha: 0.22, stickers: ['🙂','☁️','💧','🌾','✨','🐤','⭐'] },
+  { bgFrom: '#f1e6f0', bgTo: '#f0c96e', accent: '#8d6a8c', textStrong: '#6b3410', cardBg: '#fdf9fc',
+    heartCount: 2, heartAlpha: 0.18, stickers: ['😅','🌙','💭','✨','🍀','🐥','⭐'] },
+  { bgFrom: '#e9edf5', bgTo: '#e2c56e', accent: '#5f6f92', textStrong: '#6b3410', cardBg: '#f9fafc',
+    heartCount: 0, heartAlpha: 0, stickers: ['😬','🌙','⭐','✨','🔮','🐥','💫'] },
 ];
-const SAJU_THEME = { bgFrom: '#fff3c4', bgTo: '#ffd54f', stickers: ['🔮','✨','⭐','🌙','💫','🀄','🐥'] };
-const TODAY_THEME = { bgFrom: '#fff9c4', bgTo: '#ffd54f', stickers: ['🌅','✨','⭐','🍀','💫','🔮','🐥'] };
+const SAJU_THEME = { bgFrom: '#fff3c4', bgTo: '#ffd54f', accent: '#f57c00', textStrong: '#6b3410', cardBg: '#fffdf7',
+  heartCount: 6, heartAlpha: 0.22, stickers: ['🔮','✨','⭐','🌙','💫','🀄','🐥'] };
+const TODAY_THEME = { bgFrom: '#fff9c4', bgTo: '#ffd54f', accent: '#f57c00', textStrong: '#6b3410', cardBg: '#fffdf7',
+  heartCount: 6, heartAlpha: 0.22, stickers: ['🌅','✨','⭐','🍀','💫','🔮','🐥'] };
 
 const STICKER_SPOTS = [
   { x: 120, y: 180, size: 100, rot: -18 },
@@ -3570,6 +3589,28 @@ const HEART_SPOTS = [
   { x: 60, y: 1560, size: 42, rot: 10 },
   { x: 1020, y: 1610, size: 46, rot: -15 },
 ];
+
+// 하트 개수를 줄일 때도 위쪽에 몰리지 않고 카드 전체에 고르게 퍼지도록 균등 간격으로 고른다.
+function pickEvenSpots(arr, n) {
+  if (n >= arr.length) return arr;
+  if (n <= 0) return [];
+  const step = arr.length / n;
+  const result = [];
+  for (let i = 0; i < n; i++) result.push(arr[Math.floor(i * step)]);
+  return result;
+}
+
+// 텍스트가 maxWidth를 넘으면 폰트 크기를 줄여서 캔버스 밖으로 잘리지 않게 한다.
+// (긴 등급 타이틀 등 한 줄로 꽉 채워 그리는 텍스트에 사용)
+function fitFontSize(ctx, text, maxWidth, baseSize, weight) {
+  let size = baseSize;
+  ctx.font = `${weight} ${size}px 'Malgun Gothic', sans-serif`;
+  while (ctx.measureText(text).width > maxWidth && size > 32) {
+    size -= 2;
+    ctx.font = `${weight} ${size}px 'Malgun Gothic', sans-serif`;
+  }
+  return size;
+}
 
 // 카드 프레임 좌표
 const CARD_X = 70, CARD_Y = 190, CARD_W = 940, CARD_H = 1540, CARD_R = 60;
@@ -3652,19 +3693,23 @@ function drawStoryBackground(ctx, theme) {
   });
   ctx.restore();
 
-  ctx.save();
-  ctx.globalAlpha = 0.32;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  HEART_SPOTS.forEach((spot, i) => {
+  const heartCount = theme.heartCount === undefined ? 8 : theme.heartCount;
+  const heartAlpha = theme.heartAlpha === undefined ? 0.28 : theme.heartAlpha;
+  if (heartCount > 0) {
     ctx.save();
-    ctx.translate(spot.x, spot.y);
-    ctx.rotate(spot.rot * Math.PI / 180);
-    ctx.font = `${spot.size}px 'Malgun Gothic', sans-serif`;
-    ctx.fillText(HEART_EMOJIS[i % HEART_EMOJIS.length], 0, 0);
+    ctx.globalAlpha = heartAlpha;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    pickEvenSpots(HEART_SPOTS, heartCount).forEach((spot, i) => {
+      ctx.save();
+      ctx.translate(spot.x, spot.y);
+      ctx.rotate(spot.rot * Math.PI / 180);
+      ctx.font = `${spot.size}px 'Malgun Gothic', sans-serif`;
+      ctx.fillText(HEART_EMOJIS[i % HEART_EMOJIS.length], 0, 0);
+      ctx.restore();
+    });
     ctx.restore();
-  });
-  ctx.restore();
+  }
 }
 
 function drawStoryCardFrame(ctx) {
@@ -4297,24 +4342,31 @@ function drawCoupleAvatar(ctx, cx, cy, size, emoji, tierIdx) {
   ctx.fillText(emoji, badgeCx, badgeCy + badgeR * 0.05);
 }
 
-function drawScoreCardHeader(ctx, titleText, emoji, tierIdx) {
+function drawScoreCardHeader(ctx, titleText, emoji, tierIdx, theme) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillStyle = '#6b3410';
-  ctx.font = "800 66px 'Malgun Gothic', sans-serif";
+  ctx.fillStyle = theme.textStrong;
+  fitFontSize(ctx, titleText, 940, 66, 800);
   ctx.fillText(titleText, 540, 108);
   drawCoupleAvatar(ctx, 540, 392, 248, emoji, tierIdx);
 }
 
-function drawScoreCardBody(ctx, namesText, score, tier, reasonText, infoCards) {
-  ctx.fillStyle = '#6b4a2b';
+function drawScoreCardBody(ctx, namesText, score, tier, reasonText, infoCards, theme) {
+  // 이름/등급 타이틀처럼 사용자 입력이나 긴 문구가 들어갈 수 있는 텍스트는 화면 밖으로
+  // 삐져나오지 않게 최대 2줄까지 줄바꿈하고, 실제로 그려진 줄 수만큼 아래 요소들을
+  // 전부 뒤따라 내려오게(캐스케이드) 계산한다.
+  ctx.fillStyle = theme.textStrong;
   ctx.font = "700 58px 'Malgun Gothic', sans-serif";
-  ctx.fillText(namesText, 540, 655);
+  const namesLines = Math.min(countWrappedLines(ctx, namesText, 900), 2);
+  let y = wrapCanvasText(ctx, namesText, 540, 644, 900, 64, namesLines);
+  y += namesLines > 1 ? 8 : 40;
 
+  const sparkleY = y + 40;
   ctx.font = "38px 'Malgun Gothic', sans-serif";
-  ctx.fillText('✨', 300, 760);
-  ctx.fillText('✨', 780, 760);
+  ctx.fillText('✨', 300, sparkleY);
+  ctx.fillText('✨', 780, sparkleY);
 
+  const scoreBaselineY = y + 140;
   {
     const scoreText = String(score);
     const scoreFont = "800 192px 'Malgun Gothic', sans-serif";
@@ -4328,43 +4380,61 @@ function drawScoreCardBody(ctx, namesText, score, tier, reasonText, infoCards) {
     const gap = 16;
     const totalWidth = scoreWidth + gap + ptWidth;
     const startX = 540 - totalWidth / 2;
-    const baselineY = 860;
 
-    ctx.fillStyle = '#f57c00';
+    ctx.fillStyle = theme.accent;
     ctx.font = scoreFont;
-    ctx.fillText(scoreText, startX, baselineY);
+    ctx.fillText(scoreText, startX, scoreBaselineY);
 
-    ctx.fillStyle = '#c9860f';
+    ctx.fillStyle = theme.accent;
     ctx.font = ptFont;
-    ctx.fillText('점', startX + scoreWidth + gap, baselineY);
+    ctx.fillText('점', startX + scoreWidth + gap, scoreBaselineY);
 
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
   }
 
-  ctx.fillStyle = '#6b3410';
+  ctx.fillStyle = theme.textStrong;
   ctx.font = "700 64px 'Malgun Gothic', sans-serif";
-  ctx.fillText(tier.title, 540, 992);
+  const titleLines = Math.min(countWrappedLines(ctx, tier.title, 900), 2);
+  // 2줄로 넘어가는 긴 타이틀(예: 최상위 등급)은 폰트를 살짝 줄여서(줄 높이는 폰트보다
+  // 항상 커야 줄끼리 겹치지 않는다) 아래 이유 텍스트가 표시될 공간을 더 확보한다 —
+  // 흔한 한 줄 타이틀의 넉넉한 간격·크기는 그대로 유지된다.
+  const titleFontSize = titleLines > 1 ? 54 : 64;
+  const titleLineHeight = titleLines > 1 ? 60 : 66;
+  ctx.font = `700 ${titleFontSize}px 'Malgun Gothic', sans-serif`;
+  const titleY = scoreBaselineY + 132;
+  const commaIdx = tier.title.indexOf(', ');
+  if (titleLines > 1 && commaIdx !== -1) {
+    // 두 줄로 나뉠 만큼 긴 타이틀은 단어 폭 계산으로 아무데서나 끊기보다,
+    // 쉼표(자연스러운 의미 단위)에서 먼저 줄을 나눈다.
+    const part1 = tier.title.slice(0, commaIdx + 1);
+    const part2 = tier.title.slice(commaIdx + 2);
+    y = wrapCanvasText(ctx, part1, 540, titleY, 900, titleLineHeight, 1);
+    y = wrapCanvasText(ctx, part2, 540, y, 900, titleLineHeight, 1);
+  } else {
+    y = wrapCanvasText(ctx, tier.title, 540, titleY, 900, titleLineHeight, titleLines);
+  }
+  y += titleLines > 1 ? 4 : 28;
 
   // 정보 카드(아래)가 들어갈 공간을 먼저 확보한 뒤, 남는 공간만큼 tier 설명·이유 텍스트에
   // 실제로 필요한 줄 수를 계산해서 배분한다 — 고정 줄 수 제한으로 문장이 "…"로 잘리는 걸 방지.
   const CARD_GAP = 22, CARD_H = 226;
   const CARD_BLOCK_H = (infoCards && infoCards.length) ? (CARD_GAP + CARD_H) : 0;
-  const CONTENT_BOTTOM_MAX = 1700 - CARD_BLOCK_H;
+  const CONTENT_BOTTOM_MAX = 1730 - CARD_BLOCK_H;
 
   ctx.fillStyle = '#8a6d52';
   ctx.font = "400 34px 'Malgun Gothic', sans-serif";
   const tierDescLines = Math.min(countWrappedLines(ctx, tier.desc, 760), 4);
-  let y = wrapCanvasText(ctx, tier.desc, 540, 1068, 760, 46, tierDescLines);
+  y = wrapCanvasText(ctx, tier.desc, 540, y, 760, 41, tierDescLines);
 
   if (reasonText) {
     y += 12;
     drawGradientDivider(ctx, y, 460);
-    y += 30;
-    ctx.fillStyle = '#c9770b';
+    y += 27;
+    ctx.fillStyle = theme.accent;
     ctx.font = "700 36px 'Malgun Gothic', sans-serif";
     ctx.fillText('💡 왜 이 점수일까요?', 540, y);
-    y += 40;
+    y += 38;
     ctx.fillStyle = '#7a5c42';
     ctx.font = "400 30px 'Malgun Gothic', sans-serif";
     const reasonLines = countWrappedLines(ctx, reasonText, 800);
@@ -4665,17 +4735,17 @@ function renderStoryCard(kind) {
     drawStoryBackground(ctx, theme);
     drawBurstGlow(ctx, 540, 260);
 
-    roundRectPath(ctx, 80, 600, 920, 1090, 40);
+    roundRectPath(ctx, 80, 600, 920, 1130, 40);
     ctx.save();
     ctx.shadowColor = 'rgba(150,110,30,0.18)';
     ctx.shadowBlur = 30;
     ctx.shadowOffsetY = 10;
-    ctx.fillStyle = '#fffdf7';
+    ctx.fillStyle = theme.cardBg;
     ctx.fill();
     ctx.restore();
 
-    drawScoreCardHeader(ctx, titleText, emoji, tierIdx);
-    drawScoreCardBody(ctx, namesText, score, tier, reasonText, infoCards);
+    drawScoreCardHeader(ctx, titleText, emoji, tierIdx, theme);
+    drawScoreCardBody(ctx, namesText, score, tier, reasonText, infoCards, theme);
     drawStoryWatermark(ctx, tierIdx);
   }
 
