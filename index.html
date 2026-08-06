@@ -2674,7 +2674,11 @@ function pushBbiyakAd(resultId) {
   const ins = document.querySelector('#' + resultId + ' .bbiyak-ad');
   if (ins && !ins.dataset.pushed) {
     ins.dataset.pushed = '1';
-    (window.adsbygoogle = window.adsbygoogle || []).push({});
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (e) {
+      // 광고 슬롯 렌더링 실패(예: availableWidth=0)가 궁합 결과 로직을 막지 않도록 무시한다.
+    }
   }
 }
 
@@ -3589,6 +3593,24 @@ function wrapCanvasText(ctx, text, cx, y, maxWidth, lineHeight, maxLines = 5) {
   return y + lines.length * lineHeight;
 }
 
+// wrapCanvasText와 동일한 줄바꿈 규칙으로 실제 필요한 줄 수만 계산한다(그리지 않음).
+// ctx.font가 실제 렌더링 폰트로 미리 설정돼 있어야 정확하다.
+function countWrappedLines(ctx, text, maxWidth) {
+  const words = text.split(' ');
+  let lines = 0, line = '';
+  for (let n = 0; n < words.length; n++) {
+    const testLine = line + words[n] + ' ';
+    if (ctx.measureText(testLine).width > maxWidth && line !== '') {
+      lines++;
+      line = words[n] + ' ';
+    } else {
+      line = testLine;
+    }
+  }
+  if (line) lines++;
+  return lines;
+}
+
 function drawStoryBackground(ctx, theme) {
   const grad = ctx.createLinearGradient(0, 0, 1080, 1920);
   grad.addColorStop(0, theme.bgFrom);
@@ -4184,6 +4206,36 @@ function drawStatCard(ctx, x, y, w, h, emoji, label, score, color, bgColor, desc
   ctx.fillText(footerEmoji, cx, y + h - 18);
 }
 
+// score(점수) 대신 짧은 텍스트 값을 보여주는 카드 — 이름/사주/별자리/혈액형/MBTI 등
+// 두 사람(또는 항목)의 정보를 컬러풀하게 채워 스토리 카드를 꽉 차 보이게 한다.
+function drawInfoCard(ctx, x, y, w, h, emoji, label, value, color, bgColor, desc) {
+  ctx.save();
+  ctx.shadowColor = 'rgba(150,110,30,0.14)';
+  ctx.shadowBlur = 16;
+  ctx.shadowOffsetY = 5;
+  roundRectPath(ctx, x, y, w, h, 28);
+  ctx.fillStyle = bgColor;
+  ctx.fill();
+  ctx.restore();
+
+  const cx = x + w / 2;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  ctx.fillStyle = color;
+  ctx.font = "700 30px 'Malgun Gothic', sans-serif";
+  wrapCanvasText(ctx, `${emoji} ${label}`, cx, y + 42, w - 30, 34, 1);
+
+  ctx.font = "800 52px 'Malgun Gothic', sans-serif";
+  ctx.fillText(value, cx, y + 110);
+
+  if (desc) {
+    ctx.fillStyle = '#6b5d47';
+    ctx.font = "400 20px 'Malgun Gothic', sans-serif";
+    wrapCanvasText(ctx, desc, cx, y + 158, w - 34, 25, 2);
+  }
+}
+
 function drawCoupleAvatar(ctx, cx, cy, size, emoji, tierIdx) {
   drawEmojiGlow(ctx, cx, cy, size * 1.9);
 
@@ -4216,20 +4268,24 @@ function drawScoreCardHeader(ctx, titleText, emoji, tierIdx) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#6b3410';
-  ctx.font = "800 58px 'Malgun Gothic', sans-serif";
-  ctx.fillText(titleText, 540, 110);
-  drawCoupleAvatar(ctx, 540, 390, 215, emoji, tierIdx);
+  ctx.font = "800 66px 'Malgun Gothic', sans-serif";
+  ctx.fillText(titleText, 540, 108);
+  drawCoupleAvatar(ctx, 540, 392, 248, emoji, tierIdx);
 }
 
-function drawScoreCardBody(ctx, namesText, score, tier, reasonText, extraLines) {
+function drawScoreCardBody(ctx, namesText, score, tier, reasonText, infoCards) {
   ctx.fillStyle = '#6b4a2b';
-  ctx.font = "700 50px 'Malgun Gothic', sans-serif";
+  ctx.font = "700 58px 'Malgun Gothic', sans-serif";
   ctx.fillText(namesText, 540, 655);
+
+  ctx.font = "38px 'Malgun Gothic', sans-serif";
+  ctx.fillText('✨', 300, 760);
+  ctx.fillText('✨', 780, 760);
 
   {
     const scoreText = String(score);
-    const scoreFont = "800 178px 'Malgun Gothic', sans-serif";
-    const ptFont = "600 46px 'Malgun Gothic', sans-serif";
+    const scoreFont = "800 192px 'Malgun Gothic', sans-serif";
+    const ptFont = "600 50px 'Malgun Gothic', sans-serif";
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic';
     ctx.font = scoreFont;
@@ -4254,33 +4310,43 @@ function drawScoreCardBody(ctx, namesText, score, tier, reasonText, extraLines) 
   }
 
   ctx.fillStyle = '#6b3410';
-  ctx.font = "700 58px 'Malgun Gothic', sans-serif";
+  ctx.font = "700 64px 'Malgun Gothic', sans-serif";
   ctx.fillText(tier.title, 540, 992);
+
+  // 정보 카드(아래)가 들어갈 공간을 먼저 확보한 뒤, 남는 공간만큼 tier 설명·이유 텍스트에
+  // 실제로 필요한 줄 수를 계산해서 배분한다 — 고정 줄 수 제한으로 문장이 "…"로 잘리는 걸 방지.
+  const CARD_GAP = 22, CARD_H = 226;
+  const CARD_BLOCK_H = (infoCards && infoCards.length) ? (CARD_GAP + CARD_H) : 0;
+  const CONTENT_BOTTOM_MAX = 1700 - CARD_BLOCK_H;
 
   ctx.fillStyle = '#8a6d52';
   ctx.font = "400 34px 'Malgun Gothic', sans-serif";
-  let y = wrapCanvasText(ctx, tier.desc, 540, 1068, 760, 48, 3);
+  const tierDescLines = Math.min(countWrappedLines(ctx, tier.desc, 760), 4);
+  let y = wrapCanvasText(ctx, tier.desc, 540, 1068, 760, 46, tierDescLines);
 
   if (reasonText) {
-    y += 18;
+    y += 12;
     drawGradientDivider(ctx, y, 460);
-    y += 40;
+    y += 30;
     ctx.fillStyle = '#c9770b';
-    ctx.font = "700 34px 'Malgun Gothic', sans-serif";
+    ctx.font = "700 36px 'Malgun Gothic', sans-serif";
     ctx.fillText('💡 왜 이 점수일까요?', 540, y);
-    y += 50;
+    y += 40;
     ctx.fillStyle = '#7a5c42';
-    ctx.font = "400 31px 'Malgun Gothic', sans-serif";
-    y = wrapCanvasText(ctx, reasonText, 540, y, 800, 42, 9);
+    ctx.font = "400 30px 'Malgun Gothic', sans-serif";
+    const reasonLines = countWrappedLines(ctx, reasonText, 800);
+    const reasonMaxLines = Math.max(2, Math.min(reasonLines, Math.floor((CONTENT_BOTTOM_MAX - y) / 34)));
+    y = wrapCanvasText(ctx, reasonText, 540, y, 800, 34, reasonMaxLines);
   }
 
-  if (extraLines && extraLines.length) {
-    y += 20;
-    extraLines.forEach(line => {
-      ctx.fillStyle = '#b5650d';
-      ctx.font = "700 34px 'Malgun Gothic', sans-serif";
-      ctx.fillText(line, 540, y);
-      y += 48;
+  if (infoCards && infoCards.length) {
+    y += CARD_GAP;
+    const cardW = 400, cardH = CARD_H, gap = 40;
+    const totalW = infoCards.length * cardW + (infoCards.length - 1) * gap;
+    let x = 540 - totalW / 2;
+    infoCards.forEach(c => {
+      drawInfoCard(ctx, x, y, cardW, cardH, c.emoji, c.label, c.value, c.color, c.bg, c.desc);
+      x += cardW + gap;
     });
   }
 }
@@ -4486,7 +4552,11 @@ function renderStoryCard(kind) {
     ctx.font = "700 27px 'Malgun Gothic', sans-serif";
     ctx.fillText('🐥 삐약궁합', 540, 1900);
   } else {
-    let titleText, emoji, namesText, score, tier, reasonText = null, extraLines = [];
+    let titleText, emoji, namesText, score, tier, reasonText = null, infoCards = [];
+    const PERSON_COLORS = [
+      { color: '#e0507a', bg: '#ffe3ea' },
+      { color: '#3b82c4', bg: '#e3f0ff' },
+    ];
 
     if (kind === 'name') {
       const r = lastNameResult;
@@ -4494,40 +4564,67 @@ function renderStoryCard(kind) {
       titleText = '💌 이름 궁합'; emoji = r.tier.emoji;
       namesText = `${r.name1}  ➡️  ${r.name2}`;
       score = r.score; tier = r.tier;
-      reasonText = `${r.name1}님이 ${r.name2}님을 좋아하는 마음 점수예요. ${r.name1}님은 총 ${a1.total}획, ${r.name2}님은 총 ${a2.total}획이에요. 두 이름의 글자별 획수를 번갈아 배열한 뒤 피라미드처럼 더해 내려가는 전통 이름 궁합 계산법으로 산출했어요.`;
+      reasonText = `${r.name1}님이 ${r.name2}님을 좋아하는 마음 점수예요. 두 이름의 글자별 획수를 번갈아 배열한 뒤 피라미드처럼 더해 내려가는 전통 이름 궁합 계산법으로 산출했어요.`;
+      infoCards = [
+        { emoji: '💌', label: r.name1, value: `${a1.total}획`, desc: '이름 총 획수', ...PERSON_COLORS[0] },
+        { emoji: '💌', label: r.name2, value: `${a2.total}획`, desc: '이름 총 획수', ...PERSON_COLORS[1] },
+      ];
     } else if (kind === 'sajuCompat') {
       const r = lastSajuCompatResult;
       titleText = '🀄 사주 궁합'; emoji = r.tier.emoji;
       namesText = `${r.name1}  💕  ${r.name2}`;
       score = r.score; tier = r.tier;
-      reasonText = `${r.ilganText} ${r.iljiText}`;
+      reasonText = r.ilganText;
+      const ilganRel = ohengRelation(r.p1.day.stemElement, r.p2.day.stemElement);
+      const ilganLabel = ilganRel.type === 'same' ? '비화(比和)' : (ilganRel.type === 'a_generates_b' || ilganRel.type === 'b_generates_a') ? '상생(相生)' : '상극(相剋)';
+      const iljiRel = branchRelation(r.p1.day.branchIdx, r.p2.day.branchIdx);
+      const iljiLabel = { same: '동일', hap: '육합(六合)', chung: '충(沖)', samhap: '삼합(三合)', none: '무난' }[iljiRel];
+      infoCards = [
+        { emoji: '☀️', label: '일간 궁합', value: ilganLabel, desc: `${r.p1.day.stemChar} × ${r.p2.day.stemChar}`, ...PERSON_COLORS[0] },
+        { emoji: '🌙', label: '일지 궁합', value: iljiLabel, desc: `${r.p1.day.animal}띠 × ${r.p2.day.animal}띠`, ...PERSON_COLORS[1] },
+      ];
     } else if (kind === 'zodiac') {
       const r = lastZodiacResult;
       titleText = '⭐ 별자리 궁합'; emoji = r.tier.emoji;
       namesText = `${r.sign1.emoji} ${r.name1}  ×  ${r.name2} ${r.sign2.emoji}`;
       score = r.matchup.score; tier = r.tier;
       reasonText = `${r.sign1.name}와 ${r.sign2.name}의 조합: ${r.matchup.desc}`;
+      infoCards = [
+        { emoji: r.sign1.emoji, label: r.name1, value: r.sign1.name, desc: ZODIAC_ELEMENT_INFO[r.sign1.element].label + ' 기운', ...PERSON_COLORS[0] },
+        { emoji: r.sign2.emoji, label: r.name2, value: r.sign2.name, desc: ZODIAC_ELEMENT_INFO[r.sign2.element].label + ' 기운', ...PERSON_COLORS[1] },
+      ];
     } else if (kind === 'blood') {
       const r = lastBloodResult;
       titleText = '🩸 혈액형 궁합'; emoji = r.tier.emoji;
       namesText = `${r.n1}(${r.t1}형)  ×  ${r.n2}(${r.t2}형)`;
       score = r.matchup.score; tier = r.tier;
       reasonText = `${r.t1}형과 ${r.t2}형의 조합: ${r.matchup.desc}`;
+      infoCards = [
+        { emoji: '🩸', label: r.n1, value: `${r.t1}형`, desc: '', ...PERSON_COLORS[0] },
+        { emoji: '🩸', label: r.n2, value: `${r.t2}형`, desc: '', ...PERSON_COLORS[1] },
+      ];
     } else if (kind === 'mbti') {
       const r = lastMbtiResult;
       titleText = '🧩 MBTI 궁합'; emoji = r.tier.emoji;
       namesText = `${r.n1}(${r.type1})  ×  ${r.n2}(${r.type2})`;
       score = r.result.score; tier = r.tier;
-      reasonText = `${r.result.special ? r.result.special.text : `${r.result.reasons.SN} ${r.result.reasons.JP}`} ${r.togetherText}`;
+      reasonText = r.result.special ? r.result.special.text : r.result.reasons.SN;
+      infoCards = [
+        { emoji: '🧩', label: r.n1, value: r.type1, desc: '', ...PERSON_COLORS[0] },
+        { emoji: '🧩', label: r.n2, value: r.type2, desc: '', ...PERSON_COLORS[1] },
+      ];
     } else if (kind === 'combo') {
       const r = lastComboResult;
       titleText = '💫 종합 궁합'; emoji = r.tier.emoji;
       namesText = `${r.name1}  💕  ${r.name2}`;
       score = r.overall; tier = r.tier;
-      extraLines = r.breakdown.map(b => `${b.label} ${b.score}점`);
       const sorted = [...r.breakdown].sort((a, b) => b.score - a.score);
       const best = sorted[0], worst = sorted[sorted.length - 1];
       reasonText = `이름·사주·별자리·혈액형·MBTI 5가지 궁합 점수를 평균내어 산출했어요. ${best.label}(${best.score}점)이 가장 높았고, ${worst.label}(${worst.score}점)이 가장 낮았어요.`;
+      infoCards = [
+        { emoji: '🌟', label: '가장 잘 맞아요', value: `${best.label} ${best.score}점`, desc: '', color: '#4caf6d', bg: '#e3f5e0' },
+        { emoji: '🌱', label: '조금 더 챙겨요', value: `${worst.label} ${worst.score}점`, desc: '', color: '#e08a1c', bg: '#fff3d6' },
+      ];
     }
 
     const tierIdx = tierIndexFromScore(score);
@@ -4545,7 +4642,7 @@ function renderStoryCard(kind) {
     ctx.restore();
 
     drawScoreCardHeader(ctx, titleText, emoji, tierIdx);
-    drawScoreCardBody(ctx, namesText, score, tier, reasonText, extraLines);
+    drawScoreCardBody(ctx, namesText, score, tier, reasonText, infoCards);
     drawStoryWatermark(ctx, tierIdx);
   }
 
