@@ -446,6 +446,16 @@
         <div class="value" id="todayVisitors">-</div>
       </div>
     </div>
+    <div class="summary-row">
+      <div class="stat-card">
+        <div class="label">누적 조회수</div>
+        <div class="value" id="totalTabClicks">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">오늘 조회수</div>
+        <div class="value" id="todayTabClicks">-</div>
+      </div>
+    </div>
     <button id="backfillBtn">🕘 과거 기록에서 방문자·오늘 조회수 가져오기</button>
     <p class="hint" style="text-align:center; margin: -12px 0 20px;">최근 궁합 기록(최대 200건)에 남은 방문자 ID와 오늘 치 기능별 조회수를 모아 반영해요. 궁합을 한 번도 안 눌러본 방문은 기록이 없어 반영되지 않아요.</p>
 
@@ -573,6 +583,13 @@ function render(data) {
   $('todayVisits').textContent = today ? today.count.toLocaleString() : '0';
   $('totalVisitors').textContent = (data.totalVisitors || 0).toLocaleString();
   $('todayVisitors').textContent = (data.todayVisitors || 0).toLocaleString();
+
+  // 기능별 조회수를 다 합친 총 조회수(궁합 기능을 누른 총 횟수)
+  const tabClicksList = data.tabClicks || [];
+  const totalTabClicks = tabClicksList.reduce((sum, t) => sum + (t.count || 0), 0);
+  const todayTabClicks = tabClicksList.reduce((sum, t) => sum + (t.todayCount || 0), 0);
+  $('totalTabClicks').textContent = totalTabClicks.toLocaleString();
+  $('todayTabClicks').textContent = todayTabClicks.toLocaleString();
 
   const maxDaily = Math.max(1, ...data.dailyVisits.map((d) => d.count));
   $('dailyChart').innerHTML = data.dailyVisits.map((d) => {

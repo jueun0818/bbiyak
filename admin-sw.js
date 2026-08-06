@@ -4,7 +4,7 @@
 // - 페이지(admin.html)만 네트워크 우선 + 오프라인 폴백으로 캐시
 // 파일 내용을 고칠 때마다 VERSION을 올리면 기존 방문자에게 업데이트 배너가 뜬다.
 // ============================================================
-const VERSION = 'v1.0.5';
+const VERSION = 'v1.0.6';
 const CACHE_NAME = 'ppiyak-admin-' + VERSION;
 const CACHE_PREFIX = 'ppiyak-admin-';
 
