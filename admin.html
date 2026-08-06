@@ -162,7 +162,7 @@
   .visitor-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .visitor-repeat { color: var(--accent); font-weight: 700; }
 
-  #refreshBtn {
+  #refreshBtn, #backfillBtn {
     display: block;
     margin: 0 auto 20px;
     padding: 10px 18px;
@@ -173,6 +173,7 @@
     font-size: 13px;
     cursor: pointer;
   }
+  #backfillBtn:disabled { opacity: 0.6; cursor: default; }
   #dashError { color: #e0245e; font-size: 13px; text-align: center; display: none; margin-bottom: 12px; }
 
   .override-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
@@ -188,7 +189,8 @@
     font-size: 14px;
   }
   .override-form input#ovScore { flex: 0 0 84px; }
-  .override-form .hint { font-size: 12px; color: var(--muted); margin: -2px 0 0; }
+  .hint { font-size: 12px; color: var(--muted); }
+  .override-form .hint { margin: -2px 0 0; }
   .override-form button {
     padding: 11px;
     border: none;
@@ -434,6 +436,8 @@
         <div class="value" id="todayVisitors">-</div>
       </div>
     </div>
+    <button id="backfillBtn">🕘 과거 기록에서 방문자 수 가져오기</button>
+    <p class="hint" style="text-align:center; margin: -12px 0 20px;">최근 궁합 기록(최대 200건)에 남은 방문자 ID를 모아 반영해요. 궁합을 한 번도 안 눌러본 방문은 기록이 없어 반영되지 않아요.</p>
 
     <div class="section">
       <h2>최근 7일 방문</h2>
@@ -700,6 +704,34 @@ async function deleteOverride(id) {
 }
 
 $('ovAddBtn').addEventListener('click', addOverride);
+
+async function backfillVisitors() {
+  const pw = sessionStorage.getItem('bbiyak_admin_pw');
+  if (!pw) return;
+  const btn = $('backfillBtn');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '가져오는 중…';
+  try {
+    const res = await fetch('/api/backfill-visitors', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw }),
+    });
+    if (!res.ok) throw new Error('failed');
+    const data = await res.json();
+    btn.textContent = `✅ 기록 ${data.logEntries}건에서 방문자 ${data.uniqueVisitorsFound}명 반영 완료`;
+    loadStats(pw);
+  } catch (e) {
+    btn.textContent = '⚠️ 실패했어요, 다시 시도해주세요';
+  } finally {
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }, 4000);
+  }
+}
+$('backfillBtn').addEventListener('click', backfillVisitors);
 
 $('loginBtn').addEventListener('click', login);
 $('pwInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') login(); });
