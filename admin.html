@@ -122,7 +122,17 @@
   .tab-row .tab-label { width: 92px; flex-shrink: 0; }
   .tab-row .bar-track { flex: 1; height: 20px; background: var(--accent-soft); border-radius: 6px; overflow: hidden; }
   .tab-row .bar-fill { height: 100%; background: var(--accent); border-radius: 6px; min-width: 2px; }
-  .tab-row .tab-count { width: 36px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .tab-row .tab-count {
+    width: 76px;
+    flex-shrink: 0;
+    text-align: right;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+  }
+  .tab-row .tab-today { font-size: 11px; font-weight: 400; color: var(--muted); }
 
   .log-row {
     display: flex;
@@ -436,8 +446,8 @@
         <div class="value" id="todayVisitors">-</div>
       </div>
     </div>
-    <button id="backfillBtn">🕘 과거 기록에서 방문자 수 가져오기</button>
-    <p class="hint" style="text-align:center; margin: -12px 0 20px;">최근 궁합 기록(최대 200건)에 남은 방문자 ID를 모아 반영해요. 궁합을 한 번도 안 눌러본 방문은 기록이 없어 반영되지 않아요.</p>
+    <button id="backfillBtn">🕘 과거 기록에서 방문자·오늘 조회수 가져오기</button>
+    <p class="hint" style="text-align:center; margin: -12px 0 20px;">최근 궁합 기록(최대 200건)에 남은 방문자 ID와 오늘 치 기능별 조회수를 모아 반영해요. 궁합을 한 번도 안 눌러본 방문은 기록이 없어 반영되지 않아요.</p>
 
     <div class="section">
       <h2>최근 7일 방문</h2>
@@ -581,7 +591,7 @@ function render(data) {
     return `<div class="tab-row">
       <span class="tab-label">${t.label}</span>
       <span class="bar-track"><span class="bar-fill" style="width:${pct}%"></span></span>
-      <span class="tab-count">${t.count}</span>
+      <span class="tab-count">${t.count}<span class="tab-today">오늘 ${t.todayCount || 0}</span></span>
     </div>`;
   }).join('');
 

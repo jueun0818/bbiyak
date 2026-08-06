@@ -40,16 +40,16 @@ export default async function handler(req, res) {
   const n2 = safeName(body && body.name2);
   const v = safeVid(body && body.v);
 
+  const today = new Date().toISOString().slice(0, 10);
   const incrKeys = [];
   const uniqueKeys = [];
   if (event === 'pageview') {
-    const today = new Date().toISOString().slice(0, 10);
     incrKeys.push('stats:visits:total', `stats:visits:${today}`);
     // 방문 횟수(페이지뷰)와는 별개로, 같은 방문자 ID가 여러 번 봐도 한 번만 세는
     // 고유 방문자 수는 SET에 SADD해두고 SCARD로 집계한다(중복 추가는 자동 무시됨).
     if (v) uniqueKeys.push('stats:uniques:total', `stats:uniques:${today}`);
   } else if (event === 'tab_action' && ALLOWED_TABS.has(tab)) {
-    incrKeys.push(`stats:tab:${tab}`);
+    incrKeys.push(`stats:tab:${tab}`, `stats:tab:${tab}:${today}`);
   } else {
     res.status(400).json({ error: 'invalid event' });
     return;

@@ -62,8 +62,11 @@ export default async function handler(req, res) {
 
     const tabClicks = await Promise.all(
       TAB_KEYS.map(async (t) => {
-        const v = await redisCmd(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, ['GET', `stats:tab:${t}`]);
-        return { tab: t, label: TAB_LABELS[t], count: Number(v) || 0 };
+        const [v, todayV] = await Promise.all([
+          redisCmd(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, ['GET', `stats:tab:${t}`]),
+          redisCmd(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, ['GET', `stats:tab:${t}:${todayKey}`]),
+        ]);
+        return { tab: t, label: TAB_LABELS[t], count: Number(v) || 0, todayCount: Number(todayV) || 0 };
       })
     );
     tabClicks.sort((a, b) => b.count - a.count);
