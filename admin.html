@@ -424,6 +424,16 @@
         <div class="value" id="todayVisits">-</div>
       </div>
     </div>
+    <div class="summary-row">
+      <div class="stat-card">
+        <div class="label">누적 방문자</div>
+        <div class="value" id="totalVisitors">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">오늘 방문자</div>
+        <div class="value" id="todayVisitors">-</div>
+      </div>
+    </div>
 
     <div class="section">
       <h2>최근 7일 방문</h2>
@@ -547,6 +557,8 @@ function render(data) {
   $('totalVisits').textContent = data.totalVisits.toLocaleString();
   const today = data.dailyVisits[data.dailyVisits.length - 1];
   $('todayVisits').textContent = today ? today.count.toLocaleString() : '0';
+  $('totalVisitors').textContent = (data.totalVisitors || 0).toLocaleString();
+  $('todayVisitors').textContent = (data.todayVisitors || 0).toLocaleString();
 
   const maxDaily = Math.max(1, ...data.dailyVisits.map((d) => d.count));
   $('dailyChart').innerHTML = data.dailyVisits.map((d) => {

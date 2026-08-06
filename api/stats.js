@@ -45,6 +45,14 @@ export default async function handler(req, res) {
     const totalVisitsRaw = await redisCmd(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, ['GET', 'stats:visits:total']);
     const totalVisits = Number(totalVisitsRaw) || 0;
 
+    // 방문 횟수(페이지뷰 총합)와 달리, 방문자 수는 같은 사람이 여러 번 봐도 한 번만 센다
+    // (SET의 카디널리티 = SCARD).
+    const totalVisitorsRaw = await redisCmd(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, ['SCARD', 'stats:uniques:total']);
+    const totalVisitors = Number(totalVisitorsRaw) || 0;
+    const todayKey = new Date().toISOString().slice(0, 10);
+    const todayVisitorsRaw = await redisCmd(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, ['SCARD', `stats:uniques:${todayKey}`]);
+    const todayVisitors = Number(todayVisitorsRaw) || 0;
+
     const dailyVisits = await Promise.all(
       days.map(async (d) => {
         const v = await redisCmd(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, ['GET', `stats:visits:${d}`]);
@@ -66,7 +74,7 @@ export default async function handler(req, res) {
       .filter(Boolean)
       .map((e) => ({ tab: e.tab, label: TAB_LABELS[e.tab] || e.tab, n1: e.n1 || '', n2: e.n2 || '', t: e.t, v: e.v || '' }));
 
-    res.status(200).json({ totalVisits, dailyVisits, tabClicks, recentLogs });
+    res.status(200).json({ totalVisits, totalVisitors, todayVisitors, dailyVisits, tabClicks, recentLogs });
   } catch (e) {
     res.status(500).json({ error: 'failed' });
   }
