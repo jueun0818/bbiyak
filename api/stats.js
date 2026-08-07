@@ -9,7 +9,9 @@ const TAB_LABELS = {
   mbti: 'MBTI 궁합',
   combo: '종합 궁합',
 };
-const LOG_FETCH_COUNT = 50;
+// track.js가 stats:log에 최대 200건까지만 남기므로(LOG_MAX), 그만큼 전부 가져와서
+// 관리자 화면에서 "더보기"로 펼쳐볼 수 있게 한다.
+const LOG_FETCH_COUNT = 200;
 
 async function redisCmd(url, token, cmd) {
   const r = await fetch(url, {

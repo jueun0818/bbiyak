@@ -28,6 +28,10 @@
     --accent: #b5650d;
     --accent-soft: #fff3d6;
     --border: #e8e4da;
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --shadow-sm: 0 1px 2px rgba(30,20,5,0.04), 0 2px 10px rgba(30,20,5,0.05);
+    --shadow-md: 0 6px 20px rgba(30,20,5,0.09), 0 1px 3px rgba(30,20,5,0.06);
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -38,13 +42,19 @@
       --accent: #ffb74d;
       --accent-soft: #3a2f1c;
       --border: #34343c;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3), 0 2px 10px rgba(0,0,0,0.24);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.38), 0 1px 3px rgba(0,0,0,0.3);
     }
   }
   :root[data-theme="dark"] {
     --bg: #17171c; --card: #212127; --text: #ececf1; --muted: #9797a3; --accent: #ffb74d; --accent-soft: #3a2f1c; --border: #34343c;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.3), 0 2px 10px rgba(0,0,0,0.24);
+    --shadow-md: 0 8px 24px rgba(0,0,0,0.38), 0 1px 3px rgba(0,0,0,0.3);
   }
   :root[data-theme="light"] {
     --bg: #f6f5f2; --card: #ffffff; --text: #2a2a33; --muted: #767686; --accent: #b5650d; --accent-soft: #fff3d6; --border: #e8e4da;
+    --shadow-sm: 0 1px 2px rgba(30,20,5,0.04), 0 2px 10px rgba(30,20,5,0.05);
+    --shadow-md: 0 6px 20px rgba(30,20,5,0.09), 0 1px 3px rgba(30,20,5,0.06);
   }
   * { box-sizing: border-box; }
   body {
@@ -58,13 +68,47 @@
     padding: 32px 16px 64px;
   }
   .wrap { width: 100%; max-width: 640px; }
-  h1 { font-size: 22px; margin: 0 0 4px; }
-  .sub { color: var(--muted); font-size: 14px; margin: 0 0 28px; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  h1 { font-size: 21px; margin: 0; letter-spacing: -0.01em; display: flex; align-items: center; }
+  .admin-badge {
+    display: inline-block;
+    margin-left: 9px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    vertical-align: middle;
+  }
+  .sub { color: var(--muted); font-size: 14px; margin: 6px 0 28px; }
+
+  .icon-btn {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--card);
+    color: var(--text);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .icon-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+  .icon-btn:active { transform: translateY(0); }
 
   #loginCard {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
     padding: 28px;
   }
   #loginCard label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
@@ -92,15 +136,22 @@
   #loginError { color: #e0245e; font-size: 13px; margin-top: 8px; display: none; }
 
   #dashboard { display: none; }
+  .dash-toolbar { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-bottom: 18px; min-height: 38px; }
   .summary-row { display: flex; gap: 12px; margin-bottom: 20px; }
   .stat-card {
+    position: relative;
     flex: 1;
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
     padding: 18px;
+    transition: box-shadow .15s ease;
   }
+  .stat-card:hover { box-shadow: var(--shadow-md); }
+  .stat-card .stat-icon { font-size: 17px; margin-bottom: 8px; opacity: 0.85; }
   .stat-card .label { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .stat-card .label .hint { font-size: 11px; }
   .stat-card .value { font-size: 28px; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
   .stat-card .value-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
   .stat-card .sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
@@ -112,11 +163,19 @@
   .section {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
     padding: 20px;
     margin-bottom: 16px;
   }
-  .section h2 { font-size: 15px; margin: 0 0 16px; color: var(--muted); font-weight: 700; }
+  .section h2 {
+    font-size: 13px;
+    margin: 0 0 16px;
+    color: var(--muted);
+    font-weight: 800;
+    letter-spacing: 0.02em;
+  }
+  .section h2 .hint { font-weight: 400; letter-spacing: normal; }
 
   .trend-chart-wrap svg { width: 100%; height: auto; display: block; overflow: visible; }
   .trend-chart-wrap .trend-axis-label { font-size: 9.5px; fill: var(--muted); }
@@ -185,19 +244,37 @@
   .visitor-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .visitor-repeat { color: var(--accent); font-weight: 700; }
 
-  #refreshBtn, #backfillBtn {
+  .backfill-box { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--border); }
+  .backfill-box .hint { margin: 8px 0 0; text-align: center; }
+  #backfillBtn {
     display: block;
-    margin: 0 auto 20px;
-    padding: 10px 18px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: var(--card);
-    color: var(--text);
-    font-size: 13px;
+    width: 100%;
+    margin: 0;
+    padding: 9px 14px;
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--muted);
+    font-size: 12.5px;
+    font-weight: 600;
     cursor: pointer;
   }
   #backfillBtn:disabled { opacity: 0.6; cursor: default; }
-  #dashError { color: #e0245e; font-size: 13px; text-align: center; display: none; margin-bottom: 12px; }
+  #dashError { flex: 1; color: #e0245e; font-size: 13px; margin: 0; display: none; }
+
+  .more-btn {
+    display: block;
+    width: 100%;
+    margin-top: 12px;
+    padding: 10px;
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
 
   .override-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
   .override-form .row { display: flex; gap: 8px; }
@@ -425,7 +502,9 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>🐥 삐약궁합 관리자</h1>
+  <div class="topbar">
+    <h1>🐥 삐약궁합<span class="admin-badge">ADMIN</span></h1>
+  </div>
   <p class="sub">방문·기능별 사용 통계</p>
 
   <div id="loginCard">
@@ -436,54 +515,82 @@
   </div>
 
   <div id="dashboard">
-    <button id="refreshBtn">🔄 새로고침</button>
-    <p id="dashError">통계를 불러오지 못했어요.</p>
+    <div class="dash-toolbar">
+      <p id="dashError">통계를 불러오지 못했어요.</p>
+      <button id="refreshBtn" class="icon-btn" title="새로고침" aria-label="새로고침">🔄</button>
+    </div>
 
     <div class="summary-row">
       <div class="stat-card">
+        <div class="stat-icon">👀</div>
         <div class="label">누적 방문</div>
         <div class="value" id="totalVisits">-</div>
       </div>
       <div class="stat-card">
+        <div class="stat-icon">📅</div>
         <div class="label">오늘 방문</div>
-        <div class="value" id="todayVisits">-</div>
+        <div class="value-row">
+          <div class="value" id="todayVisits">-</div>
+          <div class="delta" id="todayVisitsDelta"></div>
+        </div>
       </div>
     </div>
     <div class="summary-row">
       <div class="stat-card">
+        <div class="stat-icon">🧑‍🤝‍🧑</div>
         <div class="label">누적 방문자</div>
         <div class="value" id="totalVisitors">-</div>
       </div>
       <div class="stat-card">
+        <div class="stat-icon">✨</div>
         <div class="label">오늘 방문자</div>
         <div class="value" id="todayVisitors">-</div>
       </div>
     </div>
     <div class="summary-row">
       <div class="stat-card">
+        <div class="stat-icon">📊</div>
         <div class="label">누적 조회수</div>
         <div class="value" id="totalTabClicks">-</div>
       </div>
       <div class="stat-card">
+        <div class="stat-icon">⚡</div>
         <div class="label">오늘 조회수</div>
         <div class="value" id="todayTabClicks">-</div>
       </div>
     </div>
-    <button id="backfillBtn">🕘 과거 기록에서 방문자·오늘 조회수 가져오기</button>
-    <p class="hint" style="text-align:center; margin: -12px 0 20px;">최근 궁합 기록(최대 200건)에 남은 방문자 ID와 오늘 치 기능별 조회수를 모아 반영해요. 궁합을 한 번도 안 눌러본 방문은 기록이 없어 반영되지 않아요.</p>
-
-    <div class="section">
-      <h2>최근 7일 방문</h2>
-      <div id="dailyChart"></div>
+    <div class="summary-row">
+      <div class="stat-card">
+        <div class="stat-icon">🔁</div>
+        <div class="label">재방문율 <span class="hint">(어제도 왔어요)</span></div>
+        <div class="value" id="retentionRate">-</div>
+        <div class="sub" id="retentionSub"></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎯</div>
+        <div class="label">방문자당 조회수 <span class="hint">(참여도)</span></div>
+        <div class="value" id="engagementRate">-</div>
+      </div>
     </div>
 
     <div class="section">
-      <h2>기능별 조회수 (많은 순)</h2>
+      <h2>📈 최근 30일 방문 추이</h2>
+      <div class="trend-chart-wrap" id="trendChart"></div>
+    </div>
+
+    <div class="section">
+      <h2>🧭 기능별 조회수 (많은 순)</h2>
       <div id="tabChart"></div>
     </div>
 
     <div class="section">
-      <h2>이름 점수 조작</h2>
+      <h2>🏆 인기 궁합 조합 TOP 10 <span class="hint">(서비스 오픈 이후 누적)</span></h2>
+      <div id="pairsList"></div>
+      <p id="emptyPairs" class="hint" style="display:none; text-align:center; padding: 8px 0;">아직 데이터가 없어요.</p>
+    </div>
+
+    <div class="section">
+      <h2>🎛️ 이름 점수 조작</h2>
       <div class="override-form">
         <div class="row">
           <input type="text" id="ovName1" placeholder="이름1 (필수)" maxlength="20">
@@ -500,9 +607,14 @@
     </div>
 
     <div class="section">
-      <h2>최근 궁합 기록 (누가 누구랑 봤는지)</h2>
+      <h2>📋 최근 궁합 기록 <span class="hint">(누가 누구랑 봤는지)</span></h2>
       <div id="logList"></div>
       <p id="emptyLog">아직 기록이 없어요.</p>
+      <button id="logMoreBtn" class="more-btn" hidden></button>
+      <div class="backfill-box">
+        <button id="backfillBtn">🕘 과거 기록에서 방문자·오늘 조회수 가져오기</button>
+        <p class="hint">이 목록(최대 200건)에 남은 방문자 ID와 오늘 치 기능별 조회수를 모아 반영해요. 궁합을 한 번도 안 눌러본 방문은 반영되지 않아요.</p>
+      </div>
     </div>
   </div>
 </div>
@@ -592,8 +704,12 @@ function esc(s) {
 
 function render(data) {
   $('totalVisits').textContent = data.totalVisits.toLocaleString();
-  const today = data.dailyVisits[data.dailyVisits.length - 1];
+  const daily = data.dailyVisits || [];
+  const today = daily[daily.length - 1];
+  const yesterday = daily[daily.length - 2];
   $('todayVisits').textContent = today ? today.count.toLocaleString() : '0';
+  renderDelta('todayVisitsDelta', today ? today.count : 0, yesterday ? yesterday.count : 0);
+
   $('totalVisitors').textContent = (data.totalVisitors || 0).toLocaleString();
   $('todayVisitors').textContent = (data.todayVisitors || 0).toLocaleString();
 
@@ -604,16 +720,19 @@ function render(data) {
   $('totalTabClicks').textContent = totalTabClicks.toLocaleString();
   $('todayTabClicks').textContent = todayTabClicks.toLocaleString();
 
-  const maxDaily = Math.max(1, ...data.dailyVisits.map((d) => d.count));
-  $('dailyChart').innerHTML = data.dailyVisits.map((d) => {
-    const label = d.date.slice(5).replace('-', '/');
-    const pct = Math.round((d.count / maxDaily) * 100);
-    return `<div class="day-row">
-      <span class="day-label">${label}</span>
-      <span class="bar-track"><span class="bar-fill" style="width:${pct}%"></span></span>
-      <span class="day-count">${d.count}</span>
-    </div>`;
-  }).join('');
+  const todayVisitorsN = data.todayVisitors || 0;
+  const retentionPct = Math.round((data.retentionRate || 0) * 100);
+  $('retentionRate').textContent = todayVisitorsN > 0 ? `${retentionPct}%` : '-';
+  $('retentionSub').textContent = todayVisitorsN > 0
+    ? `오늘 방문자 ${todayVisitorsN.toLocaleString()}명 중 ${(data.returningToday || 0).toLocaleString()}명`
+    : '아직 오늘 방문자가 없어요';
+
+  const totalVisitorsN = data.totalVisitors || 0;
+  const engagement = totalVisitorsN > 0 ? totalTabClicks / totalVisitorsN : 0;
+  $('engagementRate').textContent = totalVisitorsN > 0 ? `${engagement.toFixed(1)}회` : '-';
+
+  renderTrendChart(daily);
+  renderPairs(data.topPairs || []);
 
   const maxTab = Math.max(1, ...data.tabClicks.map((t) => t.count));
   $('tabChart').innerHTML = data.tabClicks.map((t) => {
@@ -625,12 +744,22 @@ function render(data) {
     </div>`;
   }).join('');
 
-  const logs = data.recentLogs || [];
-  $('emptyLog').style.display = logs.length ? 'none' : 'block';
+  allLogs = data.recentLogs || [];
+  $('emptyLog').style.display = allLogs.length ? 'none' : 'block';
+  logsExpanded = false;
+  renderLogList();
+}
+
+const LOG_PAGE_SIZE = 15;
+let allLogs = [];
+let logsExpanded = false;
+
+function renderLogList() {
+  const logs = logsExpanded ? allLogs : allLogs.slice(0, LOG_PAGE_SIZE);
 
   // 방문자 ID별 총 등장 횟수(전체 로그 기준)와 색상 배정
   const vidCounts = {};
-  logs.forEach((l) => { if (l.v) vidCounts[l.v] = (vidCounts[l.v] || 0) + 1; });
+  allLogs.forEach((l) => { if (l.v) vidCounts[l.v] = (vidCounts[l.v] || 0) + 1; });
   const vidColor = (vid) => `hsl(${hashHue(vid)}, 60%, 55%)`;
 
   $('logList').innerHTML = logs.map((l) => {
@@ -654,6 +783,87 @@ function render(data) {
         </div>
         ${visitorBadge}
       </div>
+    </div>`;
+  }).join('');
+
+  const moreBtn = $('logMoreBtn');
+  if (allLogs.length <= LOG_PAGE_SIZE) {
+    moreBtn.hidden = true;
+  } else {
+    moreBtn.hidden = false;
+    moreBtn.textContent = logsExpanded
+      ? '접기 ▲'
+      : `펼쳐서 더보기 (전체 ${allLogs.length.toLocaleString()}건) ▾`;
+  }
+}
+
+function renderDelta(elId, todayCount, yesterdayCount) {
+  const el = $(elId);
+  if (yesterdayCount === 0) {
+    el.textContent = todayCount > 0 ? '신규' : '';
+    el.className = todayCount > 0 ? 'delta up' : 'delta';
+    return;
+  }
+  const diff = todayCount - yesterdayCount;
+  const pct = Math.round((diff / yesterdayCount) * 100);
+  if (diff > 0) { el.textContent = `▲ ${pct}%`; el.className = 'delta up'; }
+  else if (diff < 0) { el.textContent = `▼ ${Math.abs(pct)}%`; el.className = 'delta down'; }
+  else { el.textContent = '± 0%'; el.className = 'delta flat'; }
+}
+
+// 최근 30일 방문 추이를 영역(area) + 선(line) 차트로 그린다. 서드파티 차트 라이브러리
+// 없이 순수 SVG path로 그려서 의존성 없이 가볍게 유지한다.
+function renderTrendChart(daily) {
+  const wrap = $('trendChart');
+  if (!daily.length) { wrap.innerHTML = ''; return; }
+
+  const w = 600, h = 150, padT = 10, padB = 20, padX = 4;
+  const max = Math.max(1, ...daily.map((d) => d.count));
+  const n = daily.length;
+  const stepX = n > 1 ? (w - padX * 2) / (n - 1) : 0;
+  const yFor = (c) => padT + (h - padT - padB) * (1 - c / max);
+  const points = daily.map((d, i) => [padX + i * stepX, yFor(d.count)]);
+  const baseline = h - padB;
+
+  const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+  const areaPath = points.length > 1
+    ? `${linePath} L${points[points.length - 1][0].toFixed(1)},${baseline} L${points[0][0].toFixed(1)},${baseline} Z`
+    : '';
+
+  const labelEvery = Math.max(1, Math.ceil(n / 6));
+  const dots = points.map((p, i) => {
+    const d = daily[i];
+    const showLabel = i % labelEvery === 0 || i === n - 1;
+    const label = showLabel
+      ? `<text class="trend-axis-label" x="${p[0].toFixed(1)}" y="${h - 4}" text-anchor="middle">${d.date.slice(5).replace('-', '/')}</text>`
+      : '';
+    return `<circle class="trend-dot" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.6"><title>${d.date} · 방문 ${d.count}회</title></circle>${label}`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" style="stop-color:var(--accent);stop-opacity:0.35" />
+          <stop offset="100%" style="stop-color:var(--accent);stop-opacity:0" />
+        </linearGradient>
+      </defs>
+      ${areaPath ? `<path d="${areaPath}" style="fill:url(#trendFill)" />` : ''}
+      <path d="${linePath}" style="fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round;stroke-linecap:round" />
+      ${dots}
+    </svg>`;
+}
+
+function renderPairs(pairs) {
+  $('emptyPairs').style.display = pairs.length ? 'none' : 'block';
+  const medals = ['🥇', '🥈', '🥉'];
+  $('pairsList').innerHTML = pairs.map((p, i) => {
+    const rank = i < 3 ? medals[i] : String(i + 1);
+    const rankClass = i < 3 ? 'pair-rank medal' : 'pair-rank';
+    return `<div class="pair-row">
+      <span class="${rankClass}">${rank}</span>
+      <span class="pair-name">${esc(p.n1)}<span class="sep">×</span>${esc(p.n2)}</span>
+      <span class="pair-count">${p.count.toLocaleString()}회</span>
     </div>`;
   }).join('');
 }
@@ -744,6 +954,10 @@ async function deleteOverride(id) {
 }
 
 $('ovAddBtn').addEventListener('click', addOverride);
+$('logMoreBtn').addEventListener('click', () => {
+  logsExpanded = !logsExpanded;
+  renderLogList();
+});
 
 async function backfillVisitors() {
   const pw = sessionStorage.getItem('bbiyak_admin_pw');
