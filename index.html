@@ -4462,7 +4462,7 @@ function drawStatCard(ctx, x, y, w, h, emoji, label, score, color, bgColor, desc
   ctx.fillText(`${score}점`, cx, y + 100);
 
   ctx.fillStyle = '#6b5d47';
-  ctx.font = "400 20px 'Malgun Gothic', sans-serif";
+  ctx.font = "20px 'Jua', 'Malgun Gothic', sans-serif";
   wrapCanvasText(ctx, desc, cx, y + 150, w - 30, 25, 2);
 
   ctx.font = "26px 'Malgun Gothic', sans-serif";
@@ -4494,7 +4494,7 @@ function drawInfoCard(ctx, x, y, w, h, emoji, label, value, color, bgColor, desc
 
   if (desc) {
     ctx.fillStyle = '#6b5d47';
-    ctx.font = "400 20px 'Malgun Gothic', sans-serif";
+    ctx.font = "20px 'Jua', 'Malgun Gothic', sans-serif";
     wrapCanvasText(ctx, desc, cx, y + 158, w - 34, 25, 2);
   }
 }
@@ -4607,7 +4607,7 @@ function drawScoreCardBody(ctx, namesText, score, tier, reasonText, infoCards, t
   const CONTENT_BOTTOM_MAX = 1730 - CARD_BLOCK_H;
 
   ctx.fillStyle = '#8a6d52';
-  ctx.font = "400 34px 'Malgun Gothic', sans-serif";
+  ctx.font = "34px 'Jua', 'Malgun Gothic', sans-serif";
   const tierDescLines = Math.min(countWrappedLines(ctx, tier.desc, 760), 4);
   y = wrapCanvasText(ctx, tier.desc, 540, y, 760, 41, tierDescLines);
 
@@ -4616,7 +4616,7 @@ function drawScoreCardBody(ctx, namesText, score, tier, reasonText, infoCards, t
     drawSectionDivider(ctx, '💡 왜 이 점수일까요?', 540, y, 460, theme.accent);
     y += 44;
     ctx.fillStyle = '#7a5c42';
-    ctx.font = "400 30px 'Malgun Gothic', sans-serif";
+    ctx.font = "30px 'Jua', 'Malgun Gothic', sans-serif";
     const reasonLines = countWrappedLines(ctx, reasonText, 800);
     const reasonMaxLines = Math.max(2, Math.min(reasonLines, Math.floor((CONTENT_BOTTOM_MAX - y) / 34)));
     y = wrapCanvasText(ctx, reasonText, 540, y, 800, 34, reasonMaxLines);
@@ -4637,7 +4637,7 @@ function drawScoreCardBody(ctx, namesText, score, tier, reasonText, infoCards, t
 function drawPillarChipCanvas(ctx, cx, topY, label, p) {
   const boxW = 170, boxH = 84, gap = 10;
   ctx.fillStyle = '#888899';
-  ctx.font = "600 26px 'Malgun Gothic', sans-serif";
+  ctx.font = "26px 'Jua', 'Malgun Gothic', sans-serif";
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(label, cx, topY);
@@ -4649,7 +4649,7 @@ function drawPillarChipCanvas(ctx, cx, topY, label, p) {
   ctx.fillStyle = '#fff';
   ctx.font = "40px 'Jua', 'Malgun Gothic', sans-serif";
   ctx.fillText(p.stemHanja, cx, stemY + 30);
-  ctx.font = "600 22px 'Malgun Gothic', sans-serif";
+  ctx.font = "22px 'Jua', 'Malgun Gothic', sans-serif";
   ctx.fillText(p.stemChar, cx, stemY + 62);
 
   const branchY = stemY + boxH + gap;
@@ -4659,11 +4659,11 @@ function drawPillarChipCanvas(ctx, cx, topY, label, p) {
   ctx.fillStyle = '#fff';
   ctx.font = "40px 'Jua', 'Malgun Gothic', sans-serif";
   ctx.fillText(p.branchHanja, cx, branchY + 30);
-  ctx.font = "600 22px 'Malgun Gothic', sans-serif";
+  ctx.font = "22px 'Jua', 'Malgun Gothic', sans-serif";
   ctx.fillText(p.branchChar, cx, branchY + 62);
 
   ctx.fillStyle = '#888899';
-  ctx.font = "500 24px 'Malgun Gothic', sans-serif";
+  ctx.font = "24px 'Jua', 'Malgun Gothic', sans-serif";
   ctx.fillText(p.animal + '띠', cx, branchY + boxH + 34);
 }
 
@@ -4726,7 +4726,7 @@ function drawParagraphText(ctx, text, y, maxLines) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#7a5c42';
-  ctx.font = "400 33px 'Malgun Gothic', sans-serif";
+  ctx.font = "33px 'Jua', 'Malgun Gothic', sans-serif";
   return wrapCanvasText(ctx, text, CARD_CX, y, 780, 46, maxLines);
 }
 
@@ -4780,7 +4780,7 @@ function renderStoryCard(kind) {
 
     // 풀이가 길어진 5개 섹션이 잘리지 않도록, 본문 글자를 살짝 줄이고(30px) 남은 공간에
     // 맞춰 실제 필요한 줄 수를 계산해서(reason 텍스트와 동일한 방식) 그린다.
-    const SAJU_BODY_FONT = "400 30px 'Malgun Gothic', sans-serif";
+    const SAJU_BODY_FONT = "30px 'Jua', 'Malgun Gothic', sans-serif";
     const SAJU_LINE_H = 40, SAJU_CONTENT_BOTTOM_MAX = 1725;
     const sajuSections = [
       { label: '☝️ 한마디로 표현하면', text: detail.summary },
@@ -4863,7 +4863,7 @@ function renderStoryCard(kind) {
     ctx.fillText(r.tier.title, 540, 886);
 
     ctx.fillStyle = '#8a6d52';
-    ctx.font = "400 32px 'Malgun Gothic', sans-serif";
+    ctx.font = "32px 'Jua', 'Malgun Gothic', sans-serif";
     const todayDescLines = Math.min(countWrappedLines(ctx, r.tier.desc, 780), 2);
     let ty = wrapCanvasText(ctx, r.tier.desc, 540, 948, 780, 40, todayDescLines);
 
@@ -4872,7 +4872,7 @@ function renderStoryCard(kind) {
     ty += 44;
     // 사주 관계(합/충 등) 조합에 따라 이유 문구가 꽤 길어질 수 있어(최대 7줄) 고정 줄 수
     // 대신 실제 필요한 줄 수를 재서 그리고, 아래 카드·배지·워터마크가 그만큼 따라 내려온다.
-    ctx.font = "400 33px 'Malgun Gothic', sans-serif";
+    ctx.font = "33px 'Jua', 'Malgun Gothic', sans-serif";
     const todayReasonLines = Math.min(countWrappedLines(ctx, r.reasonText, 780), 7);
     ty = drawParagraphText(ctx, r.reasonText, ty, todayReasonLines);
 
