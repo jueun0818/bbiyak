@@ -24,6 +24,14 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4697935900449471"
      crossorigin="anonymous"></script>
 
+<!-- ===== 스토리 이미지용 굵고 동글동글한 한글 폰트 =====
+     Malgun Gothic은 굵기가 사실상 Bold 하나뿐이라 캔버스에서 더 두껍게 그릴 방법이 없다.
+     Jua는 전체 한글이 포함된 원래부터 두꺼운 서체라, 스토리 카드의 숫자·타이틀만 이 폰트로
+     그려서 스트로크(가짜 볼드) 없이도 진짜 두껍고 귀여운 글씨를 만든다. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+
 <!-- ===== PWA (홈 화면 설치 / 오프라인 실행) ===== -->
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#ffc107">
@@ -134,6 +142,7 @@
   @media (max-width: 380px) {
     h1 { font-size: 38px; margin: 10px 40px 6px; }
     .music-toggle { width: 42px; height: 42px; font-size: 19px; }
+    .share-toggle { width: 42px; height: 42px; font-size: 18px; }
   }
   .subtitle {
     text-align: center;
@@ -922,6 +931,39 @@
     100% { transform: translateY(-16px) scale(1.05) rotate(10deg); opacity: 0; }
   }
 
+  /* 앱 링크 공유 버튼 — 소리 버튼과 대칭으로 반대쪽(왼쪽 위)에 둔다 */
+  .share-toggle-wrap {
+    position: fixed;
+    top: 18px;
+    left: 18px;
+    z-index: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .share-toggle {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    margin: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(255,193,7,0.28);
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 6px 16px -8px rgba(224,150,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-size: 21px;
+    cursor: pointer;
+    transition: transform .15s;
+  }
+  .share-toggle:active { transform: scale(0.92); }
+  .share-toggle.copied { animation: chickChirp 0.6s ease-in-out; }
+
   /* ============================================================
      PWA (홈 화면 앱) 관련 스타일
      ============================================================ */
@@ -942,6 +984,10 @@
   .music-toggle-wrap {
     top: calc(18px + env(safe-area-inset-top));
     right: calc(18px + env(safe-area-inset-right));
+  }
+  .share-toggle-wrap {
+    top: calc(18px + env(safe-area-inset-top));
+    left: calc(18px + env(safe-area-inset-left));
   }
   /* 홈 화면에서 실행하면 주소창이 없어 제목이 상단에 딱 붙으므로 여유를 조금 더 준다 */
   @media all and (display-mode: standalone) {
@@ -1188,6 +1234,11 @@
 <div class="music-toggle-wrap">
   <button id="musicToggleBtn" class="music-toggle" title="배경음악 켜기/끄기" aria-label="배경음악 켜기/끄기">🐥</button>
   <span class="music-toggle-label">소리 켰다 끄기</span>
+</div>
+
+<div class="share-toggle-wrap">
+  <button id="shareSiteBtn" class="share-toggle" title="앱 링크 공유하기" aria-label="앱 링크 공유하기">🔗</button>
+  <span class="music-toggle-label">링크 공유</span>
 </div>
 
 <div class="wrap">
@@ -3665,12 +3716,13 @@ function pickEvenSpots(arr, n) {
 
 // 텍스트가 maxWidth를 넘으면 폰트 크기를 줄여서 캔버스 밖으로 잘리지 않게 한다.
 // (긴 등급 타이틀 등 한 줄로 꽉 채워 그리는 텍스트에 사용)
-function fitFontSize(ctx, text, maxWidth, baseSize, weight) {
+function fitFontSize(ctx, text, maxWidth, baseSize, weight, family) {
+  family = family || "'Malgun Gothic', sans-serif";
   let size = baseSize;
-  ctx.font = `${weight} ${size}px 'Malgun Gothic', sans-serif`;
+  ctx.font = `${weight} ${size}px ${family}`;
   while (ctx.measureText(text).width > maxWidth && size > 32) {
     size -= 2;
-    ctx.font = `${weight} ${size}px 'Malgun Gothic', sans-serif`;
+    ctx.font = `${weight} ${size}px ${family}`;
   }
   return size;
 }
@@ -3733,6 +3785,11 @@ function countWrappedLines(ctx, text, maxWidth) {
   if (line) lines++;
   return lines;
 }
+
+// 스토리 카드용 Jua 폰트 로드를 미리 시작해둔다 — 캔버스는 폰트 로딩을 기다려주지 않고
+// 그 순간 쓸 수 있는 폰트로 즉시 그려버리므로, 처음 스토리 이미지를 열 때 이 promise를
+// await하지 않으면 Jua가 아직 안 불러와진 채로 그려져 시스템 폰트로 굳어버릴 수 있다.
+const juaFontReady = document.fonts.load("40px Jua").catch(() => {});
 
 function drawStoryBackground(ctx, theme) {
   const grad = ctx.createLinearGradient(0, 0, 1080, 1920);
@@ -4209,7 +4266,7 @@ function drawStoryWatermark(ctx, tierIndex) {
   }
 
   ctx.fillStyle = 'rgba(255,255,255,0.95)';
-  ctx.font = "700 36px 'Malgun Gothic', sans-serif";
+  ctx.font = "36px 'Jua', 'Malgun Gothic', sans-serif";
   ctx.fillText('🐥 삐약궁합', 540, 1892);
 }
 
@@ -4333,10 +4390,10 @@ function drawStatCard(ctx, x, y, w, h, emoji, label, score, color, bgColor, desc
   ctx.textBaseline = 'middle';
 
   ctx.fillStyle = color;
-  ctx.font = "700 25px 'Malgun Gothic', sans-serif";
+  ctx.font = "25px 'Jua', 'Malgun Gothic', sans-serif";
   ctx.fillText(`${emoji} ${label}`, cx, y + 38);
 
-  ctx.font = "800 54px 'Malgun Gothic', sans-serif";
+  ctx.font = "54px 'Jua', 'Malgun Gothic', sans-serif";
   ctx.fillText(`${score}점`, cx, y + 100);
 
   ctx.fillStyle = '#6b5d47';
@@ -4364,10 +4421,10 @@ function drawInfoCard(ctx, x, y, w, h, emoji, label, value, color, bgColor, desc
   ctx.textBaseline = 'middle';
 
   ctx.fillStyle = color;
-  ctx.font = "700 30px 'Malgun Gothic', sans-serif";
+  ctx.font = "30px 'Jua', 'Malgun Gothic', sans-serif";
   wrapCanvasText(ctx, `${emoji} ${label}`, cx, y + 42, w - 30, 34, 1);
 
-  ctx.font = "800 52px 'Malgun Gothic', sans-serif";
+  ctx.font = "52px 'Jua', 'Malgun Gothic', sans-serif";
   ctx.fillText(value, cx, y + 110);
 
   if (desc) {
@@ -4409,7 +4466,7 @@ function drawScoreCardHeader(ctx, titleText, emoji, tierIdx, theme) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = theme.textStrong;
-  fitFontSize(ctx, titleText, 940, 66, 800);
+  fitFontSize(ctx, titleText, 940, 66, 400, "'Jua', 'Malgun Gothic', sans-serif");
   ctx.fillText(titleText, 540, 108);
   drawCoupleAvatar(ctx, 540, 392, 248, emoji, tierIdx);
 }
@@ -4419,7 +4476,7 @@ function drawScoreCardBody(ctx, namesText, score, tier, reasonText, infoCards, t
   // 삐져나오지 않게 최대 2줄까지 줄바꿈하고, 실제로 그려진 줄 수만큼 아래 요소들을
   // 전부 뒤따라 내려오게(캐스케이드) 계산한다.
   ctx.fillStyle = theme.textStrong;
-  ctx.font = "700 58px 'Malgun Gothic', sans-serif";
+  ctx.font = "58px 'Jua', 'Malgun Gothic', sans-serif";
   const namesLines = Math.min(countWrappedLines(ctx, namesText, 900), 2);
   let y = wrapCanvasText(ctx, namesText, 540, 644, 900, 64, namesLines);
   y += namesLines > 1 ? 8 : 40;
@@ -4432,8 +4489,8 @@ function drawScoreCardBody(ctx, namesText, score, tier, reasonText, infoCards, t
   const scoreBaselineY = y + 140;
   {
     const scoreText = String(score);
-    const scoreFont = "800 192px 'Malgun Gothic', sans-serif";
-    const ptFont = "600 50px 'Malgun Gothic', sans-serif";
+    const scoreFont = "192px 'Jua', 'Malgun Gothic', sans-serif";
+    const ptFont = "50px 'Jua', 'Malgun Gothic', sans-serif";
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic';
     ctx.font = scoreFont;
@@ -4457,14 +4514,14 @@ function drawScoreCardBody(ctx, namesText, score, tier, reasonText, infoCards, t
   }
 
   ctx.fillStyle = theme.textStrong;
-  ctx.font = "700 64px 'Malgun Gothic', sans-serif";
+  ctx.font = "64px 'Jua', 'Malgun Gothic', sans-serif";
   const titleLines = Math.min(countWrappedLines(ctx, tier.title, 900), 2);
   // 2줄로 넘어가는 긴 타이틀(예: 최상위 등급)은 폰트를 살짝 줄여서(줄 높이는 폰트보다
   // 항상 커야 줄끼리 겹치지 않는다) 아래 이유 텍스트가 표시될 공간을 더 확보한다 —
   // 흔한 한 줄 타이틀의 넉넉한 간격·크기는 그대로 유지된다.
   const titleFontSize = titleLines > 1 ? 54 : 64;
   const titleLineHeight = titleLines > 1 ? 60 : 66;
-  ctx.font = `700 ${titleFontSize}px 'Malgun Gothic', sans-serif`;
+  ctx.font = `${titleFontSize}px 'Jua', 'Malgun Gothic', sans-serif`;
   const titleY = scoreBaselineY + 132;
   const commaIdx = tier.title.indexOf(', ');
   if (titleLines > 1 && commaIdx !== -1) {
@@ -4495,7 +4552,7 @@ function drawScoreCardBody(ctx, namesText, score, tier, reasonText, infoCards, t
     drawGradientDivider(ctx, y, 460);
     y += 27;
     ctx.fillStyle = theme.accent;
-    ctx.font = "700 36px 'Malgun Gothic', sans-serif";
+    ctx.font = "36px 'Jua', 'Malgun Gothic', sans-serif";
     ctx.fillText('💡 왜 이 점수일까요?', 540, y);
     y += 38;
     ctx.fillStyle = '#7a5c42';
@@ -4530,7 +4587,7 @@ function drawPillarChipCanvas(ctx, cx, topY, label, p) {
   roundRectPath(ctx, cx - boxW / 2, stemY, boxW, boxH, 18);
   ctx.fill();
   ctx.fillStyle = '#fff';
-  ctx.font = "800 40px 'Malgun Gothic', sans-serif";
+  ctx.font = "40px 'Jua', 'Malgun Gothic', sans-serif";
   ctx.fillText(p.stemHanja, cx, stemY + 30);
   ctx.font = "600 22px 'Malgun Gothic', sans-serif";
   ctx.fillText(p.stemChar, cx, stemY + 62);
@@ -4540,7 +4597,7 @@ function drawPillarChipCanvas(ctx, cx, topY, label, p) {
   roundRectPath(ctx, cx - boxW / 2, branchY, boxW, boxH, 18);
   ctx.fill();
   ctx.fillStyle = '#fff';
-  ctx.font = "800 40px 'Malgun Gothic', sans-serif";
+  ctx.font = "40px 'Jua', 'Malgun Gothic', sans-serif";
   ctx.fillText(p.branchHanja, cx, branchY + 30);
   ctx.font = "600 22px 'Malgun Gothic', sans-serif";
   ctx.fillText(p.branchChar, cx, branchY + 62);
@@ -4551,7 +4608,7 @@ function drawPillarChipCanvas(ctx, cx, topY, label, p) {
 }
 
 function drawPillBadge(ctx, text, cx, cy, bgColor) {
-  const font = "700 42px 'Malgun Gothic', sans-serif";
+  const font = "42px 'Jua', 'Malgun Gothic', sans-serif";
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.font = font;
@@ -4573,7 +4630,7 @@ function drawLabeledParagraph(ctx, label, text, y, maxLines) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#c9770b';
-  ctx.font = "700 34px 'Malgun Gothic', sans-serif";
+  ctx.font = "34px 'Jua', 'Malgun Gothic', sans-serif";
   ctx.fillText(label, CARD_CX, y);
   y += 46;
   ctx.fillStyle = '#7a5c42';
@@ -4595,7 +4652,7 @@ function renderStoryCard(kind) {
     ctx.textBaseline = 'middle';
     drawEmojiGlow(ctx, 540, 250, 160);
     ctx.fillStyle = '#6b3410';
-    ctx.font = "800 54px 'Malgun Gothic', sans-serif";
+    ctx.font = "54px 'Jua', 'Malgun Gothic', sans-serif";
     ctx.fillText(name ? `🔮 ${name}님의 사주팔자` : '🔮 나의 사주팔자', 540, 240);
 
     roundRectPath(ctx, 80, 400, 920, 1300, 40);
@@ -4643,10 +4700,10 @@ function renderStoryCard(kind) {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#6b4a2b';
-    ctx.font = "700 44px 'Malgun Gothic', sans-serif";
+    ctx.font = "44px 'Jua', 'Malgun Gothic', sans-serif";
     ctx.fillText(`${r.name}님의`, 700, 112);
     ctx.fillStyle = '#6b3410';
-    ctx.font = "800 86px 'Malgun Gothic', sans-serif";
+    ctx.font = "86px 'Jua', 'Malgun Gothic', sans-serif";
     ctx.fillText('오늘의 운세', 700, 212);
     ctx.font = '48px \'Malgun Gothic\', sans-serif';
     ctx.fillText('🍀', 995, 130);
@@ -4668,8 +4725,8 @@ function renderStoryCard(kind) {
 
     {
       const scoreText = String(r.overall);
-      const scoreFont = "800 164px 'Malgun Gothic', sans-serif";
-      const ptFont = "600 42px 'Malgun Gothic', sans-serif";
+      const scoreFont = "164px 'Jua', 'Malgun Gothic', sans-serif";
+      const ptFont = "42px 'Jua', 'Malgun Gothic', sans-serif";
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
       ctx.font = scoreFont;
@@ -4691,7 +4748,7 @@ function renderStoryCard(kind) {
     }
 
     ctx.fillStyle = '#6b4a2b';
-    ctx.font = "700 56px 'Malgun Gothic', sans-serif";
+    ctx.font = "56px 'Jua', 'Malgun Gothic', sans-serif";
     ctx.fillText(r.tier.title, 540, 886);
 
     ctx.fillStyle = '#8a6d52';
@@ -4723,7 +4780,7 @@ function renderStoryCard(kind) {
     ctx.fillText('🌼', 150, decorY);
     ctx.fillText('⭐', 930, decorY);
     ctx.fillStyle = 'rgba(107,74,43,0.85)';
-    ctx.font = "700 34px 'Malgun Gothic', sans-serif";
+    ctx.font = "34px 'Jua', 'Malgun Gothic', sans-serif";
     ctx.fillText('🐥 삐약궁합', 540, decorY + 32);
   } else {
     let titleText, emoji, namesText, score, tier, reasonText = null, infoCards = [];
@@ -4827,6 +4884,7 @@ let currentStoryKind = null;
 
 async function openStoryModal(kind) {
   currentStoryKind = kind;
+  await juaFontReady;
   const dataUrl = renderStoryCard(kind);
   document.getElementById('storyPreviewImg').src = dataUrl;
   document.getElementById('storyDownloadBtn').href = dataUrl;
@@ -4963,6 +5021,52 @@ async function copySiteLink(btn) {
 }
 
 document.getElementById('storyCopyLinkBtn').addEventListener('click', (e) => copySiteLink(e.currentTarget));
+
+// 화면 위쪽 링크 공유 버튼 — 네이티브 공유 시트가 되면 그걸(카카오톡 등 포함) 쓰고,
+// 안 되면 링크만 클립보드로 복사한다. 아이콘 버튼이라 결과 안내는 옆의 캡션에 표시한다.
+document.getElementById('shareSiteBtn').addEventListener('click', async () => {
+  const url = location.origin + location.pathname;
+  const btn = document.getElementById('shareSiteBtn');
+  const label = btn.nextElementSibling;
+  const originalLabel = label.textContent;
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: '🐥 삐약궁합',
+        text: '이름·사주·별자리·혈액형·MBTI·종합 궁합에 사주팔자, 오늘의 운세까지! 재미로 확인해보세요 🐥',
+        url,
+      });
+      return;
+    } catch (e) {
+      if (e && e.name === 'AbortError') return; // 사용자가 공유 시트를 닫은 경우
+      // 그 외 실패 시 아래 클립보드 복사로 폴백
+    }
+  }
+
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(url);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = url;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    label.textContent = '✅ 복사완료!';
+    btn.classList.add('copied');
+  } catch (e) {
+    label.textContent = '복사 실패 😢';
+  }
+  setTimeout(() => {
+    label.textContent = originalLabel;
+    btn.classList.remove('copied');
+  }, 1600);
+});
 
 // ============================================================
 // 귀여운 배경음악 (Web Audio API로 즉석 생성한 뮤직박스 멜로디)
