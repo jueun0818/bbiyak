@@ -498,6 +498,16 @@
     line-height: 1.6;
     text-align: center;
   }
+  .ilgan-box .ilgan-summary {
+    margin-top: 10px;
+    padding: 10px 16px;
+    border-radius: 14px;
+    background: rgba(255,152,0,0.12);
+    color: var(--purple);
+    font-weight: 700;
+    font-size: 15px;
+    text-align: center;
+  }
   .ilgan-detail-row {
     text-align: left;
     margin-top: 12px;
@@ -1341,6 +1351,7 @@
       <div class="ilgan-box">
         <div class="ilgan-title" id="ilganTitle"></div>
         <div class="ilgan-desc" id="ilganDesc"></div>
+        <div class="ilgan-summary" id="ilganSummary"></div>
         <div class="ilgan-detail-row"><b>기본 성향</b><span id="ilganTrait"></span></div>
         <div class="ilgan-detail-row"><b>강점</b><span id="ilganStrength"></span></div>
         <div class="ilgan-detail-row"><b>유의할 점</b><span id="ilganCaution"></span></div>
@@ -2546,82 +2557,92 @@ const ILGAN_DETAIL = [
   { // 갑(甲) 목
     keyword: '큰 나무',
     desc: '곧고 위로 뻗어나가는 큰 나무 같은 사람이에요. 목표가 뚜렷하고 앞장서서 이끄는 걸 좋아해요.',
-    trait: '자존심이 뚜렷하고 우직하게 목표를 향해 나아가는 타입이에요. 시작한 일은 끝까지 밀고 나가는 힘이 있어요.',
-    strength: '리더십과 추진력이 뛰어나고, 한번 마음먹은 일은 흔들림 없이 밀어붙이는 뚝심이 있어요.',
-    caution: '고집이 세서 주변 의견을 잘 듣지 않을 때가 있어요. 조금만 유연해지면 관계가 훨씬 편해져요.',
-    relationship: '리드하는 역할을 좋아해서, 자신을 존중해주고 함께 성장할 수 있는 상대와 특히 잘 맞아요.',
+    summary: '우직하게 앞으로 나아가는 타고난 리더',
+    trait: '한번 정한 목표는 끝까지 밀고 나가는 편이에요. 새로운 일이 생기면 먼저 나서서 시작하고, 주변 사람들이 자연스럽게 따라오게 만드는 힘이 있어요.',
+    strength: '결정을 내려야 하는 순간에 망설이지 않고 앞장서줘요. 한번 맡은 일은 끝까지 책임지는 뚝심이 있어서 함께 있으면 든든하게 느껴져요.',
+    caution: '내 생각이 맞다고 느끼면 다른 의견이 잘 안 들릴 때가 있어요. 상대 얘기를 끝까지 들어보는 연습을 하면 관계가 한결 편해질 거예요.',
+    relationship: '자연스럽게 이끄는 역할을 맡는 편이라, 내 의견을 존중해주면서 함께 발전해나가려는 사람과 있을 때 가장 편안해요.',
   },
   { // 을(乙) 목
     keyword: '부드러운 넝쿨',
     desc: '바람에 흔들려도 꺾이지 않는 넝쿨처럼 유연하고 적응력이 뛰어난 사람이에요.',
-    trait: '눈치가 빠르고 사교성이 좋아, 어떤 환경에서도 자기 자리를 잘 찾아가는 편이에요.',
-    strength: '은근히 강한 생존력과 융통성을 갖고 있어, 위기 상황에서도 유연하게 대처해요.',
-    caution: '우유부단해 보이거나 상황에 따라 입장이 바뀌는 것처럼 비칠 수 있어요.',
-    relationship: '은근한 매력으로 사람을 끌어당기며, 자신을 세심하게 챙겨주는 상대와 잘 맞아요.',
+    summary: '어디서든 유연하게 적응하는 생존왕',
+    trait: '낯선 자리에 가도 눈치 빠르게 분위기를 파악하고 금세 편안한 자리를 찾아내는 편이에요. 사람들과도 부드럽게 잘 어울려요.',
+    strength: '겉으로는 부드러워 보여도 위기 상황에서 의외로 잘 버티고, 상황에 맞춰 유연하게 방법을 바꿀 줄 아는 힘이 있어요.',
+    caution: '이 사람 저 사람 말에 다 맞춰주다 보니 우유부단하거나 줏대 없어 보일 때가 있어요. 가끔은 내 생각을 분명히 말해보는 것도 좋아요.',
+    relationship: '은근한 매력으로 사람을 끌어당기는 편이라, 그런 나를 세심하게 챙겨주고 알아봐주는 사람과 있을 때 특히 잘 맞아요.',
   },
   { // 병(丙) 화
     keyword: '태양',
     desc: '세상을 환하게 비추는 태양처럼 밝고 에너지 넘치는 사람이에요.',
-    trait: '열정적이고 표현력이 풍부하며, 주변을 환하게 만드는 리더 기질이 있어요.',
-    strength: '사람들을 이끄는 매력이 있어 어디서든 주목받고, 분위기를 밝게 만드는 힘이 있어요.',
-    caution: '감정 기복이 크거나 성급하게 결정할 때가 있어요. 한 박자 쉬어가는 연습이 도움이 돼요.',
-    relationship: '화끈하고 다정하게 표현하는 편이라, 감정 표현에 적극적으로 반응해주는 상대와 잘 맞아요.',
+    summary: '주변을 환하게 밝히는 에너자이저',
+    trait: '감정 표현이 솔직하고 분명해서, 좋으면 좋다고 싫으면 싫다고 바로 티가 나는 편이에요. 어디를 가든 존재감이 확실해요.',
+    strength: '밝고 씩씩한 에너지로 분위기를 살리는 힘이 있어요. 사람들 앞에 나서는 걸 두려워하지 않고, 함께 있으면 자연스럽게 분위기가 밝아져요.',
+    caution: '감정이 앞서서 성급하게 결정하거나 기분이 쉽게 오르내릴 때가 있어요. 결정하기 전에 한 박자만 쉬어가면 훨씬 좋은 선택을 할 수 있어요.',
+    relationship: '좋아하는 마음을 숨기지 않고 화끈하게 표현하는 편이라, 그 마음에 적극적으로 반응해주는 사람과 있을 때 케미가 잘 터져요.',
   },
   { // 정(丁) 화
     keyword: '촛불',
     desc: '은은하게 주변을 밝히는 촛불 같은 사람이에요. 따뜻하고 섬세한 매력이 있어요.',
-    trait: '조용히 주변을 챙기는 배려심 많은 타입이고, 분위기를 세심하게 살피는 편이에요.',
-    strength: '섬세한 감성과 배려심이 깊어, 곁에 있는 사람을 편안하게 만들어줘요.',
-    caution: '속마음을 잘 드러내지 않아 답답해 보이거나, 예민해질 때가 있어요.',
-    relationship: '조용히 곁을 지키는 스타일이라, 진심을 알아봐주고 꾸준히 다가와주는 상대와 잘 맞아요.',
+    summary: '조용히 곁을 밝혀주는 다정한 사람',
+    trait: '나서서 주목받기보다 주변 사람을 조용히 챙기는 걸 더 편안하게 느껴요. 분위기가 안 좋으면 먼저 눈치채고 살펴주는 편이에요.',
+    strength: '섬세한 마음으로 상대를 배려할 줄 알아서, 옆에 있는 사람을 편안하게 만들어주는 힘이 있어요. 작은 것도 잘 기억해줘요.',
+    caution: '속마음을 잘 안 드러내다 보니 답답해 보이거나, 사소한 일에도 예민하게 반응할 때가 있어요. 마음을 조금씩 표현하는 연습이 도움이 돼요.',
+    relationship: '화려하게 다가가기보다 조용히 곁을 지키는 스타일이라, 그 진심을 알아봐주고 천천히 다가와주는 사람과 잘 맞아요.',
   },
   { // 무(戊) 토
     keyword: '큰 산',
     desc: '든든하게 자리를 지키는 큰 산처럼 안정감 있고 믿음직한 사람이에요.',
-    trait: '신뢰감이 있고 포용력이 넓으며, 웬만한 일에는 잘 흔들리지 않아요.',
-    strength: '포용력이 크고 중심이 단단해서, 주변 사람들이 편하게 기댈 수 있는 존재예요.',
-    caution: '변화를 꺼리거나 고지식하게 원칙을 고수해 답답해 보일 수 있어요.',
-    relationship: '묵묵히 곁을 지켜주는 스타일이라, 조급해하지 않고 천천히 신뢰를 쌓는 관계에서 빛을 발해요.',
+    summary: '웬만해선 흔들리지 않는 든든한 존재',
+    trait: '웬만한 일에는 잘 흔들리지 않고 묵묵히 자기 자리를 지키는 편이에요. 급하게 서두르기보다 안정적으로 상황을 지켜보는 걸 좋아해요.',
+    strength: '포용력이 넓어서 다른 사람 실수도 너그럽게 받아주고, 중심이 단단해서 주변 사람들이 편하게 기댈 수 있는 존재가 돼줘요.',
+    caution: '변화를 반기지 않고 익숙한 방식을 고집할 때가 있어서 답답하게 느껴질 수 있어요. 가끔은 새로운 방법도 시도해보면 좋아요.',
+    relationship: '묵묵히 곁을 지켜주는 스타일이라, 조급해하지 않고 천천히 신뢰를 쌓아가는 관계에서 진짜 매력이 드러나요.',
   },
   { // 기(己) 토
     keyword: '비옥한 논밭',
     desc: '생명을 길러내는 논밭처럼 실속 있고 현실감각이 뛰어난 사람이에요.',
-    trait: '성실하고 꼼꼼하며, 실속을 챙기는 현실 감각이 뛰어나요.',
-    strength: '맡은 일을 확실하게 해내는 책임감과, 상황을 꼼꼼히 살피는 눈썰미가 있어요.',
-    caution: '걱정이 많거나 지나치게 계산적으로 보일 때가 있어요.',
-    relationship: '실질적인 배려로 마음을 표현하는 편이라, 그 진심을 알아채고 편안하게 받아주는 상대와 잘 맞아요.',
+    summary: '꼼꼼하고 실속 있게 챙기는 살림꾼',
+    trait: '맡은 일은 성실하게 끝까지 해내고, 겉치레보다 실속을 먼저 챙기는 현실적인 감각을 갖고 있어요. 계획 세우는 걸 좋아해요.',
+    strength: '작은 부분까지 꼼꼼하게 살피는 눈썰미가 있어서 맡은 일을 확실하게 해내고, 주변 사람들에게 믿음직하다는 인상을 줘요.',
+    caution: '이것저것 걱정이 많거나, 손익을 너무 꼼꼼히 따져서 계산적으로 보일 때가 있어요. 가끔은 마음 가는 대로 움직여봐도 좋아요.',
+    relationship: '말보다 행동으로 실질적인 배려를 보여주는 편이라, 그 진심을 알아채고 편안하게 받아주는 사람과 잘 맞아요.',
   },
   { // 경(庚) 금
     keyword: '무쇠',
     desc: '잘 벼려진 무쇠처럼 강인하고 결단력 있는 사람이에요.',
-    trait: '결단력이 강하고 원칙을 중요하게 여기며, 카리스마가 느껴지는 타입이에요.',
-    strength: '옳다고 생각하는 일은 망설임 없이 밀어붙이는 추진력과 의리가 있어요.',
-    caution: '지나치게 직설적이거나 냉정해 보여 오해를 살 때가 있어요.',
-    relationship: '겉은 단단해도 속은 의리 있는 편이라, 진심을 알아주는 사람에게는 한없이 든든한 존재가 돼요.',
+    summary: '뜻을 정하면 밀어붙이는 강단 있는 사람',
+    trait: '옳다고 믿는 일은 눈치 보지 않고 결단력 있게 밀고 나가는 편이에요. 원칙을 중요하게 생각해서 말과 행동이 분명해요.',
+    strength: '한번 옳다고 판단하면 망설임 없이 실행하는 추진력이 있고, 곁에 있는 사람을 의리 있게 챙기는 든든한 면이 있어요.',
+    caution: '생각을 직설적으로 표현하다 보니 차갑거나 냉정하게 느껴질 때가 있어요. 말을 조금만 부드럽게 다듬으면 오해가 훨씬 줄어들어요.',
+    relationship: '겉은 단단해 보여도 속은 의리로 가득한 편이라, 진심을 알아봐주는 사람에게는 누구보다 든든한 편이 돼줘요.',
   },
   { // 신(辛) 금
     keyword: '보석',
     desc: '정교하게 세공된 보석처럼 예리하고 완벽을 추구하는 사람이에요.',
-    trait: '섬세하고 예리하며, 완벽을 추구하는 깔끔한 성향이에요.',
-    strength: '디테일을 놓치지 않는 분석력과 감각이 뛰어나, 완성도 높은 결과물을 만들어내요.',
-    caution: '예민하거나 까다로워 보일 수 있고, 스스로에게도 엄격한 편이에요.',
-    relationship: '겉으로는 도도해 보여도, 마음을 준 상대에게는 세심하게 잘해주는 스타일이에요.',
+    summary: '디테일까지 완벽을 추구하는 세공사',
+    trait: '작은 부분 하나까지 신경 써서 완성도를 높이려는 편이에요. 대충 넘어가는 걸 싫어하고, 늘 깔끔하게 마무리하려고 해요.',
+    strength: '남들이 놓치는 디테일을 잘 캐치하는 분석력이 있어서, 무엇을 하든 완성도 높은 결과물을 만들어내는 힘이 있어요.',
+    caution: '기준이 높다 보니 스스로에게도, 주변에도 예민하고 까다롭게 느껴질 때가 있어요. 완벽하지 않아도 괜찮다고 여유를 가져보세요.',
+    relationship: '겉으로는 도도해 보여도 마음을 준 상대에게는 세심하게 잘해주는 편이라, 진심으로 다가와주는 사람에게 마음을 열어요.',
   },
   { // 임(壬) 수
     keyword: '큰 바다',
     desc: '넓고 깊은 바다처럼 스케일이 크고 포용력 있는 사람이에요.',
-    trait: '생각이 깊고 포용력이 크며, 상황에 따라 유연하게 대처하는 편이에요.',
-    strength: '지혜롭고 유연해서, 어떤 상황에서도 나름의 대처 방법을 잘 찾아내요.',
-    caution: '속을 잘 알 수 없거나, 결정을 미루며 우유부단해 보일 때가 있어요.',
-    relationship: '편안하게 품어주는 스타일이라, 솔직하게 다가와주는 상대와 깊은 신뢰를 쌓아요.',
+    summary: '스케일 크고 포용력 넘치는 바다 같은 사람',
+    trait: '생각의 폭이 넓고 어떤 상황에서도 여유 있게 대처하는 편이에요. 작은 일에 얽매이기보다 큰 그림을 보려고 해요.',
+    strength: '지혜롭고 유연한 사고로, 어떤 상황이 와도 나름의 해결 방법을 잘 찾아내요. 사람을 품는 포용력도 커요.',
+    caution: '속마음을 잘 드러내지 않아 어렵게 느껴지거나, 결정을 자꾸 미뤄서 우유부단해 보일 때가 있어요. 가끔은 먼저 마음을 표현해보세요.',
+    relationship: '편안하게 품어주는 스타일이라, 솔직하게 다가와서 마음을 표현해주는 사람과 깊은 신뢰를 쌓아갈 수 있어요.',
   },
   { // 계(癸) 수
     keyword: '이슬비',
     desc: '조용히 스며드는 이슬비처럼 섬세하고 감수성이 풍부한 사람이에요.',
-    trait: '감성적이고 직관이 뛰어나며, 섬세하게 주변을 살피는 타입이에요.',
-    strength: '공감 능력이 좋아 다른 사람의 마음을 잘 헤아리고, 직관적으로 분위기를 파악해요.',
-    caution: '감정 기복에 예민하거나, 소극적으로 물러설 때가 있어요.',
-    relationship: '잔잔하지만 깊은 애정을 주는 스타일이라, 그 진심을 알아채주는 상대와 특히 잘 맞아요.',
+    summary: '섬세하고 다정하게 스며드는 감성파',
+    trait: '말하지 않아도 상대 기분을 먼저 알아채는 섬세한 감성을 갖고 있어요. 조용히 스며들듯 사람과 가까워지는 편이에요.',
+    strength: '공감 능력이 뛰어나서 다른 사람 마음을 잘 헤아리고, 분위기를 직관적으로 파악해서 세심하게 배려할 줄 알아요.',
+    caution: '감정 기복에 예민하게 반응하거나, 상처받을까 봐 소극적으로 물러설 때가 있어요. 내 감정도 소중하다고 여겨보세요.',
+    relationship: '잔잔하지만 깊은 애정을 주는 스타일이라, 그 진심을 알아채고 천천히 다가와주는 사람과 특히 잘 맞아요.',
   },
 ];
 
@@ -2752,6 +2773,7 @@ document.getElementById('sajuBtn').addEventListener('click', () => {
   document.getElementById('ilganTitle').textContent =
     `일간(日干): ${pillars.day.stemChar}${pillars.day.stemHanja} · ${ELEMENT_INFO[pillars.day.stemElement].label} · ${detail.keyword}`;
   document.getElementById('ilganDesc').textContent = detail.desc;
+  document.getElementById('ilganSummary').textContent = `☝️ 한마디로 표현하면 · ${detail.summary}`;
   document.getElementById('ilganTrait').textContent = detail.trait;
   document.getElementById('ilganStrength').textContent = detail.strength;
   document.getElementById('ilganCaution').textContent = detail.caution;
@@ -4730,7 +4752,7 @@ function renderStoryCard(kind) {
     ctx.font = '46px \'Malgun Gothic\', sans-serif';
     ctx.fillText('✨', 985, 150);
 
-    roundRectPath(ctx, 80, 400, 920, 1300, 40);
+    roundRectPath(ctx, 80, 400, 920, 1330, 40);
     ctx.save();
     ctx.shadowColor = 'rgba(150,110,30,0.18)';
     ctx.shadowBlur = 30;
@@ -4756,24 +4778,27 @@ function renderStoryCard(kind) {
       drawPillarChipCanvas(ctx, startX + stepX * i, 585, c.label, c.p);
     });
 
-    // 섹션이 4개로 늘어난 만큼, 고정 줄 수 대신 남은 공간에 맞춰 실제 필요한 줄 수를
-    // 계산해서(reason 텍스트와 동일한 방식) 카드 밖으로 넘치는 일이 없게 한다.
-    const SAJU_CONTENT_BOTTOM_MAX = 1690;
+    // 풀이가 길어진 5개 섹션이 잘리지 않도록, 본문 글자를 살짝 줄이고(30px) 남은 공간에
+    // 맞춰 실제 필요한 줄 수를 계산해서(reason 텍스트와 동일한 방식) 그린다.
+    const SAJU_BODY_FONT = "400 30px 'Malgun Gothic', sans-serif";
+    const SAJU_LINE_H = 40, SAJU_CONTENT_BOTTOM_MAX = 1725;
     const sajuSections = [
+      { label: '☝️ 한마디로 표현하면', text: detail.summary },
       { label: '💭 기본 성향', text: detail.trait },
       { label: '💪 강점', text: detail.strength },
       { label: '⚠️ 유의할 점', text: detail.caution },
       { label: '💕 잘 맞는 상대', text: detail.relationship },
     ];
-    let y = 930;
+    let y = 890;
     sajuSections.forEach((s, i) => {
       drawSectionDivider(ctx, s.label, CARD_CX, y, 460);
-      y += 40;
-      ctx.font = "400 33px 'Malgun Gothic', sans-serif";
+      y += 32;
+      ctx.font = SAJU_BODY_FONT;
       const rawLines = countWrappedLines(ctx, s.text, 780);
-      const maxLines = Math.max(1, Math.min(rawLines, 3, Math.floor((SAJU_CONTENT_BOTTOM_MAX - y) / 46)));
-      y = drawParagraphText(ctx, s.text, y, maxLines);
-      if (i < sajuSections.length - 1) y += 28;
+      const maxLines = Math.max(1, Math.min(rawLines, 4, Math.floor((SAJU_CONTENT_BOTTOM_MAX - y) / SAJU_LINE_H)));
+      ctx.fillStyle = '#7a5c42';
+      y = wrapCanvasText(ctx, s.text, CARD_CX, y, 780, SAJU_LINE_H, maxLines);
+      if (i < sajuSections.length - 1) y += 14;
     });
 
     drawStoryWatermark(ctx);
@@ -5010,7 +5035,7 @@ function buildResultText(kind) {
     const p = r.pillars;
     const nameLine = r.name ? `${r.name}님의 사주팔자` : '나의 사주팔자';
     const pillarLine = `년주 ${p.year.stemChar}${p.year.branchChar} · 월주 ${p.month.stemChar}${p.month.branchChar} · 일주 ${p.day.stemChar}${p.day.branchChar}` + (p.hour ? ` · 시주 ${p.hour.stemChar}${p.hour.branchChar}` : '');
-    return `🔮 ${nameLine}\n일간 ${p.day.stemChar}${p.day.stemHanja} · ${r.detail.keyword}\n${pillarLine}\n\n${r.detail.desc}${FOOTER}`;
+    return `🔮 ${nameLine}\n일간 ${p.day.stemChar}${p.day.stemHanja} · ${r.detail.keyword}\n${pillarLine}\n\n${r.detail.desc}\n☝️ 한마디로 · ${r.detail.summary}${FOOTER}`;
   }
   if (kind === 'today') {
     const r = lastTodayResult;
