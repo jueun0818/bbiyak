@@ -4398,7 +4398,7 @@ function drawMedallionSparkle(ctx, cx, cy, r) {
   ctx.fillText('💫', cx + r * 1.1, cy + r * 0.75);
 }
 
-function drawChickAvatar(ctx, cx, cy, r, expression) {
+function drawChickAvatar(ctx, cx, cy, r, expression, badgeEmoji) {
   drawEmojiGlow(ctx, cx, cy, r * 1.55);
 
   const chickH = r * 1.62;
@@ -4417,7 +4417,7 @@ function drawChickAvatar(ctx, cx, cy, r, expression) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.font = `${Math.round(badgeR * 1.3)}px 'Malgun Gothic', sans-serif`;
-  ctx.fillText('😊', badgeCx, badgeCy + badgeR * 0.05);
+  ctx.fillText(badgeEmoji || '😊', badgeCx, badgeCy + badgeR * 0.05);
 }
 
 function drawStatCard(ctx, x, y, w, h, emoji, label, score, color, bgColor, desc, footerEmoji) {
@@ -4718,12 +4718,17 @@ function renderStoryCard(kind) {
     drawStoryBackground(ctx, SAJU_THEME);
     drawBurstGlow(ctx, 540, 260);
 
+    drawChickAvatar(ctx, 205, 235, 150, 'happy', '🔮');
+
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    drawEmojiGlow(ctx, 540, 250, 160);
-    ctx.fillStyle = '#6b3410';
-    ctx.font = "54px 'Jua', 'Malgun Gothic', sans-serif";
-    ctx.fillText(name ? `🔮 ${name}님의 사주팔자` : '🔮 나의 사주팔자', 540, 240);
+    ctx.fillStyle = '#6b4a2b';
+    ctx.font = "40px 'Jua', 'Malgun Gothic', sans-serif";
+    ctx.fillText(name ? `${name}님의` : '나의', 700, 130);
+    ctx.font = "78px 'Jua', 'Malgun Gothic', sans-serif";
+    drawPopTitle(ctx, '사주팔자', 700, 232, '#6b3410', 12);
+    ctx.font = '46px \'Malgun Gothic\', sans-serif';
+    ctx.fillText('✨', 985, 150);
 
     roundRectPath(ctx, 80, 400, 920, 1300, 40);
     ctx.save();
@@ -4751,15 +4756,25 @@ function renderStoryCard(kind) {
       drawPillarChipCanvas(ctx, startX + stepX * i, 585, c.label, c.p);
     });
 
-    let y = 990;
-    drawSectionDivider(ctx, '💭 기본 성향', CARD_CX, y, 460); y += 44;
-    y = drawParagraphText(ctx, detail.trait, y, 3);
-    y += 34;
-    drawSectionDivider(ctx, '💪 강점', CARD_CX, y, 460); y += 44;
-    y = drawParagraphText(ctx, detail.strength, y, 3);
-    y += 34;
-    drawSectionDivider(ctx, '⚠️ 유의할 점', CARD_CX, y, 460); y += 44;
-    y = drawParagraphText(ctx, detail.caution, y, 3);
+    // 섹션이 4개로 늘어난 만큼, 고정 줄 수 대신 남은 공간에 맞춰 실제 필요한 줄 수를
+    // 계산해서(reason 텍스트와 동일한 방식) 카드 밖으로 넘치는 일이 없게 한다.
+    const SAJU_CONTENT_BOTTOM_MAX = 1690;
+    const sajuSections = [
+      { label: '💭 기본 성향', text: detail.trait },
+      { label: '💪 강점', text: detail.strength },
+      { label: '⚠️ 유의할 점', text: detail.caution },
+      { label: '💕 잘 맞는 상대', text: detail.relationship },
+    ];
+    let y = 930;
+    sajuSections.forEach((s, i) => {
+      drawSectionDivider(ctx, s.label, CARD_CX, y, 460);
+      y += 40;
+      ctx.font = "400 33px 'Malgun Gothic', sans-serif";
+      const rawLines = countWrappedLines(ctx, s.text, 780);
+      const maxLines = Math.max(1, Math.min(rawLines, 3, Math.floor((SAJU_CONTENT_BOTTOM_MAX - y) / 46)));
+      y = drawParagraphText(ctx, s.text, y, maxLines);
+      if (i < sajuSections.length - 1) y += 28;
+    });
 
     drawStoryWatermark(ctx);
   } else if (kind === 'today') {
