@@ -1238,24 +1238,41 @@
     margin-bottom: 14px;
     flex-wrap: wrap;
   }
-  .board-filter { display: flex; gap: 6px; }
-  .board-filter-btn {
-    width: auto;
-    margin: 0;
-    padding: 8px 14px;
+  .board-title { font-size: 17px; font-weight: 800; color: var(--purple); }
+  .board-section-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--purple);
+    margin: 18px 0 10px;
+  }
+  .board-list ~ .board-section-title { margin-top: 18px; }
+  .board-result-strip {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .board-result-strip:empty::after {
+    content: '아직 올라온 궁합 결과가 없어요';
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+  .board-result-card {
+    flex: 0 0 auto;
+    width: 168px;
     border: 1.5px solid var(--line);
-    border-radius: 999px;
-    background: #fff;
-    color: #a3781c;
-    font-size: 14px;
-    font-weight: 700;
-    box-shadow: none;
+    border-radius: 16px;
+    padding: 12px 13px;
+    background: linear-gradient(160deg, #fffdf2, var(--panel));
+    cursor: pointer;
   }
-  .board-filter-btn.active {
-    background: var(--grad-amber);
-    color: #fff;
-    border-color: transparent;
-  }
+  .board-result-card .board-result-nick { font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
+  .board-result-card .board-result-names { font-size: 14px; font-weight: 800; color: var(--text); line-height: 1.3; }
+  .board-result-card .board-result-score { font-size: 20px; font-weight: 800; color: var(--amber-text); margin-top: 4px; }
+  .board-result-card .board-result-tier { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .board-result-card .board-result-foot { margin-top: 8px; font-size: 12px; color: var(--muted); }
   .board-auth { display: flex; align-items: center; gap: 8px; }
   .board-user-label { font-size: 13.5px; color: var(--muted); font-weight: 700; }
   .board-login-btn, .board-logout-btn {
@@ -2059,11 +2076,7 @@
   <div class="tab-panel" id="tabBoard">
   <div class="card board-card">
     <div class="board-header">
-      <div class="board-filter">
-        <button type="button" class="board-filter-btn active" data-cat="">전체</button>
-        <button type="button" class="board-filter-btn" data-cat="result">궁합 결과</button>
-        <button type="button" class="board-filter-btn" data-cat="free">자유글</button>
-      </div>
+      <span class="board-title">💬 궁합 게시판</span>
       <div class="board-auth">
         <span class="board-user-label" id="boardUserLabel" hidden></span>
         <button type="button" class="board-login-btn" id="boardLoginBtn" hidden>💬 카카오로 시작하기</button>
@@ -2082,6 +2095,10 @@
     </div>
     <p class="board-login-hint" id="boardLoginHint">글을 쓰거나 댓글・좋아요를 남기려면 카카오 로그인이 필요해요.</p>
 
+    <div class="board-section-title">🎉 궁합 결과</div>
+    <div class="board-result-strip" id="boardResultStrip"></div>
+
+    <div class="board-section-title">💬 자유글</div>
     <div class="board-list" id="boardList"></div>
     <button type="button" class="board-more-btn" id="boardMoreBtn" hidden>더보기</button>
   </div>
@@ -5527,7 +5544,6 @@ document.getElementById('boardAttachResult').addEventListener('change', () => {
 });
 
 let boardSession = { loggedIn: false, nickname: '', kakaoId: '' };
-let boardCategory = '';
 let boardOffset = 0;
 let boardLoadedOnce = false;
 const BOARD_PAGE_SIZE = 20;
@@ -5597,6 +5613,34 @@ function renderBoardPostCard(post) {
   return el;
 }
 
+function renderResultStripCard(post) {
+  const data = post.resultData;
+  const el = document.createElement('div');
+  el.className = 'board-result-card';
+  el.dataset.id = post.id;
+  el.innerHTML = `
+    <div class="board-result-nick">🐥 ${escapeHtml(post.nickname)}</div>
+    <div class="board-result-names">${data ? escapeHtml(data.names || '') : ''}</div>
+    ${data && data.score != null ? `<div class="board-result-score">${data.score}점</div>` : ''}
+    ${data && data.tierTitle ? `<div class="board-result-tier">${escapeHtml(data.tierTitle)}</div>` : ''}
+    <div class="board-result-foot">❤️ ${post.likeCount} · 💬 ${post.commentCount}</div>
+  `;
+  el.addEventListener('click', () => openBoardDetail(post.id));
+  return el;
+}
+
+async function loadResultStrip() {
+  const stripEl = document.getElementById('boardResultStrip');
+  try {
+    const r = await fetch('/api/board?category=result&offset=0');
+    const data = await r.json();
+    stripEl.innerHTML = '';
+    (data.posts || []).forEach((post) => stripEl.appendChild(renderResultStripCard(post)));
+  } catch (e) {
+    // 비어 있으면 CSS ::after 안내 문구가 대신 보여진다
+  }
+}
+
 async function loadBoardPosts(reset) {
   if (reset) boardOffset = 0;
   const listEl = document.getElementById('boardList');
@@ -5604,13 +5648,12 @@ async function loadBoardPosts(reset) {
   if (reset) listEl.innerHTML = '<p class="board-empty">불러오는 중...</p>';
 
   try {
-    const params = new URLSearchParams({ offset: String(boardOffset) });
-    if (boardCategory) params.set('category', boardCategory);
+    const params = new URLSearchParams({ category: 'free', offset: String(boardOffset) });
     const r = await fetch(`/api/board?${params.toString()}`);
     const data = await r.json();
     if (reset) listEl.innerHTML = '';
     if (reset && (!data.posts || data.posts.length === 0)) {
-      listEl.innerHTML = '<p class="board-empty">아직 글이 없어요. 첫 글을 남겨보세요 🐣</p>';
+      listEl.innerHTML = '<p class="board-empty">아직 자유글이 없어요. 첫 글을 남겨보세요 🐣</p>';
     } else {
       (data.posts || []).forEach((post) => listEl.appendChild(renderBoardPostCard(post)));
     }
@@ -5625,18 +5668,10 @@ function onBoardTabShown() {
   refreshBoardSession();
   if (!boardLoadedOnce) {
     boardLoadedOnce = true;
+    loadResultStrip();
     loadBoardPosts(true);
   }
 }
-
-document.querySelectorAll('.board-filter-btn').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.board-filter-btn').forEach((b) => b.classList.remove('active'));
-    btn.classList.add('active');
-    boardCategory = btn.dataset.cat || '';
-    loadBoardPosts(true);
-  });
-});
 
 document.getElementById('boardMoreBtn').addEventListener('click', () => loadBoardPosts(false));
 
@@ -5674,7 +5709,9 @@ document.getElementById('boardWriteSubmit').addEventListener('click', async () =
     }
     textEl.value = '';
     document.getElementById('boardAttachResult').value = '';
-    if (!boardCategory || boardCategory === data.post.category) {
+    if (data.post.category === 'result') {
+      document.getElementById('boardResultStrip').prepend(renderResultStripCard(data.post));
+    } else {
       document.getElementById('boardList').prepend(renderBoardPostCard(data.post));
       const empty = document.querySelector('#boardList .board-empty');
       if (empty) empty.remove();
@@ -5743,10 +5780,15 @@ function renderBoardDetail(post, comments) {
       if (!r.ok) return;
       document.getElementById('boardDetailLike').classList.toggle('liked', data.liked);
       document.getElementById('boardDetailLikeCount').textContent = data.likeCount;
-      const cardEl = document.querySelector(`.board-post[data-id="${post.id}"] .board-post-foot span:first-child`);
-      if (cardEl) {
-        cardEl.classList.toggle('liked', data.liked);
-        cardEl.textContent = `❤️ ${data.likeCount}`;
+      const listCardEl = document.querySelector(`.board-post[data-id="${post.id}"] .board-post-foot span:first-child`);
+      if (listCardEl) {
+        listCardEl.classList.toggle('liked', data.liked);
+        listCardEl.textContent = `❤️ ${data.likeCount}`;
+      }
+      const stripCardEl = document.querySelector(`.board-result-card[data-id="${post.id}"] .board-result-foot`);
+      if (stripCardEl) {
+        const commentCount = post.commentCount || 0;
+        stripCardEl.textContent = `❤️ ${data.likeCount} · 💬 ${commentCount}`;
       }
     } catch (e) { /* ignore */ }
   });
@@ -5763,8 +5805,10 @@ function renderBoardDetail(post, comments) {
         });
         if (!r.ok) return;
         document.getElementById('boardDetailModal').classList.remove('show');
-        const cardEl = document.querySelector(`.board-post[data-id="${post.id}"]`);
-        if (cardEl) cardEl.remove();
+        const listCardEl = document.querySelector(`.board-post[data-id="${post.id}"]`);
+        if (listCardEl) listCardEl.remove();
+        const stripCardEl = document.querySelector(`.board-result-card[data-id="${post.id}"]`);
+        if (stripCardEl) stripCardEl.remove();
       } catch (e) { /* ignore */ }
     });
   }
@@ -5800,10 +5844,16 @@ document.getElementById('boardCommentSubmit').addEventListener('click', async ()
     div.innerHTML = `<span class="board-comment-nick">${escapeHtml(data.comment.nickname)}</span>${escapeHtml(data.comment.body)}`;
     commentsEl.appendChild(div);
     input.value = '';
-    const cardEl = document.querySelector(`.board-post[data-id="${boardDetailPostId}"] .board-post-foot span:last-child`);
-    if (cardEl) {
-      const n = (parseInt(cardEl.textContent.replace(/\D/g, ''), 10) || 0) + 1;
-      cardEl.textContent = `💬 ${n}`;
+    const listCardEl = document.querySelector(`.board-post[data-id="${boardDetailPostId}"] .board-post-foot span:last-child`);
+    if (listCardEl) {
+      const n = (parseInt(listCardEl.textContent.replace(/\D/g, ''), 10) || 0) + 1;
+      listCardEl.textContent = `💬 ${n}`;
+    }
+    const stripCardEl = document.querySelector(`.board-result-card[data-id="${boardDetailPostId}"] .board-result-foot`);
+    if (stripCardEl) {
+      const n = (parseInt(stripCardEl.textContent.match(/💬 (\d+)/)?.[1], 10) || 0) + 1;
+      const likeMatch = stripCardEl.textContent.match(/❤️ (\d+)/);
+      stripCardEl.textContent = `❤️ ${likeMatch ? likeMatch[1] : 0} · 💬 ${n}`;
     }
   } catch (e) { /* ignore */ }
 });
