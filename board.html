@@ -173,12 +173,18 @@
   .board-result-card .board-result-foot { margin-top: 8px; font-size: 12px; color: var(--muted); }
   .board-auth { display: flex; align-items: center; gap: 8px; }
   .board-user-label { font-size: 13.5px; color: var(--muted); font-weight: 700; }
-  .board-login-btn, .board-logout-btn {
+  .board-login-btn, .board-logout-btn, .board-nickname-edit-btn {
     width: auto;
     margin: 0;
     padding: 9px 14px;
     font-size: 13.5px;
     border-radius: 12px;
+  }
+  .board-nickname-edit-btn {
+    background: #fff;
+    color: #a3781c;
+    border: 1.5px solid var(--line);
+    box-shadow: none;
   }
   .board-login-btn {
     background: linear-gradient(90deg, #fee500, #fada00);
@@ -365,6 +371,7 @@
       <span class="board-title">🐥 다들 어떤 궁합 나왔어요?</span>
       <div class="board-auth">
         <span class="board-user-label" id="boardUserLabel" hidden></span>
+        <button type="button" class="board-nickname-edit-btn" id="boardNicknameEditBtn" hidden>✏️ 닉네임 변경</button>
         <button type="button" class="board-login-btn" id="boardLoginBtn" hidden>💬 카카오로 시작하기</button>
         <button type="button" class="board-logout-btn" id="boardLogoutBtn" hidden>로그아웃</button>
       </div>
@@ -480,18 +487,42 @@ async function refreshBoardSession() {
   }
   const loginBtn = document.getElementById('boardLoginBtn');
   const logoutBtn = document.getElementById('boardLogoutBtn');
+  const nicknameEditBtn = document.getElementById('boardNicknameEditBtn');
   const userLabel = document.getElementById('boardUserLabel');
   const writeBox = document.getElementById('boardWriteBox');
   const loginHint = document.getElementById('boardLoginHint');
 
   loginBtn.hidden = boardSession.loggedIn;
   logoutBtn.hidden = !boardSession.loggedIn;
+  nicknameEditBtn.hidden = !boardSession.loggedIn;
   userLabel.hidden = !boardSession.loggedIn;
   userLabel.textContent = boardSession.loggedIn ? `🐥 ${boardSession.nickname}님` : '';
   writeBox.hidden = !boardSession.loggedIn;
   loginHint.hidden = boardSession.loggedIn;
   if (boardSession.loggedIn) populateAttachSelect();
 }
+
+document.getElementById('boardNicknameEditBtn').addEventListener('click', async () => {
+  const next = prompt('사용할 닉네임을 입력해주세요 (최대 20자)', boardSession.nickname || '');
+  const trimmed = (next || '').trim();
+  if (!trimmed || trimmed === boardSession.nickname) return;
+  try {
+    const r = await fetch('/api/update-nickname', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nickname: trimmed.slice(0, 20) }),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      alert('닉네임을 바꾸지 못했어요.');
+      return;
+    }
+    boardSession.nickname = data.nickname;
+    document.getElementById('boardUserLabel').textContent = `🐥 ${data.nickname}님`;
+  } catch (e) {
+    alert('닉네임을 바꾸지 못했어요.');
+  }
+});
 
 function renderResultChip(data) {
   if (!data) return '';
