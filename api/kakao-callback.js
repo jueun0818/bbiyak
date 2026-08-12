@@ -8,6 +8,7 @@ export default async function handler(req, res) {
   const back = typeof req.query.state === 'string' && req.query.state ? decodeURIComponent(req.query.state) : '/';
 
   if (!KAKAO_REST_API_KEY || !code) {
+    console.error('[kakao-callback] missing key or code', { hasKey: !!KAKAO_REST_API_KEY, hasCode: !!code });
     res.writeHead(302, { Location: `${back}?loginError=1` });
     res.end();
     return;
@@ -29,6 +30,7 @@ export default async function handler(req, res) {
     });
     const tokenData = await tokenRes.json();
     if (!tokenData.access_token) {
+      console.error('[kakao-callback] token exchange failed', tokenRes.status, tokenData);
       res.writeHead(302, { Location: `${back}?loginError=1` });
       res.end();
       return;
@@ -38,6 +40,12 @@ export default async function handler(req, res) {
       headers: { Authorization: `Bearer ${tokenData.access_token}` },
     });
     const me = await meRes.json();
+    if (!me || !me.id) {
+      console.error('[kakao-callback] user info fetch failed', meRes.status, me);
+      res.writeHead(302, { Location: `${back}?loginError=1` });
+      res.end();
+      return;
+    }
     const nickname =
       (me.kakao_account && me.kakao_account.profile && me.kakao_account.profile.nickname) ||
       (me.properties && me.properties.nickname) ||
@@ -48,6 +56,7 @@ export default async function handler(req, res) {
     res.writeHead(302, { Location: back });
     res.end();
   } catch (e) {
+    console.error('[kakao-callback] unexpected error', e && e.message, e && e.stack);
     res.writeHead(302, { Location: `${back}?loginError=1` });
     res.end();
   }
