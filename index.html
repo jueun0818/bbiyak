@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -394,6 +394,7 @@
     gap: 3px;
     box-shadow: none;
   }
+  a.tab-btn { text-decoration: none; }
   .tab-btn .tab-icon { font-size: 21px; line-height: 1; }
   .tab-btn .tab-label { line-height: 1.1; }
   .tab-btn.active {
@@ -1227,232 +1228,6 @@
     color: #8f5c00;
     border-color: #fff;
   }
-
-  /* ---- 궁합 게시판 ---- */
-  .board-card { padding: 22px 18px 26px; }
-  .board-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 14px;
-    flex-wrap: wrap;
-  }
-  .board-title { font-size: 17px; font-weight: 800; color: var(--purple); }
-  .board-section-title {
-    font-size: 15px;
-    font-weight: 800;
-    color: var(--purple);
-    margin: 18px 0 10px;
-  }
-  .board-list ~ .board-section-title { margin-top: 18px; }
-  .board-result-strip {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding-bottom: 4px;
-    margin-bottom: 4px;
-    -webkit-overflow-scrolling: touch;
-  }
-  .board-result-strip:empty::after {
-    content: '아직 올라온 궁합 결과가 없어요';
-    font-size: 13.5px;
-    color: var(--muted);
-  }
-  .board-result-card {
-    flex: 0 0 auto;
-    width: 168px;
-    border: 1.5px solid var(--line);
-    border-radius: 16px;
-    padding: 12px 13px;
-    background: linear-gradient(160deg, #fffdf2, var(--panel));
-    cursor: pointer;
-  }
-  .board-result-card .board-result-nick { font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
-  .board-result-card .board-result-names { font-size: 14px; font-weight: 800; color: var(--text); line-height: 1.3; }
-  .board-result-card .board-result-score { font-size: 20px; font-weight: 800; color: var(--amber-text); margin-top: 4px; }
-  .board-result-card .board-result-tier { font-size: 12px; color: var(--muted); margin-top: 2px; }
-  .board-result-card .board-result-foot { margin-top: 8px; font-size: 12px; color: var(--muted); }
-  .board-auth { display: flex; align-items: center; gap: 8px; }
-  .board-user-label { font-size: 13.5px; color: var(--muted); font-weight: 700; }
-  .board-login-btn, .board-logout-btn {
-    width: auto;
-    margin: 0;
-    padding: 9px 14px;
-    font-size: 13.5px;
-    border-radius: 12px;
-  }
-  .board-login-btn {
-    background: linear-gradient(90deg, #fee500, #fada00);
-    color: #3a2e00;
-    box-shadow: 0 6px 14px -6px rgba(180,150,0,0.6);
-  }
-  .board-logout-btn {
-    background: #fff;
-    color: #a3781c;
-    border: 1.5px solid var(--line);
-    box-shadow: none;
-  }
-
-  .board-write { margin-bottom: 16px; }
-  .board-attach-select {
-    margin-bottom: 8px;
-    font-size: 15px;
-    padding: 11px 14px;
-  }
-  #boardWriteText {
-    width: 100%;
-    min-height: 76px;
-    padding: 13px 14px;
-    border-radius: 14px;
-    border: 1.5px solid var(--line);
-    font-size: 15.5px;
-    font-family: inherit;
-    resize: vertical;
-    outline: none;
-    box-sizing: border-box;
-  }
-  #boardWriteText:focus { border-color: var(--amber-strong); }
-  .board-write-row {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    margin-top: 8px;
-  }
-  #boardWriteSubmit { width: auto; margin: 0; padding: 10px 20px; font-size: 15px; }
-  .board-login-hint {
-    text-align: center;
-    font-size: 14px;
-    color: var(--muted);
-    background: var(--panel);
-    border-radius: 12px;
-    padding: 14px;
-    margin: 0 0 16px;
-  }
-
-  .board-list { display: flex; flex-direction: column; gap: 12px; }
-  .board-empty { text-align: center; color: var(--muted); font-size: 14.5px; padding: 24px 0; }
-  .board-post {
-    border: 1.5px solid var(--line);
-    border-radius: 16px;
-    padding: 14px 16px;
-    background: #fff;
-    cursor: pointer;
-  }
-  .board-post-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 6px;
-  }
-  .board-post-nick { font-weight: 700; color: var(--purple); font-size: 14.5px; }
-  .board-post-time { font-size: 12.5px; color: var(--muted); }
-  .board-post-body {
-    font-size: 15px;
-    color: var(--text);
-    white-space: pre-wrap;
-    word-break: break-word;
-    line-height: 1.55;
-  }
-  .board-result-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 8px;
-    padding: 7px 12px;
-    border-radius: 999px;
-    background: var(--panel);
-    color: var(--amber-text);
-    font-size: 13.5px;
-    font-weight: 700;
-  }
-  .board-post-foot {
-    display: flex;
-    gap: 14px;
-    margin-top: 10px;
-    font-size: 13.5px;
-    color: var(--muted);
-  }
-  .board-post-foot span.liked { color: #e0507a; font-weight: 700; }
-  .board-more-btn {
-    background: #fff;
-    color: #a3781c;
-    border: 1.5px solid var(--line);
-    box-shadow: none;
-    margin-top: 4px;
-  }
-
-  .board-detail-modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 60;
-    background: rgba(30,20,0,0.5);
-    padding: 16px;
-    align-items: flex-end;
-    justify-content: center;
-  }
-  .board-detail-modal.show { display: flex; }
-  .board-detail-inner {
-    position: relative;
-    width: 100%;
-    max-width: 480px;
-    max-height: 86vh;
-    overflow-y: auto;
-    background: #fffdf7;
-    border-radius: 22px 22px 12px 12px;
-    padding: 22px 18px 18px;
-  }
-  .board-detail-close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    margin: 0;
-    border-radius: 50%;
-    background: rgba(0,0,0,0.06);
-    color: #6b5d47;
-    font-size: 15px;
-    box-shadow: none;
-  }
-  .board-comments { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
-  .board-comment {
-    background: var(--panel);
-    border-radius: 12px;
-    padding: 10px 12px;
-    font-size: 14.5px;
-  }
-  .board-comment-nick { font-weight: 700; color: var(--purple); margin-right: 6px; }
-  .board-comment-write {
-    display: flex;
-    gap: 8px;
-    margin-top: 14px;
-    position: sticky;
-    bottom: 0;
-    background: #fffdf7;
-    padding-top: 6px;
-  }
-  #boardCommentText {
-    flex: 1;
-    padding: 11px 13px;
-    border-radius: 12px;
-    border: 1.5px solid var(--line);
-    font-size: 14.5px;
-    outline: none;
-  }
-  #boardCommentSubmit { width: auto; margin: 0; padding: 11px 16px; font-size: 14.5px; }
-  .board-delete-btn {
-    width: auto;
-    margin: 0;
-    padding: 6px 12px;
-    font-size: 12.5px;
-    background: #fff;
-    color: #c0504f;
-    border: 1.5px solid #f3d4d3;
-    box-shadow: none;
-  }
 </style>
 </head>
 <body>
@@ -1491,7 +1266,7 @@
     <button class="tab-btn" id="tabBtnBlood"><span class="tab-icon">🩸</span><span class="tab-label">혈액형 궁합</span></button>
     <button class="tab-btn" id="tabBtnMbti"><span class="tab-icon">🧩</span><span class="tab-label">MBTI 궁합</span></button>
     <button class="tab-btn" id="tabBtnCombo"><span class="tab-icon">💫</span><span class="tab-label">종합 궁합</span></button>
-    <button class="tab-btn" id="tabBtnBoard"><span class="tab-icon">💬</span><span class="tab-label">궁합 게시판</span></button>
+    <a class="tab-btn" href="board.html"><span class="tab-icon">💬</span><span class="tab-label">궁합 게시판</span></a>
   </div>
 
   <div class="tab-panel active" id="tabName">
@@ -2072,50 +1847,6 @@
 
   <p class="disclaimer">* 종합 궁합은 이름 궁합·사주 궁합·별자리 궁합·혈액형 궁합·MBTI 궁합 5가지 점수의 평균으로 산출한 재미용 콘텐츠입니다.<br>각 항목의 산출 근거는 해당 탭의 안내를 참고해주세요.</p>
   </div>
-
-  <div class="tab-panel" id="tabBoard">
-  <div class="card board-card">
-    <div class="board-header">
-      <span class="board-title">💬 궁합 게시판</span>
-      <div class="board-auth">
-        <span class="board-user-label" id="boardUserLabel" hidden></span>
-        <button type="button" class="board-login-btn" id="boardLoginBtn" hidden>💬 카카오로 시작하기</button>
-        <button type="button" class="board-logout-btn" id="boardLogoutBtn" hidden>로그아웃</button>
-      </div>
-    </div>
-
-    <div class="board-write" id="boardWriteBox" hidden>
-      <select class="board-attach-select" id="boardAttachResult">
-        <option value="">📋 결과 첨부 안 함</option>
-      </select>
-      <textarea id="boardWriteText" maxlength="500" placeholder="궁합 결과나 하고 싶은 말을 자유롭게 남겨보세요 🐥"></textarea>
-      <div class="board-write-row">
-        <button type="button" id="boardWriteSubmit">✍️ 올리기</button>
-      </div>
-    </div>
-    <p class="board-login-hint" id="boardLoginHint">글을 쓰거나 댓글・좋아요를 남기려면 카카오 로그인이 필요해요.</p>
-
-    <div class="board-section-title">🎉 궁합 결과</div>
-    <div class="board-result-strip" id="boardResultStrip"></div>
-
-    <div class="board-section-title">💬 자유글</div>
-    <div class="board-list" id="boardList"></div>
-    <button type="button" class="board-more-btn" id="boardMoreBtn" hidden>더보기</button>
-  </div>
-  <p class="disclaimer">* 게시판 글과 댓글은 카카오 로그인 닉네임으로 공개 게시돼요. 서로 예의를 지켜주세요 🐥</p>
-  </div>
-</div>
-
-<div class="board-detail-modal" id="boardDetailModal">
-  <div class="board-detail-inner">
-    <button type="button" class="board-detail-close" id="boardDetailClose" aria-label="닫기">✕</button>
-    <div id="boardDetailBody"></div>
-    <div class="board-comments" id="boardComments"></div>
-    <div class="board-comment-write" id="boardCommentWriteRow" hidden>
-      <input type="text" id="boardCommentText" maxlength="200" placeholder="댓글을 남겨보세요">
-      <button type="button" id="boardCommentSubmit">등록</button>
-    </div>
-  </div>
 </div>
 
 <div class="story-modal" id="storyModal">
@@ -2617,6 +2348,7 @@ function showResult(name1, name2) {
   pushBbiyakAd('result');
 
   lastNameResult = { name1, name2, score, tier };
+  saveResultSnapshot('name', score, tier.title, `${name1} → ${name2}`);
   playScoreSfx(score);
 }
 
@@ -2671,7 +2403,6 @@ const TAB_LINKS = [
   ['tabBtnBlood', 'tabBlood'],
   ['tabBtnMbti', 'tabMbti'],
   ['tabBtnCombo', 'tabCombo'],
-  ['tabBtnBoard', 'tabBoard'],
 ];
 
 function activateTab(btnId) {
@@ -2682,7 +2413,6 @@ function activateTab(btnId) {
     document.getElementById(bId).classList.toggle('active', bId === btnId);
     document.getElementById(pId).classList.toggle('active', pId === panelId);
   });
-  if (panelId === 'tabBoard' && typeof onBoardTabShown === 'function') onBoardTabShown();
 }
 
 TAB_LINKS.forEach(([btnId]) => {
@@ -2699,7 +2429,6 @@ const TAB_BY_PARAM = {
   blood: 'tabBtnBlood',
   mbti: 'tabBtnMbti',
   combo: 'tabBtnCombo',
-  board: 'tabBtnBoard',
 };
 const requestedTab = new URLSearchParams(location.search).get('tab');
 if (requestedTab && TAB_BY_PARAM[requestedTab.toLowerCase()]) {
@@ -3062,6 +2791,7 @@ document.getElementById('sajuBtn').addEventListener('click', () => {
   pushBbiyakAd('sajuResult');
 
   lastSajuResult = { pillars, detail, name };
+  saveResultSnapshot('saju', null, detail.keyword, name || '나');
 });
 
 // ============================================================
@@ -3329,6 +3059,7 @@ document.getElementById('sajuCompatBtn').addEventListener('click', () => {
   const n1 = document.getElementById('scName1').value.trim() || '첫 번째 분';
   const n2 = document.getElementById('scName2').value.trim() || '두 번째 분';
   lastSajuCompatResult = { ...result, tier, name1: n1, name2: n2 };
+  saveResultSnapshot('sajuCompat', result.score, tier.title, `${n1} × ${n2}`);
   playScoreSfx(result.score);
 });
 
@@ -3547,6 +3278,7 @@ document.getElementById('todayBtn').addEventListener('click', () => {
   showBox('todayResult');
 
   lastTodayResult = { ...result, tier, name };
+  saveResultSnapshot('today', result.overall, tier.title, name);
   playScoreSfx(result.overall);
 });
 
@@ -3647,6 +3379,7 @@ document.getElementById('zodiacBtn').addEventListener('click', () => {
   const n1 = document.getElementById('zName1').value.trim() || '첫 번째 분';
   const n2 = document.getElementById('zName2').value.trim() || '두 번째 분';
   lastZodiacResult = { sign1, sign2, matchup, tier, name1: n1, name2: n2 };
+  saveResultSnapshot('zodiac', matchup.score, tier.title, `${n1} × ${n2}`);
   playScoreSfx(matchup.score);
 });
 
@@ -3695,6 +3428,7 @@ document.getElementById('bloodBtn').addEventListener('click', () => {
   showBox('bloodResult');
 
   lastBloodResult = { t1, t2, n1, n2, matchup, tier };
+  saveResultSnapshot('blood', matchup.score, tier.title, `${n1} × ${n2}`);
   playScoreSfx(matchup.score);
 });
 
@@ -3877,6 +3611,7 @@ document.getElementById('mbtiBtn').addEventListener('click', () => {
   showBox('mbtiResult');
 
   lastMbtiResult = { type1, type2, n1, n2, result, tier, togetherText, activityText };
+  saveResultSnapshot('mbti', result.score, tier.title, `${n1} × ${n2}`);
   playScoreSfx(result.score);
 });
 
@@ -3968,6 +3703,7 @@ document.getElementById('comboBtn').addEventListener('click', () => {
       { label: 'MBTI궁합', score: mbtiRes.score },
     ],
   };
+  saveResultSnapshot('combo', overall, tier.title, `${name1} × ${name2}`);
   playScoreSfx(overall);
 });
 
@@ -3981,6 +3717,30 @@ let lastZodiacResult = null;
 let lastBloodResult = null;
 let lastMbtiResult = null;
 let lastComboResult = null;
+
+// 궁합 게시판(board.html)은 별도 페이지라 이 메모리 상의 last*Result 값을
+// 직접 읽을 수 없다. 결과가 나올 때마다 가벼운 스냅샷을 localStorage에 남겨두면
+// 게시판 페이지에서 "결과 첨부" 드롭다운으로 읽어갈 수 있다.
+const RESULT_KIND_META = {
+  name: { emoji: '💌', label: '이름 궁합' },
+  saju: { emoji: '🔮', label: '사주팔자' },
+  today: { emoji: '🌅', label: '오늘의 운세' },
+  sajuCompat: { emoji: '🀄', label: '사주 궁합' },
+  zodiac: { emoji: '⭐', label: '별자리 궁합' },
+  blood: { emoji: '🩸', label: '혈액형 궁합' },
+  mbti: { emoji: '🧩', label: 'MBTI 궁합' },
+  combo: { emoji: '💫', label: '종합 궁합' },
+};
+
+function saveResultSnapshot(kind, score, tierTitle, names) {
+  const meta = RESULT_KIND_META[kind];
+  if (!meta) return;
+  try {
+    localStorage.setItem('bbiyak_result_' + kind, JSON.stringify({
+      kind, emoji: meta.emoji, label: meta.label, score, tierTitle, names, savedAt: Date.now(),
+    }));
+  } catch (e) { /* 시크릿 모드 등으로 localStorage를 못 쓰면 조용히 무시 */ }
+}
 
 // 점수 등급(tier)마다 색 온도를 다르게 줘서 "따뜻한 로맨스 → 서늘한 어긋남"으로 이어지는
 // 색 스토리를 만든다. accent=점수·포인트 색, textStrong=제목 색, cardBg=흰 카드 톤,
@@ -5486,386 +5246,6 @@ document.getElementById('shareSiteBtn').addEventListener('click', async () => {
     btn.classList.remove('copied');
   }, 1600);
 });
-
-// ============================================================
-// 궁합 게시판 (카카오 로그인 · 글쓰기 · 댓글 · 좋아요)
-// ============================================================
-const RESULT_KIND_META = {
-  name: { emoji: '💌', label: '이름 궁합' },
-  saju: { emoji: '🔮', label: '사주팔자' },
-  today: { emoji: '🌅', label: '오늘의 운세' },
-  sajuCompat: { emoji: '🀄', label: '사주 궁합' },
-  zodiac: { emoji: '⭐', label: '별자리 궁합' },
-  blood: { emoji: '🩸', label: '혈액형 궁합' },
-  mbti: { emoji: '🧩', label: 'MBTI 궁합' },
-  combo: { emoji: '💫', label: '종합 궁합' },
-};
-
-function buildResultData(kind) {
-  const meta = RESULT_KIND_META[kind];
-  if (!meta) return null;
-  let score = null, tierTitle = null, names = null;
-  try {
-    if (kind === 'name' && lastNameResult) { const r = lastNameResult; score = r.score; tierTitle = r.tier.title; names = `${r.name1} → ${r.name2}`; }
-    else if (kind === 'saju' && lastSajuResult) { const r = lastSajuResult; tierTitle = r.detail.keyword; names = r.name || '나'; }
-    else if (kind === 'today' && lastTodayResult) { const r = lastTodayResult; score = r.overall; tierTitle = r.tier.title; names = r.name; }
-    else if (kind === 'sajuCompat' && lastSajuCompatResult) { const r = lastSajuCompatResult; score = r.score; tierTitle = r.tier.title; names = `${r.name1} × ${r.name2}`; }
-    else if (kind === 'zodiac' && lastZodiacResult) { const r = lastZodiacResult; score = r.matchup.score; tierTitle = r.tier.title; names = `${r.name1} × ${r.name2}`; }
-    else if (kind === 'blood' && lastBloodResult) { const r = lastBloodResult; score = r.matchup.score; tierTitle = r.tier.title; names = `${r.n1} × ${r.n2}`; }
-    else if (kind === 'mbti' && lastMbtiResult) { const r = lastMbtiResult; score = r.result.score; tierTitle = r.tier.title; names = `${r.n1} × ${r.n2}`; }
-    else if (kind === 'combo' && lastComboResult) { const r = lastComboResult; score = r.score; tierTitle = r.tier.title; names = `${r.name1} × ${r.name2}`; }
-    else return null;
-  } catch (e) { return null; }
-  return { kind, emoji: meta.emoji, label: meta.label, score, tierTitle, names };
-}
-
-function populateAttachSelect() {
-  const sel = document.getElementById('boardAttachResult');
-  const prevValue = sel.value;
-  sel.innerHTML = '<option value="">📋 결과 첨부 안 함</option>';
-  Object.keys(RESULT_KIND_META).forEach((kind) => {
-    const data = buildResultData(kind);
-    if (!data) return;
-    const opt = document.createElement('option');
-    opt.value = kind;
-    opt.textContent = `${data.emoji} ${data.label} · ${data.names || ''} ${data.score != null ? data.score + '점' : ''}`.trim();
-    sel.appendChild(opt);
-  });
-  if ([...sel.options].some((o) => o.value === prevValue)) sel.value = prevValue;
-}
-
-document.getElementById('boardAttachResult').addEventListener('change', () => {
-  const kind = document.getElementById('boardAttachResult').value;
-  const textEl = document.getElementById('boardWriteText');
-  if (!kind || textEl.value.trim()) return;
-  const data = buildResultData(kind);
-  if (!data) return;
-  textEl.value = `${data.emoji} ${data.label} ${data.names || ''} ${data.score != null ? data.score + '점!' : ''}`.trim();
-});
-
-let boardSession = { loggedIn: false, nickname: '', kakaoId: '' };
-let boardOffset = 0;
-let boardLoadedOnce = false;
-const BOARD_PAGE_SIZE = 20;
-
-function timeAgo(ms) {
-  const diff = Math.max(0, Date.now() - ms);
-  const min = Math.floor(diff / 60000);
-  if (min < 1) return '방금 전';
-  if (min < 60) return `${min}분 전`;
-  const hour = Math.floor(min / 60);
-  if (hour < 24) return `${hour}시간 전`;
-  const day = Math.floor(hour / 24);
-  if (day < 7) return `${day}일 전`;
-  const d = new Date(ms);
-  return `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`;
-}
-
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-}
-
-async function refreshBoardSession() {
-  try {
-    const r = await fetch('/api/session');
-    boardSession = await r.json();
-  } catch (e) {
-    boardSession = { loggedIn: false };
-  }
-  const loginBtn = document.getElementById('boardLoginBtn');
-  const logoutBtn = document.getElementById('boardLogoutBtn');
-  const userLabel = document.getElementById('boardUserLabel');
-  const writeBox = document.getElementById('boardWriteBox');
-  const loginHint = document.getElementById('boardLoginHint');
-
-  loginBtn.hidden = boardSession.loggedIn;
-  logoutBtn.hidden = !boardSession.loggedIn;
-  userLabel.hidden = !boardSession.loggedIn;
-  userLabel.textContent = boardSession.loggedIn ? `🐥 ${boardSession.nickname}님` : '';
-  writeBox.hidden = !boardSession.loggedIn;
-  loginHint.hidden = boardSession.loggedIn;
-  if (boardSession.loggedIn) populateAttachSelect();
-}
-
-function renderResultChip(data) {
-  if (!data) return '';
-  const scoreText = data.score != null ? ` · ${data.score}점` : '';
-  return `<div class="board-result-chip">${data.emoji} ${escapeHtml(data.label)} · ${escapeHtml(data.names || '')}${scoreText}${data.tierTitle ? ' · ' + escapeHtml(data.tierTitle) : ''}</div>`;
-}
-
-function renderBoardPostCard(post) {
-  const el = document.createElement('div');
-  el.className = 'board-post';
-  el.dataset.id = post.id;
-  el.innerHTML = `
-    <div class="board-post-head">
-      <span class="board-post-nick">🐥 ${escapeHtml(post.nickname)}</span>
-      <span class="board-post-time">${timeAgo(post.createdAt)}</span>
-    </div>
-    <div class="board-post-body">${escapeHtml(post.body)}</div>
-    ${renderResultChip(post.resultData)}
-    <div class="board-post-foot">
-      <span class="${post.likedByMe ? 'liked' : ''}">❤️ ${post.likeCount}</span>
-      <span>💬 ${post.commentCount}</span>
-    </div>
-  `;
-  el.addEventListener('click', () => openBoardDetail(post.id));
-  return el;
-}
-
-function renderResultStripCard(post) {
-  const data = post.resultData;
-  const el = document.createElement('div');
-  el.className = 'board-result-card';
-  el.dataset.id = post.id;
-  el.innerHTML = `
-    <div class="board-result-nick">🐥 ${escapeHtml(post.nickname)}</div>
-    <div class="board-result-names">${data ? escapeHtml(data.names || '') : ''}</div>
-    ${data && data.score != null ? `<div class="board-result-score">${data.score}점</div>` : ''}
-    ${data && data.tierTitle ? `<div class="board-result-tier">${escapeHtml(data.tierTitle)}</div>` : ''}
-    <div class="board-result-foot">❤️ ${post.likeCount} · 💬 ${post.commentCount}</div>
-  `;
-  el.addEventListener('click', () => openBoardDetail(post.id));
-  return el;
-}
-
-async function loadResultStrip() {
-  const stripEl = document.getElementById('boardResultStrip');
-  try {
-    const r = await fetch('/api/board?category=result&offset=0');
-    const data = await r.json();
-    stripEl.innerHTML = '';
-    (data.posts || []).forEach((post) => stripEl.appendChild(renderResultStripCard(post)));
-  } catch (e) {
-    // 비어 있으면 CSS ::after 안내 문구가 대신 보여진다
-  }
-}
-
-async function loadBoardPosts(reset) {
-  if (reset) boardOffset = 0;
-  const listEl = document.getElementById('boardList');
-  const moreBtn = document.getElementById('boardMoreBtn');
-  if (reset) listEl.innerHTML = '<p class="board-empty">불러오는 중...</p>';
-
-  try {
-    const params = new URLSearchParams({ category: 'free', offset: String(boardOffset) });
-    const r = await fetch(`/api/board?${params.toString()}`);
-    const data = await r.json();
-    if (reset) listEl.innerHTML = '';
-    if (reset && (!data.posts || data.posts.length === 0)) {
-      listEl.innerHTML = '<p class="board-empty">아직 자유글이 없어요. 첫 글을 남겨보세요 🐣</p>';
-    } else {
-      (data.posts || []).forEach((post) => listEl.appendChild(renderBoardPostCard(post)));
-    }
-    boardOffset += BOARD_PAGE_SIZE;
-    moreBtn.hidden = !data.hasMore;
-  } catch (e) {
-    if (reset) listEl.innerHTML = '<p class="board-empty">게시판을 불러오지 못했어요. 잠시 후 다시 시도해주세요.</p>';
-  }
-}
-
-function onBoardTabShown() {
-  refreshBoardSession();
-  if (!boardLoadedOnce) {
-    boardLoadedOnce = true;
-    loadResultStrip();
-    loadBoardPosts(true);
-  }
-}
-
-document.getElementById('boardMoreBtn').addEventListener('click', () => loadBoardPosts(false));
-
-document.getElementById('boardLoginBtn').addEventListener('click', () => {
-  const back = location.pathname + '?tab=board';
-  location.href = `/api/kakao-login?back=${encodeURIComponent(back)}`;
-});
-
-document.getElementById('boardLogoutBtn').addEventListener('click', async () => {
-  await fetch('/api/logout', { method: 'POST' });
-  await refreshBoardSession();
-});
-
-document.getElementById('boardWriteSubmit').addEventListener('click', async () => {
-  const btn = document.getElementById('boardWriteSubmit');
-  const textEl = document.getElementById('boardWriteText');
-  const kind = document.getElementById('boardAttachResult').value;
-  const body = textEl.value.trim();
-  if (!body) { textEl.focus(); return; }
-
-  const resultData = kind ? buildResultData(kind) : null;
-  const category = resultData ? 'result' : 'free';
-
-  btn.disabled = true;
-  try {
-    const r = await fetch('/api/board', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ category, body, resultData }),
-    });
-    const data = await r.json();
-    if (!r.ok) {
-      alert(r.status === 429 ? '너무 빨리 연달아 올렸어요. 잠시 후 다시 시도해주세요.' : '글을 올리지 못했어요.');
-      return;
-    }
-    textEl.value = '';
-    document.getElementById('boardAttachResult').value = '';
-    if (data.post.category === 'result') {
-      document.getElementById('boardResultStrip').prepend(renderResultStripCard(data.post));
-    } else {
-      document.getElementById('boardList').prepend(renderBoardPostCard(data.post));
-      const empty = document.querySelector('#boardList .board-empty');
-      if (empty) empty.remove();
-    }
-  } catch (e) {
-    alert('글을 올리지 못했어요.');
-  } finally {
-    btn.disabled = false;
-  }
-});
-
-let boardDetailPostId = null;
-
-async function openBoardDetail(id) {
-  boardDetailPostId = id;
-  const modal = document.getElementById('boardDetailModal');
-  const bodyEl = document.getElementById('boardDetailBody');
-  const commentsEl = document.getElementById('boardComments');
-  bodyEl.innerHTML = '<p class="board-empty">불러오는 중...</p>';
-  commentsEl.innerHTML = '';
-  modal.classList.add('show');
-
-  try {
-    const r = await fetch(`/api/board-post?id=${encodeURIComponent(id)}`);
-    if (!r.ok) { bodyEl.innerHTML = '<p class="board-empty">글을 찾을 수 없어요.</p>'; return; }
-    const { post, comments } = await r.json();
-    renderBoardDetail(post, comments);
-  } catch (e) {
-    bodyEl.innerHTML = '<p class="board-empty">불러오지 못했어요.</p>';
-  }
-}
-
-function renderBoardDetail(post, comments) {
-  const bodyEl = document.getElementById('boardDetailBody');
-  const isMine = boardSession.loggedIn && boardSession.kakaoId === post.kakaoId;
-  bodyEl.innerHTML = `
-    <div class="board-post-head">
-      <span class="board-post-nick">🐥 ${escapeHtml(post.nickname)}</span>
-      <span class="board-post-time">${timeAgo(post.createdAt)}</span>
-    </div>
-    <div class="board-post-body">${escapeHtml(post.body)}</div>
-    ${renderResultChip(post.resultData)}
-    <div class="board-post-foot">
-      <span class="board-like-btn ${post.likedByMe ? 'liked' : ''}" id="boardDetailLike" style="cursor:pointer">❤️ <span id="boardDetailLikeCount">${post.likeCount}</span></span>
-      <span>💬 ${post.commentCount}</span>
-      ${isMine ? '<button type="button" class="board-delete-btn" id="boardDetailDelete">삭제</button>' : ''}
-    </div>
-  `;
-
-  const commentsEl = document.getElementById('boardComments');
-  commentsEl.innerHTML = comments.length
-    ? comments.map((c) => `<div class="board-comment"><span class="board-comment-nick">${escapeHtml(c.nickname)}</span>${escapeHtml(c.body)}</div>`).join('')
-    : '<p class="board-empty">아직 댓글이 없어요.</p>';
-
-  document.getElementById('boardCommentWriteRow').hidden = !boardSession.loggedIn;
-
-  document.getElementById('boardDetailLike').addEventListener('click', async () => {
-    if (!boardSession.loggedIn) { alert('좋아요는 로그인 후 누를 수 있어요.'); return; }
-    try {
-      const r = await fetch('/api/board-post', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ postId: post.id, action: 'like' }),
-      });
-      const data = await r.json();
-      if (!r.ok) return;
-      document.getElementById('boardDetailLike').classList.toggle('liked', data.liked);
-      document.getElementById('boardDetailLikeCount').textContent = data.likeCount;
-      const listCardEl = document.querySelector(`.board-post[data-id="${post.id}"] .board-post-foot span:first-child`);
-      if (listCardEl) {
-        listCardEl.classList.toggle('liked', data.liked);
-        listCardEl.textContent = `❤️ ${data.likeCount}`;
-      }
-      const stripCardEl = document.querySelector(`.board-result-card[data-id="${post.id}"] .board-result-foot`);
-      if (stripCardEl) {
-        const commentCount = post.commentCount || 0;
-        stripCardEl.textContent = `❤️ ${data.likeCount} · 💬 ${commentCount}`;
-      }
-    } catch (e) { /* ignore */ }
-  });
-
-  const deleteBtn = document.getElementById('boardDetailDelete');
-  if (deleteBtn) {
-    deleteBtn.addEventListener('click', async () => {
-      if (!confirm('이 글을 삭제할까요?')) return;
-      try {
-        const r = await fetch('/api/board-post', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ postId: post.id, action: 'delete' }),
-        });
-        if (!r.ok) return;
-        document.getElementById('boardDetailModal').classList.remove('show');
-        const listCardEl = document.querySelector(`.board-post[data-id="${post.id}"]`);
-        if (listCardEl) listCardEl.remove();
-        const stripCardEl = document.querySelector(`.board-result-card[data-id="${post.id}"]`);
-        if (stripCardEl) stripCardEl.remove();
-      } catch (e) { /* ignore */ }
-    });
-  }
-}
-
-document.getElementById('boardDetailClose').addEventListener('click', () => {
-  document.getElementById('boardDetailModal').classList.remove('show');
-});
-document.getElementById('boardDetailModal').addEventListener('click', (e) => {
-  if (e.target.id === 'boardDetailModal') document.getElementById('boardDetailModal').classList.remove('show');
-});
-
-document.getElementById('boardCommentSubmit').addEventListener('click', async () => {
-  const input = document.getElementById('boardCommentText');
-  const text = input.value.trim();
-  if (!text || !boardDetailPostId) return;
-  try {
-    const r = await fetch('/api/board-post', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ postId: boardDetailPostId, action: 'comment', body: text }),
-    });
-    const data = await r.json();
-    if (!r.ok) {
-      alert(r.status === 429 ? '너무 빨리 연달아 남겼어요. 잠시 후 다시 시도해주세요.' : '댓글을 남기지 못했어요.');
-      return;
-    }
-    const commentsEl = document.getElementById('boardComments');
-    const empty = commentsEl.querySelector('.board-empty');
-    if (empty) empty.remove();
-    const div = document.createElement('div');
-    div.className = 'board-comment';
-    div.innerHTML = `<span class="board-comment-nick">${escapeHtml(data.comment.nickname)}</span>${escapeHtml(data.comment.body)}`;
-    commentsEl.appendChild(div);
-    input.value = '';
-    const listCardEl = document.querySelector(`.board-post[data-id="${boardDetailPostId}"] .board-post-foot span:last-child`);
-    if (listCardEl) {
-      const n = (parseInt(listCardEl.textContent.replace(/\D/g, ''), 10) || 0) + 1;
-      listCardEl.textContent = `💬 ${n}`;
-    }
-    const stripCardEl = document.querySelector(`.board-result-card[data-id="${boardDetailPostId}"] .board-result-foot`);
-    if (stripCardEl) {
-      const n = (parseInt(stripCardEl.textContent.match(/💬 (\d+)/)?.[1], 10) || 0) + 1;
-      const likeMatch = stripCardEl.textContent.match(/❤️ (\d+)/);
-      stripCardEl.textContent = `❤️ ${likeMatch ? likeMatch[1] : 0} · 💬 ${n}`;
-    }
-  } catch (e) { /* ignore */ }
-});
-
-document.getElementById('boardCommentText').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') document.getElementById('boardCommentSubmit').click();
-});
-
-// 카카오 로그인 콜백에서 돌아왔을 때(?tab=board&loginError=1) 안내
-if (new URLSearchParams(location.search).get('loginError')) {
-  setTimeout(() => alert('카카오 로그인에 실패했어요. 다시 시도해주세요.'), 300);
-}
 
 // ============================================================
 // 귀여운 배경음악 (Web Audio API로 즉석 생성한 뮤직박스 멜로디)

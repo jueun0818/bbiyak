@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="삐약궁합 이용자들이 궁합 결과와 자유글을 올리고 댓글・좋아요를 남기는 게시판입니다.">
+<meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#ffc107">
+<meta name="color-scheme" content="light">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<title>궁합 게시판 - 삐약궁합</title>
+<style>
+  :root{
+    --pink: #ffc107;
+    --purple: #b5650d;
+    --bg1: #fffbe6;
+    --bg2: #fff3c4;
+    --card: #ffffff;
+    --text: #3b3227;
+    --muted: #8b7a63;
+    --amber-strong: #ffa000;
+    --amber-text: #c07f00;
+    --grad-amber: linear-gradient(135deg, #ffcf3f, #ffa000);
+    --line: #ffe7b3;
+    --panel: #fffbf0;
+  }
+  * { box-sizing: border-box; }
+  html {
+    background: linear-gradient(168deg, #fffbea 0%, #ffedad 38%, #ffd966 100%);
+  }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    background:
+      radial-gradient(120% 80% at 15% 0%, rgba(255,224,110,0.9) 0%, rgba(255,224,110,0) 55%),
+      radial-gradient(100% 70% at 92% 100%, rgba(255,183,40,0.5) 0%, rgba(255,183,40,0) 55%),
+      linear-gradient(168deg, #fffbea 0%, #ffedad 38%, #ffd966 100%);
+    background-attachment: fixed;
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    padding: 20px 16px 64px;
+    position: relative;
+    overflow-x: hidden;
+  }
+  .wrap { width: 100%; max-width: 560px; position: relative; z-index: 1; }
+
+  .board-page-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 4px 0 16px;
+  }
+  .board-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: #fff;
+    color: #a3781c;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    border: 1.5px solid var(--line);
+  }
+  .board-page-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--purple);
+    margin: 0;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1.5px solid rgba(255,193,7,0.32);
+    border-radius: 24px;
+    padding: 28px 24px;
+    box-shadow:
+      0 1px 2px rgba(180,120,0,0.05),
+      0 14px 30px -10px rgba(224,150,0,0.28);
+    position: relative;
+  }
+  button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 8px;
+    border: none;
+    border-radius: 14px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    color: #fff;
+    background: var(--grad-amber);
+    cursor: pointer;
+    box-shadow: 0 8px 18px -7px rgba(224,150,0,0.75);
+    transition: transform .1s, opacity .15s, box-shadow .15s;
+  }
+  button:active { transform: scale(0.98); box-shadow: 0 4px 10px -6px rgba(224,150,0,0.7); }
+  button:disabled { opacity: 0.6; cursor: default; }
+  select {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1.5px solid var(--line);
+    font-size: 18px;
+    outline: none;
+    font-family: inherit;
+    color: var(--text);
+    background: #fff;
+  }
+  .disclaimer {
+    margin: 20px auto 0;
+    max-width: 480px;
+    padding: 12px 16px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.55);
+    font-size: 12.5px;
+    color: #867760;
+    text-align: center;
+    line-height: 1.65;
+  }
+
+  /* ---- 궁합 게시판 ---- */
+  .board-card { padding: 22px 18px 26px; }
+  .board-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .board-title { font-size: 17px; font-weight: 800; color: var(--purple); }
+  .board-section-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--purple);
+    margin: 18px 0 10px;
+  }
+  .board-list ~ .board-section-title { margin-top: 18px; }
+  .board-result-strip {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .board-result-strip:empty::after {
+    content: '아직 올라온 궁합 결과가 없어요';
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+  .board-result-card {
+    flex: 0 0 auto;
+    width: 168px;
+    border: 1.5px solid var(--line);
+    border-radius: 16px;
+    padding: 12px 13px;
+    background: linear-gradient(160deg, #fffdf2, var(--panel));
+    cursor: pointer;
+  }
+  .board-result-card .board-result-nick { font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
+  .board-result-card .board-result-names { font-size: 14px; font-weight: 800; color: var(--text); line-height: 1.3; }
+  .board-result-card .board-result-score { font-size: 20px; font-weight: 800; color: var(--amber-text); margin-top: 4px; }
+  .board-result-card .board-result-tier { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .board-result-card .board-result-foot { margin-top: 8px; font-size: 12px; color: var(--muted); }
+  .board-auth { display: flex; align-items: center; gap: 8px; }
+  .board-user-label { font-size: 13.5px; color: var(--muted); font-weight: 700; }
+  .board-login-btn, .board-logout-btn {
+    width: auto;
+    margin: 0;
+    padding: 9px 14px;
+    font-size: 13.5px;
+    border-radius: 12px;
+  }
+  .board-login-btn {
+    background: linear-gradient(90deg, #fee500, #fada00);
+    color: #3a2e00;
+    box-shadow: 0 6px 14px -6px rgba(180,150,0,0.6);
+  }
+  .board-logout-btn {
+    background: #fff;
+    color: #a3781c;
+    border: 1.5px solid var(--line);
+    box-shadow: none;
+  }
+
+  .board-write { margin-bottom: 16px; }
+  .board-attach-select {
+    margin-bottom: 8px;
+    font-size: 15px;
+    padding: 11px 14px;
+  }
+  #boardWriteText {
+    width: 100%;
+    min-height: 76px;
+    padding: 13px 14px;
+    border-radius: 14px;
+    border: 1.5px solid var(--line);
+    font-size: 15.5px;
+    font-family: inherit;
+    resize: vertical;
+    outline: none;
+    box-sizing: border-box;
+  }
+  #boardWriteText:focus { border-color: var(--amber-strong); }
+  .board-write-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+  #boardWriteSubmit { width: auto; margin: 0; padding: 10px 20px; font-size: 15px; }
+  .board-login-hint {
+    text-align: center;
+    font-size: 14px;
+    color: var(--muted);
+    background: var(--panel);
+    border-radius: 12px;
+    padding: 14px;
+    margin: 0 0 16px;
+  }
+
+  .board-list { display: flex; flex-direction: column; gap: 12px; }
+  .board-empty { text-align: center; color: var(--muted); font-size: 14.5px; padding: 24px 0; }
+  .board-post {
+    border: 1.5px solid var(--line);
+    border-radius: 16px;
+    padding: 14px 16px;
+    background: #fff;
+    cursor: pointer;
+  }
+  .board-post-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .board-post-nick { font-weight: 700; color: var(--purple); font-size: 14.5px; }
+  .board-post-time { font-size: 12.5px; color: var(--muted); }
+  .board-post-body {
+    font-size: 15px;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.55;
+  }
+  .board-result-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: var(--panel);
+    color: var(--amber-text);
+    font-size: 13.5px;
+    font-weight: 700;
+  }
+  .board-post-foot {
+    display: flex;
+    gap: 14px;
+    margin-top: 10px;
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+  .board-post-foot span.liked { color: #e0507a; font-weight: 700; }
+  .board-more-btn {
+    background: #fff;
+    color: #a3781c;
+    border: 1.5px solid var(--line);
+    box-shadow: none;
+    margin-top: 4px;
+  }
+
+  .board-detail-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: rgba(30,20,0,0.5);
+    padding: 16px;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .board-detail-modal.show { display: flex; }
+  .board-detail-inner {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    max-height: 86vh;
+    overflow-y: auto;
+    background: #fffdf7;
+    border-radius: 22px 22px 12px 12px;
+    padding: 22px 18px 18px;
+  }
+  .board-detail-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    margin: 0;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.06);
+    color: #6b5d47;
+    font-size: 15px;
+    box-shadow: none;
+  }
+  .board-comments { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
+  .board-comment {
+    background: var(--panel);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 14.5px;
+  }
+  .board-comment-nick { font-weight: 700; color: var(--purple); margin-right: 6px; }
+  .board-comment-write {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    position: sticky;
+    bottom: 0;
+    background: #fffdf7;
+    padding-top: 6px;
+  }
+  #boardCommentText {
+    flex: 1;
+    padding: 11px 13px;
+    border-radius: 12px;
+    border: 1.5px solid var(--line);
+    font-size: 14.5px;
+    outline: none;
+  }
+  #boardCommentSubmit { width: auto; margin: 0; padding: 11px 16px; font-size: 14.5px; }
+  .board-delete-btn {
+    width: auto;
+    margin: 0;
+    padding: 6px 12px;
+    font-size: 12.5px;
+    background: #fff;
+    color: #c0504f;
+    border: 1.5px solid #f3d4d3;
+    box-shadow: none;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="board-page-header">
+    <a class="board-back-link" href="./">← 삐약궁합</a>
+    <h1 class="board-page-title">💬 궁합 게시판</h1>
+  </div>
+
+  <div class="card board-card">
+    <div class="board-header">
+      <span class="board-title">🐥 다들 어떤 궁합 나왔어요?</span>
+      <div class="board-auth">
+        <span class="board-user-label" id="boardUserLabel" hidden></span>
+        <button type="button" class="board-login-btn" id="boardLoginBtn" hidden>💬 카카오로 시작하기</button>
+        <button type="button" class="board-logout-btn" id="boardLogoutBtn" hidden>로그아웃</button>
+      </div>
+    </div>
+
+    <div class="board-write" id="boardWriteBox" hidden>
+      <select class="board-attach-select" id="boardAttachResult">
+        <option value="">📋 결과 첨부 안 함</option>
+      </select>
+      <textarea id="boardWriteText" maxlength="500" placeholder="궁합 결과나 하고 싶은 말을 자유롭게 남겨보세요 🐥"></textarea>
+      <div class="board-write-row">
+        <button type="button" id="boardWriteSubmit">✍️ 올리기</button>
+      </div>
+    </div>
+    <p class="board-login-hint" id="boardLoginHint">글을 쓰거나 댓글・좋아요를 남기려면 카카오 로그인이 필요해요.</p>
+
+    <div class="board-section-title">🎉 궁합 결과</div>
+    <div class="board-result-strip" id="boardResultStrip"></div>
+
+    <div class="board-section-title">💬 자유글</div>
+    <div class="board-list" id="boardList"></div>
+    <button type="button" class="board-more-btn" id="boardMoreBtn" hidden>더보기</button>
+  </div>
+  <p class="disclaimer">* 게시판 글과 댓글은 카카오 로그인 닉네임으로 공개 게시돼요. 서로 예의를 지켜주세요 🐥<br>* "결과 첨부"는 방금 전 이 기기의 삐약궁합에서 확인한 결과만 골라 올릴 수 있어요.</p>
+</div>
+
+<div class="board-detail-modal" id="boardDetailModal">
+  <div class="board-detail-inner">
+    <button type="button" class="board-detail-close" id="boardDetailClose" aria-label="닫기">✕</button>
+    <div id="boardDetailBody"></div>
+    <div class="board-comments" id="boardComments"></div>
+    <div class="board-comment-write" id="boardCommentWriteRow" hidden>
+      <input type="text" id="boardCommentText" maxlength="200" placeholder="댓글을 남겨보세요">
+      <button type="button" id="boardCommentSubmit">등록</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// index.html의 각 결과 화면이 계산을 마칠 때마다 localStorage에 남겨두는 가벼운
+// 스냅샷(bbiyak_result_<kind>)을 읽어서 "결과 첨부" 드롭다운을 채운다.
+function getAllResultSnapshots() {
+  const out = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key || !key.startsWith('bbiyak_result_')) continue;
+    try {
+      const data = JSON.parse(localStorage.getItem(key));
+      if (data) out.push(data);
+    } catch (e) { /* ignore */ }
+  }
+  return out;
+}
+
+function buildResultData(kind) {
+  try {
+    const raw = localStorage.getItem('bbiyak_result_' + kind);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+
+function populateAttachSelect() {
+  const sel = document.getElementById('boardAttachResult');
+  const prevValue = sel.value;
+  sel.innerHTML = '<option value="">📋 결과 첨부 안 함</option>';
+  getAllResultSnapshots()
+    .sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0))
+    .forEach((data) => {
+      const opt = document.createElement('option');
+      opt.value = data.kind;
+      opt.textContent = `${data.emoji} ${data.label} · ${data.names || ''} ${data.score != null ? data.score + '점' : ''}`.trim();
+      sel.appendChild(opt);
+    });
+  if ([...sel.options].some((o) => o.value === prevValue)) sel.value = prevValue;
+}
+
+document.getElementById('boardAttachResult').addEventListener('change', () => {
+  const kind = document.getElementById('boardAttachResult').value;
+  const textEl = document.getElementById('boardWriteText');
+  if (!kind || textEl.value.trim()) return;
+  const data = buildResultData(kind);
+  if (!data) return;
+  textEl.value = `${data.emoji} ${data.label} ${data.names || ''} ${data.score != null ? data.score + '점!' : ''}`.trim();
+});
+
+let boardSession = { loggedIn: false, nickname: '', kakaoId: '' };
+let boardOffset = 0;
+const BOARD_PAGE_SIZE = 20;
+
+function timeAgo(ms) {
+  const diff = Math.max(0, Date.now() - ms);
+  const min = Math.floor(diff / 60000);
+  if (min < 1) return '방금 전';
+  if (min < 60) return `${min}분 전`;
+  const hour = Math.floor(min / 60);
+  if (hour < 24) return `${hour}시간 전`;
+  const day = Math.floor(hour / 24);
+  if (day < 7) return `${day}일 전`;
+  const d = new Date(ms);
+  return `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+async function refreshBoardSession() {
+  try {
+    const r = await fetch('/api/session');
+    boardSession = await r.json();
+  } catch (e) {
+    boardSession = { loggedIn: false };
+  }
+  const loginBtn = document.getElementById('boardLoginBtn');
+  const logoutBtn = document.getElementById('boardLogoutBtn');
+  const userLabel = document.getElementById('boardUserLabel');
+  const writeBox = document.getElementById('boardWriteBox');
+  const loginHint = document.getElementById('boardLoginHint');
+
+  loginBtn.hidden = boardSession.loggedIn;
+  logoutBtn.hidden = !boardSession.loggedIn;
+  userLabel.hidden = !boardSession.loggedIn;
+  userLabel.textContent = boardSession.loggedIn ? `🐥 ${boardSession.nickname}님` : '';
+  writeBox.hidden = !boardSession.loggedIn;
+  loginHint.hidden = boardSession.loggedIn;
+  if (boardSession.loggedIn) populateAttachSelect();
+}
+
+function renderResultChip(data) {
+  if (!data) return '';
+  const scoreText = data.score != null ? ` · ${data.score}점` : '';
+  return `<div class="board-result-chip">${data.emoji} ${escapeHtml(data.label)} · ${escapeHtml(data.names || '')}${scoreText}${data.tierTitle ? ' · ' + escapeHtml(data.tierTitle) : ''}</div>`;
+}
+
+function renderBoardPostCard(post) {
+  const el = document.createElement('div');
+  el.className = 'board-post';
+  el.dataset.id = post.id;
+  el.innerHTML = `
+    <div class="board-post-head">
+      <span class="board-post-nick">🐥 ${escapeHtml(post.nickname)}</span>
+      <span class="board-post-time">${timeAgo(post.createdAt)}</span>
+    </div>
+    <div class="board-post-body">${escapeHtml(post.body)}</div>
+    ${renderResultChip(post.resultData)}
+    <div class="board-post-foot">
+      <span class="${post.likedByMe ? 'liked' : ''}">❤️ ${post.likeCount}</span>
+      <span>💬 ${post.commentCount}</span>
+    </div>
+  `;
+  el.addEventListener('click', () => openBoardDetail(post.id));
+  return el;
+}
+
+function renderResultStripCard(post) {
+  const data = post.resultData;
+  const el = document.createElement('div');
+  el.className = 'board-result-card';
+  el.dataset.id = post.id;
+  el.innerHTML = `
+    <div class="board-result-nick">🐥 ${escapeHtml(post.nickname)}</div>
+    <div class="board-result-names">${data ? escapeHtml(data.names || '') : ''}</div>
+    ${data && data.score != null ? `<div class="board-result-score">${data.score}점</div>` : ''}
+    ${data && data.tierTitle ? `<div class="board-result-tier">${escapeHtml(data.tierTitle)}</div>` : ''}
+    <div class="board-result-foot">❤️ ${post.likeCount} · 💬 ${post.commentCount}</div>
+  `;
+  el.addEventListener('click', () => openBoardDetail(post.id));
+  return el;
+}
+
+async function loadResultStrip() {
+  const stripEl = document.getElementById('boardResultStrip');
+  try {
+    const r = await fetch('/api/board?category=result&offset=0');
+    const data = await r.json();
+    stripEl.innerHTML = '';
+    (data.posts || []).forEach((post) => stripEl.appendChild(renderResultStripCard(post)));
+  } catch (e) {
+    // 비어 있으면 CSS ::after 안내 문구가 대신 보여진다
+  }
+}
+
+async function loadBoardPosts(reset) {
+  if (reset) boardOffset = 0;
+  const listEl = document.getElementById('boardList');
+  const moreBtn = document.getElementById('boardMoreBtn');
+  if (reset) listEl.innerHTML = '<p class="board-empty">불러오는 중...</p>';
+
+  try {
+    const params = new URLSearchParams({ category: 'free', offset: String(boardOffset) });
+    const r = await fetch(`/api/board?${params.toString()}`);
+    const data = await r.json();
+    if (reset) listEl.innerHTML = '';
+    if (reset && (!data.posts || data.posts.length === 0)) {
+      listEl.innerHTML = '<p class="board-empty">아직 자유글이 없어요. 첫 글을 남겨보세요 🐣</p>';
+    } else {
+      (data.posts || []).forEach((post) => listEl.appendChild(renderBoardPostCard(post)));
+    }
+    boardOffset += BOARD_PAGE_SIZE;
+    moreBtn.hidden = !data.hasMore;
+  } catch (e) {
+    if (reset) listEl.innerHTML = '<p class="board-empty">게시판을 불러오지 못했어요. 잠시 후 다시 시도해주세요.</p>';
+  }
+}
+
+document.getElementById('boardMoreBtn').addEventListener('click', () => loadBoardPosts(false));
+
+document.getElementById('boardLoginBtn').addEventListener('click', () => {
+  location.href = `/api/kakao-login?back=${encodeURIComponent('/board.html')}`;
+});
+
+document.getElementById('boardLogoutBtn').addEventListener('click', async () => {
+  await fetch('/api/logout', { method: 'POST' });
+  await refreshBoardSession();
+});
+
+document.getElementById('boardWriteSubmit').addEventListener('click', async () => {
+  const btn = document.getElementById('boardWriteSubmit');
+  const textEl = document.getElementById('boardWriteText');
+  const kind = document.getElementById('boardAttachResult').value;
+  const body = textEl.value.trim();
+  if (!body) { textEl.focus(); return; }
+
+  const resultData = kind ? buildResultData(kind) : null;
+  const category = resultData ? 'result' : 'free';
+
+  btn.disabled = true;
+  try {
+    const r = await fetch('/api/board', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ category, body, resultData }),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      alert(r.status === 429 ? '너무 빨리 연달아 올렸어요. 잠시 후 다시 시도해주세요.' : '글을 올리지 못했어요.');
+      return;
+    }
+    textEl.value = '';
+    document.getElementById('boardAttachResult').value = '';
+    if (data.post.category === 'result') {
+      document.getElementById('boardResultStrip').prepend(renderResultStripCard(data.post));
+    } else {
+      document.getElementById('boardList').prepend(renderBoardPostCard(data.post));
+      const empty = document.querySelector('#boardList .board-empty');
+      if (empty) empty.remove();
+    }
+  } catch (e) {
+    alert('글을 올리지 못했어요.');
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+let boardDetailPostId = null;
+
+async function openBoardDetail(id) {
+  boardDetailPostId = id;
+  const modal = document.getElementById('boardDetailModal');
+  const bodyEl = document.getElementById('boardDetailBody');
+  const commentsEl = document.getElementById('boardComments');
+  bodyEl.innerHTML = '<p class="board-empty">불러오는 중...</p>';
+  commentsEl.innerHTML = '';
+  modal.classList.add('show');
+
+  try {
+    const r = await fetch(`/api/board-post?id=${encodeURIComponent(id)}`);
+    if (!r.ok) { bodyEl.innerHTML = '<p class="board-empty">글을 찾을 수 없어요.</p>'; return; }
+    const { post, comments } = await r.json();
+    renderBoardDetail(post, comments);
+  } catch (e) {
+    bodyEl.innerHTML = '<p class="board-empty">불러오지 못했어요.</p>';
+  }
+}
+
+function renderBoardDetail(post, comments) {
+  const bodyEl = document.getElementById('boardDetailBody');
+  const isMine = boardSession.loggedIn && boardSession.kakaoId === post.kakaoId;
+  bodyEl.innerHTML = `
+    <div class="board-post-head">
+      <span class="board-post-nick">🐥 ${escapeHtml(post.nickname)}</span>
+      <span class="board-post-time">${timeAgo(post.createdAt)}</span>
+    </div>
+    <div class="board-post-body">${escapeHtml(post.body)}</div>
+    ${renderResultChip(post.resultData)}
+    <div class="board-post-foot">
+      <span class="board-like-btn ${post.likedByMe ? 'liked' : ''}" id="boardDetailLike" style="cursor:pointer">❤️ <span id="boardDetailLikeCount">${post.likeCount}</span></span>
+      <span>💬 ${post.commentCount}</span>
+      ${isMine ? '<button type="button" class="board-delete-btn" id="boardDetailDelete">삭제</button>' : ''}
+    </div>
+  `;
+
+  const commentsEl = document.getElementById('boardComments');
+  commentsEl.innerHTML = comments.length
+    ? comments.map((c) => `<div class="board-comment"><span class="board-comment-nick">${escapeHtml(c.nickname)}</span>${escapeHtml(c.body)}</div>`).join('')
+    : '<p class="board-empty">아직 댓글이 없어요.</p>';
+
+  document.getElementById('boardCommentWriteRow').hidden = !boardSession.loggedIn;
+
+  document.getElementById('boardDetailLike').addEventListener('click', async () => {
+    if (!boardSession.loggedIn) { alert('좋아요는 로그인 후 누를 수 있어요.'); return; }
+    try {
+      const r = await fetch('/api/board-post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ postId: post.id, action: 'like' }),
+      });
+      const data = await r.json();
+      if (!r.ok) return;
+      document.getElementById('boardDetailLike').classList.toggle('liked', data.liked);
+      document.getElementById('boardDetailLikeCount').textContent = data.likeCount;
+      const listCardEl = document.querySelector(`.board-post[data-id="${post.id}"] .board-post-foot span:first-child`);
+      if (listCardEl) {
+        listCardEl.classList.toggle('liked', data.liked);
+        listCardEl.textContent = `❤️ ${data.likeCount}`;
+      }
+      const stripCardEl = document.querySelector(`.board-result-card[data-id="${post.id}"] .board-result-foot`);
+      if (stripCardEl) {
+        const commentCount = post.commentCount || 0;
+        stripCardEl.textContent = `❤️ ${data.likeCount} · 💬 ${commentCount}`;
+      }
+    } catch (e) { /* ignore */ }
+  });
+
+  const deleteBtn = document.getElementById('boardDetailDelete');
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', async () => {
+      if (!confirm('이 글을 삭제할까요?')) return;
+      try {
+        const r = await fetch('/api/board-post', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ postId: post.id, action: 'delete' }),
+        });
+        if (!r.ok) return;
+        document.getElementById('boardDetailModal').classList.remove('show');
+        const listCardEl = document.querySelector(`.board-post[data-id="${post.id}"]`);
+        if (listCardEl) listCardEl.remove();
+        const stripCardEl = document.querySelector(`.board-result-card[data-id="${post.id}"]`);
+        if (stripCardEl) stripCardEl.remove();
+      } catch (e) { /* ignore */ }
+    });
+  }
+}
+
+document.getElementById('boardDetailClose').addEventListener('click', () => {
+  document.getElementById('boardDetailModal').classList.remove('show');
+});
+document.getElementById('boardDetailModal').addEventListener('click', (e) => {
+  if (e.target.id === 'boardDetailModal') document.getElementById('boardDetailModal').classList.remove('show');
+});
+
+document.getElementById('boardCommentSubmit').addEventListener('click', async () => {
+  const input = document.getElementById('boardCommentText');
+  const text = input.value.trim();
+  if (!text || !boardDetailPostId) return;
+  try {
+    const r = await fetch('/api/board-post', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ postId: boardDetailPostId, action: 'comment', body: text }),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      alert(r.status === 429 ? '너무 빨리 연달아 남겼어요. 잠시 후 다시 시도해주세요.' : '댓글을 남기지 못했어요.');
+      return;
+    }
+    const commentsEl = document.getElementById('boardComments');
+    const empty = commentsEl.querySelector('.board-empty');
+    if (empty) empty.remove();
+    const div = document.createElement('div');
+    div.className = 'board-comment';
+    div.innerHTML = `<span class="board-comment-nick">${escapeHtml(data.comment.nickname)}</span>${escapeHtml(data.comment.body)}`;
+    commentsEl.appendChild(div);
+    input.value = '';
+    const listCardEl = document.querySelector(`.board-post[data-id="${boardDetailPostId}"] .board-post-foot span:last-child`);
+    if (listCardEl) {
+      const n = (parseInt(listCardEl.textContent.replace(/\D/g, ''), 10) || 0) + 1;
+      listCardEl.textContent = `💬 ${n}`;
+    }
+    const stripCardEl = document.querySelector(`.board-result-card[data-id="${boardDetailPostId}"] .board-result-foot`);
+    if (stripCardEl) {
+      const n = (parseInt(stripCardEl.textContent.match(/💬 (\d+)/)?.[1], 10) || 0) + 1;
+      const likeMatch = stripCardEl.textContent.match(/❤️ (\d+)/);
+      stripCardEl.textContent = `❤️ ${likeMatch ? likeMatch[1] : 0} · 💬 ${n}`;
+    }
+  } catch (e) { /* ignore */ }
+});
+
+document.getElementById('boardCommentText').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('boardCommentSubmit').click();
+});
+
+if (new URLSearchParams(location.search).get('loginError')) {
+  setTimeout(() => alert('카카오 로그인에 실패했어요. 다시 시도해주세요.'), 300);
+}
+
+refreshBoardSession();
+loadResultStrip();
+loadBoardPosts(true);
+</script>
+</body>
+</html>

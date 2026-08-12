@@ -5,13 +5,14 @@
 // - 정적 파일: 캐시 우선 + 백그라운드 갱신(stale-while-revalidate)
 // 파일 내용을 고칠 때마다 VERSION을 올리면 기존 방문자에게 업데이트 배너가 뜬다.
 // ============================================================
-const VERSION = 'v1.4.1';
+const VERSION = 'v1.5.0';
 const CACHE_NAME = 'ppiyak-' + VERSION;
 const CACHE_PREFIX = 'ppiyak-';
 
 // 설치 시점에 미리 받아둘 파일 (하나라도 실패하면 설치 실패 → 배포 누락을 바로 알 수 있음)
 const PRECACHE_URLS = [
   './index.html',
+  './board.html',
   './manifest.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png',
@@ -64,19 +65,20 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(handleAsset(event));
 });
 
-// 페이지 요청: 네트워크 우선 → 오프라인이면 캐시된 index.html
-// (start_url이 ./?source=pwa 처럼 쿼리가 붙어도 항상 index.html 사본으로 응답)
+// 페이지 요청: 네트워크 우선 → 오프라인이면 캐시된 사본
+// (index.html은 쿼리가 붙어도 항상 index.html 사본으로, board.html은 board.html 사본으로 응답)
 async function handleNavigate(event) {
   const cache = await caches.open(CACHE_NAME);
+  const cacheKey = new URL(event.request.url).pathname.endsWith('/board.html') ? './board.html' : './index.html';
   try {
     const preloaded = await event.preloadResponse;
     const res = preloaded || await fetch(event.request);
     if (res && res.ok && res.type === 'basic') {
-      cache.put('./index.html', res.clone());
+      cache.put(cacheKey, res.clone());
     }
     return res;
   } catch (e) {
-    const cached = await cache.match('./index.html');
+    const cached = await cache.match(cacheKey);
     if (cached) return cached;
     return new Response(
       '<!DOCTYPE html><html lang="ko"><meta charset="utf-8"><title>오프라인</title>' +
