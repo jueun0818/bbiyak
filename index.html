@@ -391,6 +391,74 @@
   }
   .board-nav-link .tab-icon { font-size: 18px; }
   .board-nav-arrow { opacity: 0.6; font-weight: 800; }
+
+  .feedback-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    margin: -8px 0 18px;
+    padding: 10px 16px;
+    border-radius: 14px;
+    background: #fff;
+    color: #a3781c;
+    font-size: 13.5px;
+    font-weight: 700;
+    border: 1.5px solid var(--line);
+    box-shadow: none;
+  }
+
+  .feedback-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(30,20,0,0.5);
+    padding: 16px;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .feedback-modal.show { display: flex; }
+  .feedback-modal-inner {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    background: #fffdf7;
+    border-radius: 22px 22px 12px 12px;
+    padding: 22px 18px 18px;
+  }
+  .feedback-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    margin: 0;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.06);
+    color: #6b5d47;
+    font-size: 15px;
+    box-shadow: none;
+  }
+  .feedback-modal-title { margin: 0 0 14px; font-size: 15.5px; font-weight: 800; color: var(--purple); text-align: center; }
+  #feedbackText {
+    width: 100%;
+    min-height: 100px;
+    padding: 13px 14px;
+    border-radius: 14px;
+    border: 1.5px solid var(--line);
+    font-size: 15px;
+    font-family: inherit;
+    resize: vertical;
+    outline: none;
+    box-sizing: border-box;
+  }
+  #feedbackText:focus { border-color: var(--amber-strong); }
+  .feedback-submit-row { display: flex; justify-content: flex-end; margin-top: 8px; }
+  #feedbackSubmitBtn { width: auto; margin: 0; padding: 10px 20px; font-size: 15px; }
+  .feedback-modal-note { margin: 10px 0 0; font-size: 12px; color: var(--muted); text-align: center; line-height: 1.5; }
   .tab-btn {
     flex: 1 1 30%;
     margin: 0;
@@ -1285,6 +1353,7 @@
   </div>
 
   <a class="board-nav-link" href="board.html"><span class="tab-icon">💬</span> 궁합 게시판 <span class="board-nav-arrow">›</span></a>
+  <button type="button" class="feedback-nav-btn" id="feedbackNavBtn">💡 개선하면 좋겠는 점 보내기</button>
 
   <div class="tab-panel active" id="tabName">
   <div class="card">
@@ -1863,6 +1932,18 @@
   </div>
 
   <p class="disclaimer">* 종합 궁합은 이름 궁합·사주 궁합·별자리 궁합·혈액형 궁합·MBTI 궁합 5가지 점수의 평균으로 산출한 재미용 콘텐츠입니다.<br>각 항목의 산출 근거는 해당 탭의 안내를 참고해주세요.</p>
+  </div>
+</div>
+
+<div class="feedback-modal" id="feedbackModal">
+  <div class="feedback-modal-inner">
+    <button type="button" class="feedback-modal-close" id="feedbackModalClose" aria-label="닫기">✕</button>
+    <p class="feedback-modal-title">💡 개선하면 좋겠는 점</p>
+    <textarea id="feedbackText" maxlength="300" placeholder="불편했던 점이나 있었으면 하는 기능을 자유롭게 적어주세요"></textarea>
+    <div class="feedback-submit-row">
+      <button type="button" id="feedbackSubmitBtn">보내기</button>
+    </div>
+    <p class="feedback-modal-note">다른 사람에게는 공개되지 않고 운영자만 확인해요.</p>
   </div>
 </div>
 
@@ -5220,6 +5301,54 @@ document.getElementById('storyCopyLinkBtn').addEventListener('click', (e) => cop
 
 // 화면 위쪽 링크 공유 버튼 — 네이티브 공유 시트가 되면 그걸(카카오톡 등 포함) 쓰고,
 // 안 되면 링크만 클립보드로 복사한다. 아이콘 버튼이라 결과 안내는 옆의 캡션에 표시한다.
+// ============================================================
+// 건의사항 (게시판의 건의함과 동일한 API를 쓰는, 메인 화면 전용 진입점)
+// ============================================================
+function getFeedbackDeviceId() {
+  let id = '';
+  try { id = localStorage.getItem('bbiyak_device_id') || ''; } catch (e) { /* 무시 */ }
+  if (!id) {
+    id = (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    try { localStorage.setItem('bbiyak_device_id', id); } catch (e) { /* 무시 */ }
+  }
+  return id;
+}
+
+document.getElementById('feedbackNavBtn').addEventListener('click', () => {
+  document.getElementById('feedbackModal').classList.add('show');
+});
+document.getElementById('feedbackModalClose').addEventListener('click', () => {
+  document.getElementById('feedbackModal').classList.remove('show');
+});
+document.getElementById('feedbackModal').addEventListener('click', (e) => {
+  if (e.target.id === 'feedbackModal') document.getElementById('feedbackModal').classList.remove('show');
+});
+document.getElementById('feedbackSubmitBtn').addEventListener('click', async () => {
+  const textEl = document.getElementById('feedbackText');
+  const text = textEl.value.trim();
+  if (!text) { textEl.focus(); return; }
+  const btn = document.getElementById('feedbackSubmitBtn');
+  btn.disabled = true;
+  try {
+    const r = await fetch('/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ body: text, deviceId: getFeedbackDeviceId() }),
+    });
+    if (!r.ok) {
+      alert(r.status === 429 ? '너무 빨리 연달아 보냈어요. 잠시 후 다시 시도해주세요.' : '보내지 못했어요.');
+      return;
+    }
+    textEl.value = '';
+    document.getElementById('feedbackModal').classList.remove('show');
+    alert('의견 감사해요! 꼼꼼히 읽어볼게요 🐥');
+  } catch (e) {
+    alert('보내지 못했어요.');
+  } finally {
+    btn.disabled = false;
+  }
+});
+
 document.getElementById('shareSiteBtn').addEventListener('click', async () => {
   const url = location.origin + location.pathname;
   const btn = document.getElementById('shareSiteBtn');
