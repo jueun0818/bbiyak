@@ -224,14 +224,20 @@
     margin-top: 8px;
   }
   #boardWriteSubmit { width: auto; margin: 0; padding: 10px 20px; font-size: 15px; }
-  .board-login-hint {
+  .board-gate {
     text-align: center;
-    font-size: 14px;
+    padding: 40px 16px;
+  }
+  .board-gate-text {
+    font-size: 15px;
     color: var(--muted);
-    background: var(--panel);
-    border-radius: 12px;
-    padding: 14px;
     margin: 0 0 16px;
+  }
+  .board-gate .board-login-btn {
+    width: auto;
+    display: inline-block;
+    padding: 13px 24px;
+    font-size: 15.5px;
   }
 
   .board-list { display: flex; flex-direction: column; gap: 12px; }
@@ -372,28 +378,33 @@
       <div class="board-auth">
         <span class="board-user-label" id="boardUserLabel" hidden></span>
         <button type="button" class="board-nickname-edit-btn" id="boardNicknameEditBtn" hidden>✏️ 닉네임 변경</button>
-        <button type="button" class="board-login-btn" id="boardLoginBtn" hidden>💬 카카오로 시작하기</button>
         <button type="button" class="board-logout-btn" id="boardLogoutBtn" hidden>로그아웃</button>
       </div>
     </div>
 
-    <div class="board-write" id="boardWriteBox" hidden>
-      <select class="board-attach-select" id="boardAttachResult">
-        <option value="">📋 결과 첨부 안 함</option>
-      </select>
-      <textarea id="boardWriteText" maxlength="500" placeholder="궁합 결과나 하고 싶은 말을 자유롭게 남겨보세요 🐥"></textarea>
-      <div class="board-write-row">
-        <button type="button" id="boardWriteSubmit">✍️ 올리기</button>
-      </div>
+    <div class="board-gate" id="boardGate">
+      <p class="board-gate-text">🔒 게시판은 카카오 로그인 후 볼 수 있어요.</p>
+      <button type="button" class="board-login-btn" id="boardGateLoginBtn">💬 카카오로 시작하기</button>
     </div>
-    <p class="board-login-hint" id="boardLoginHint">글을 쓰거나 댓글・좋아요를 남기려면 카카오 로그인이 필요해요.</p>
 
-    <div class="board-section-title">🎉 궁합 결과</div>
-    <div class="board-result-strip" id="boardResultStrip"></div>
+    <div id="boardContent" hidden>
+      <div class="board-write" id="boardWriteBox">
+        <select class="board-attach-select" id="boardAttachResult">
+          <option value="">📋 결과 첨부 안 함</option>
+        </select>
+        <textarea id="boardWriteText" maxlength="500" placeholder="궁합 결과나 하고 싶은 말을 자유롭게 남겨보세요 🐥"></textarea>
+        <div class="board-write-row">
+          <button type="button" id="boardWriteSubmit">✍️ 올리기</button>
+        </div>
+      </div>
 
-    <div class="board-section-title">💬 자유글</div>
-    <div class="board-list" id="boardList"></div>
-    <button type="button" class="board-more-btn" id="boardMoreBtn" hidden>더보기</button>
+      <div class="board-section-title">🎉 궁합 결과</div>
+      <div class="board-result-strip" id="boardResultStrip"></div>
+
+      <div class="board-section-title">💬 자유글</div>
+      <div class="board-list" id="boardList"></div>
+      <button type="button" class="board-more-btn" id="boardMoreBtn" hidden>더보기</button>
+    </div>
   </div>
   <p class="disclaimer">* 게시판 글과 댓글은 카카오 로그인 닉네임으로 공개 게시돼요. 서로 예의를 지켜주세요 🐥<br>* "결과 첨부"는 방금 전 이 기기의 삐약궁합에서 확인한 결과만 골라 올릴 수 있어요.</p>
 </div>
@@ -459,6 +470,7 @@ document.getElementById('boardAttachResult').addEventListener('change', () => {
 
 let boardSession = { loggedIn: false, nickname: '', kakaoId: '' };
 let boardOffset = 0;
+let boardLoadedOnce = false;
 const BOARD_PAGE_SIZE = 20;
 
 function timeAgo(ms) {
@@ -485,21 +497,27 @@ async function refreshBoardSession() {
   } catch (e) {
     boardSession = { loggedIn: false };
   }
-  const loginBtn = document.getElementById('boardLoginBtn');
   const logoutBtn = document.getElementById('boardLogoutBtn');
   const nicknameEditBtn = document.getElementById('boardNicknameEditBtn');
   const userLabel = document.getElementById('boardUserLabel');
-  const writeBox = document.getElementById('boardWriteBox');
-  const loginHint = document.getElementById('boardLoginHint');
+  const gate = document.getElementById('boardGate');
+  const content = document.getElementById('boardContent');
 
-  loginBtn.hidden = boardSession.loggedIn;
   logoutBtn.hidden = !boardSession.loggedIn;
   nicknameEditBtn.hidden = !boardSession.loggedIn;
   userLabel.hidden = !boardSession.loggedIn;
   userLabel.textContent = boardSession.loggedIn ? `🐥 ${boardSession.nickname}님` : '';
-  writeBox.hidden = !boardSession.loggedIn;
-  loginHint.hidden = boardSession.loggedIn;
-  if (boardSession.loggedIn) populateAttachSelect();
+  gate.hidden = boardSession.loggedIn;
+  content.hidden = !boardSession.loggedIn;
+
+  if (boardSession.loggedIn) {
+    populateAttachSelect();
+    if (!boardLoadedOnce) {
+      boardLoadedOnce = true;
+      loadResultStrip();
+      loadBoardPosts(true);
+    }
+  }
 }
 
 document.getElementById('boardNicknameEditBtn').addEventListener('click', async () => {
@@ -603,7 +621,7 @@ async function loadBoardPosts(reset) {
 
 document.getElementById('boardMoreBtn').addEventListener('click', () => loadBoardPosts(false));
 
-document.getElementById('boardLoginBtn').addEventListener('click', () => {
+document.getElementById('boardGateLoginBtn').addEventListener('click', () => {
   location.href = `/api/kakao-login?back=${encodeURIComponent('/board.html')}`;
 });
 
@@ -794,8 +812,6 @@ if (new URLSearchParams(location.search).get('loginError')) {
 }
 
 refreshBoardSession();
-loadResultStrip();
-loadBoardPosts(true);
 </script>
 </body>
 </html>
