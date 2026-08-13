@@ -374,6 +374,23 @@
       0 10px 24px -12px rgba(224,150,0,0.3);
     backdrop-filter: blur(6px);
   }
+  .board-nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 0 0 18px;
+    padding: 13px 16px;
+    border-radius: 16px;
+    background: linear-gradient(90deg, rgba(254,229,0,0.9), rgba(250,218,0,0.9));
+    color: #3a2e00;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 6px 16px -8px rgba(180,150,0,0.55);
+  }
+  .board-nav-link .tab-icon { font-size: 18px; }
+  .board-nav-arrow { opacity: 0.6; font-weight: 800; }
   .tab-btn {
     flex: 1 1 30%;
     margin: 0;
@@ -394,7 +411,6 @@
     gap: 3px;
     box-shadow: none;
   }
-  a.tab-btn { text-decoration: none; }
   .tab-btn .tab-icon { font-size: 21px; line-height: 1; }
   .tab-btn .tab-label { line-height: 1.1; }
   .tab-btn.active {
@@ -1266,8 +1282,9 @@
     <button class="tab-btn" id="tabBtnBlood"><span class="tab-icon">🩸</span><span class="tab-label">혈액형 궁합</span></button>
     <button class="tab-btn" id="tabBtnMbti"><span class="tab-icon">🧩</span><span class="tab-label">MBTI 궁합</span></button>
     <button class="tab-btn" id="tabBtnCombo"><span class="tab-icon">💫</span><span class="tab-label">종합 궁합</span></button>
-    <a class="tab-btn" href="board.html"><span class="tab-icon">💬</span><span class="tab-label">궁합 게시판</span></a>
   </div>
+
+  <a class="board-nav-link" href="board.html"><span class="tab-icon">💬</span> 궁합 게시판 <span class="board-nav-arrow">›</span></a>
 
   <div class="tab-panel active" id="tabName">
   <div class="card">
