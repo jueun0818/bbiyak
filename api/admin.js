@@ -48,6 +48,22 @@ async function postReports(url, token, body, res) {
   // action === 'delete': board-post.js의 삭제 로직과 동일하게 관련 키를 전부 정리한다.
   const raw = await redisCmd(url, token, ['GET', `board:post:${id}`]);
   const post = raw ? JSON.parse(raw) : null;
+
+  // 글이 사라지면 그 밑에 달렸던 댓글들도 각 댓글 작성자의 "내 댓글 모아보기"
+  // 인덱스에서 같이 지워야, 클릭했을 때 없는 글로 연결되는 걸 막을 수 있다.
+  const commentsToClean = (await redisCmd(url, token, ['LRANGE', `board:post:${id}:comments`, '0', '-1'])) || [];
+  for (const s of commentsToClean) {
+    let c;
+    try { c = JSON.parse(s); } catch { continue; }
+    if (!c || !c.kakaoId || !c.id) continue;
+    const key = `user:${c.kakaoId}:comments`;
+    const list = (await redisCmd(url, token, ['LRANGE', key, '0', '-1'])) || [];
+    const match = list.find((s2) => {
+      try { return JSON.parse(s2).id === c.id; } catch { return false; }
+    });
+    if (match) await redisCmd(url, token, ['LREM', key, '1', match]);
+  }
+
   await redisCmd(url, token, ['DEL', `board:post:${id}`]);
   await redisCmd(url, token, ['DEL', `board:post:${id}:comments`]);
   await redisCmd(url, token, ['DEL', `board:post:${id}:likes`]);

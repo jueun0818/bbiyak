@@ -147,30 +147,40 @@ export default async function handler(req, res) {
 
         const postCommentsKey = `board:post:${postId}:comments`;
         const rawList = (await redisCmd(['LRANGE', postCommentsKey, '0', '-1'])) || [];
-        let foundIndex = -1;
+        let targetRaw = null;
         let foundComment = null;
-        for (let i = 0; i < rawList.length; i++) {
+        for (const s of rawList) {
           let c;
-          try { c = JSON.parse(rawList[i]); } catch { continue; }
-          if (c.id === commentId) { foundIndex = i; foundComment = c; break; }
+          try { c = JSON.parse(s); } catch { continue; }
+          if (c.id === commentId) { targetRaw = s; foundComment = c; break; }
         }
-        if (foundIndex === -1 || !foundComment || foundComment.kakaoId !== user.kakaoId) {
+        if (!targetRaw || !foundComment || foundComment.kakaoId !== user.kakaoId) {
           res.status(403).json({ error: 'forbidden' });
           return;
         }
         const editedAt = Date.now();
         const updatedComment = { ...foundComment, body: text, editedAt };
-        await redisCmd(['LSET', postCommentsKey, String(foundIndex), JSON.stringify(updatedComment)]);
+        // 인덱스 기반 LSET 대신 값 기준 LINSERT+LREM으로 바꿔치기한다 — 이 사이에 새
+        // 댓글이 LPUSH되어 인덱스가 밀려도 엉뚱한 자리를 덮어쓰지 않게 하기 위함이다.
+        const insertResult = await redisCmd(['LINSERT', postCommentsKey, 'BEFORE', targetRaw, JSON.stringify(updatedComment)]);
+        if (Number(insertResult) <= 0) {
+          res.status(409).json({ error: 'comment changed, please retry' });
+          return;
+        }
+        await redisCmd(['LREM', postCommentsKey, '1', targetRaw]);
 
-        // 내 댓글 모아보기 인덱스도 같이 갱신한다.
+        // 내 댓글 모아보기 인덱스도 같은 방식으로 갱신한다(실패해도 본 댓글 수정은 이미 끝났으니 무시).
         const userCommentsKey = `user:${user.kakaoId}:comments`;
         const userRawList = (await redisCmd(['LRANGE', userCommentsKey, '0', '-1'])) || [];
-        for (let i = 0; i < userRawList.length; i++) {
-          let c;
-          try { c = JSON.parse(userRawList[i]); } catch { continue; }
-          if (c.id === commentId) {
-            await redisCmd(['LSET', userCommentsKey, String(i), JSON.stringify({ ...c, body: text, editedAt })]);
-            break;
+        const userTargetRaw = userRawList.find((s) => {
+          try { return JSON.parse(s).id === commentId; } catch { return false; }
+        });
+        if (userTargetRaw) {
+          let userEntry;
+          try { userEntry = JSON.parse(userTargetRaw); } catch { userEntry = null; }
+          if (userEntry) {
+            const userInsertResult = await redisCmd(['LINSERT', userCommentsKey, 'BEFORE', userTargetRaw, JSON.stringify({ ...userEntry, body: text, editedAt })]);
+            if (Number(userInsertResult) > 0) await redisCmd(['LREM', userCommentsKey, '1', userTargetRaw]);
           }
         }
 

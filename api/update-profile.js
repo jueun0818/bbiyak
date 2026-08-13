@@ -37,11 +37,14 @@ async function renameCommentsNickname(kakaoId, nickname) {
   await Promise.all([...postIds].map(async (postId) => {
     const postCommentsKey = `board:post:${postId}:comments`;
     const list = (await redisCmd(['LRANGE', postCommentsKey, '0', '-1'])) || [];
-    for (let i = 0; i < list.length; i++) {
+    for (const raw of list) {
       let c;
-      try { c = JSON.parse(list[i]); } catch { continue; }
+      try { c = JSON.parse(raw); } catch { continue; }
       if (c.kakaoId === kakaoId && c.nickname !== nickname) {
-        await redisCmd(['LSET', postCommentsKey, String(i), JSON.stringify({ ...c, nickname })]);
+        // 인덱스 기반 LSET 대신 값 기준 LINSERT+LREM을 쓴다 — 여러 글의 댓글을 동시에
+        // (Promise.all) 훑는 데다, 그 사이 새 댓글이 LPUSH되면 인덱스가 밀릴 수 있어서다.
+        const insertResult = await redisCmd(['LINSERT', postCommentsKey, 'BEFORE', raw, JSON.stringify({ ...c, nickname })]);
+        if (Number(insertResult) > 0) await redisCmd(['LREM', postCommentsKey, '1', raw]);
       }
     }
   }));
