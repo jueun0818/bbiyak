@@ -12,7 +12,7 @@ export default async function handler(req, res) {
       res.status(200).json({ loggedIn: false });
       return;
     }
-    res.status(200).json({ loggedIn: true, nickname: user.nickname, kakaoId: user.kakaoId });
+    res.status(200).json({ loggedIn: true, nickname: user.nickname, kakaoId: user.kakaoId, avatar: user.avatar || null });
   } catch (e) {
     res.status(200).json({ loggedIn: false });
   }

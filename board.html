@@ -192,6 +192,37 @@
     text-shadow: 0 1px 1px rgba(0,0,0,0.15);
   }
   .board-comment .board-avatar { width: 18px; height: 18px; font-size: 9.5px; }
+  .board-avatar.emoji { background: var(--panel); font-size: 13px; text-shadow: none; }
+  .board-comment .board-avatar.emoji { font-size: 11px; }
+
+  .board-avatar-modal-inner { max-height: none; padding: 22px 20px 24px; }
+  .board-avatar-modal-title { margin: 0 0 14px; font-size: 15.5px; font-weight: 800; color: var(--purple); text-align: center; }
+  .board-avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+  .board-avatar-option {
+    width: auto;
+    margin: 0;
+    padding: 0;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    border-radius: 14px;
+    background: var(--panel);
+    border: 1.5px solid var(--line);
+    color: inherit;
+    box-shadow: none;
+  }
+  .board-avatar-option.selected {
+    border-color: var(--amber-strong);
+    background: #fff3d6;
+  }
+  .board-avatar-option:active { transform: scale(0.94); }
+  .board-avatar-option.reset { font-size: 12.5px; font-weight: 700; color: var(--muted); }
   .board-auth { display: flex; align-items: center; gap: 8px; }
   .board-user-label { font-size: 13.5px; color: var(--muted); font-weight: 700; }
   .board-login-btn, .board-logout-btn, .board-nickname-edit-btn {
@@ -404,6 +435,7 @@
       <span class="board-title">🐥 다들 어떤 궁합 나왔어요?</span>
       <div class="board-auth">
         <span class="board-user-label" id="boardUserLabel" hidden></span>
+        <button type="button" class="board-nickname-edit-btn" id="boardAvatarEditBtn" hidden>🖼️ 프로필</button>
         <button type="button" class="board-nickname-edit-btn" id="boardNicknameEditBtn" hidden>✏️ 닉네임 변경</button>
         <button type="button" class="board-logout-btn" id="boardLogoutBtn" hidden>로그아웃</button>
       </div>
@@ -445,6 +477,14 @@
       <input type="text" id="boardCommentText" maxlength="200" placeholder="댓글을 남겨보세요">
       <button type="button" id="boardCommentSubmit">등록</button>
     </div>
+  </div>
+</div>
+
+<div class="board-detail-modal" id="boardAvatarModal">
+  <div class="board-detail-inner board-avatar-modal-inner">
+    <button type="button" class="board-detail-close" id="boardAvatarClose" aria-label="닫기">✕</button>
+    <p class="board-avatar-modal-title">🖼️ 프로필 그림 고르기</p>
+    <div class="board-avatar-grid" id="boardAvatarGrid"></div>
   </div>
 </div>
 
@@ -524,7 +564,11 @@ function avatarColor(nickname) {
   for (const ch of String(nickname)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
   return AVATAR_COLORS[h % AVATAR_COLORS.length];
 }
-function avatarHtml(nickname) {
+// 프로필에서 고를 수 있는 귀여운 이모지 아바타 목록. api/update-avatar.js의 허용 목록과 맞춰야 한다.
+const AVATAR_OPTIONS = ['🐥', '🐣', '🐤', '🐰', '🐱', '🐶', '🦊', '🐻', '🐼', '🐨', '🐷', '🐹', '🦄', '🐢', '🦋', '🐸', '🐧', '🦁', '🐯', '🐮'];
+
+function avatarHtml(nickname, avatar) {
+  if (avatar) return `<span class="board-avatar emoji">${escapeHtml(avatar)}</span>`;
   const initial = String(nickname).trim().slice(0, 1) || '🐥';
   return `<span class="board-avatar" style="background:${avatarColor(nickname)}">${escapeHtml(initial)}</span>`;
 }
@@ -551,14 +595,14 @@ async function refreshBoardSession() {
   }
   const logoutBtn = document.getElementById('boardLogoutBtn');
   const nicknameEditBtn = document.getElementById('boardNicknameEditBtn');
-  const userLabel = document.getElementById('boardUserLabel');
+  const avatarEditBtn = document.getElementById('boardAvatarEditBtn');
   const gate = document.getElementById('boardGate');
   const content = document.getElementById('boardContent');
 
   logoutBtn.hidden = !boardSession.loggedIn;
   nicknameEditBtn.hidden = !boardSession.loggedIn;
-  userLabel.hidden = !boardSession.loggedIn;
-  userLabel.textContent = boardSession.loggedIn ? `🐥 ${boardSession.nickname}님` : '';
+  avatarEditBtn.hidden = !boardSession.loggedIn;
+  renderUserLabel();
   gate.hidden = boardSession.loggedIn;
   content.hidden = !boardSession.loggedIn;
 
@@ -570,6 +614,14 @@ async function refreshBoardSession() {
       loadBoardPosts(true);
     }
   }
+}
+
+function renderUserLabel() {
+  const userLabel = document.getElementById('boardUserLabel');
+  userLabel.hidden = !boardSession.loggedIn;
+  userLabel.innerHTML = boardSession.loggedIn
+    ? `${avatarHtml(boardSession.nickname, boardSession.avatar)}${escapeHtml(boardSession.nickname)}님`
+    : '';
 }
 
 document.getElementById('boardNicknameEditBtn').addEventListener('click', async () => {
@@ -588,10 +640,56 @@ document.getElementById('boardNicknameEditBtn').addEventListener('click', async 
       return;
     }
     boardSession.nickname = data.nickname;
-    document.getElementById('boardUserLabel').textContent = `🐥 ${data.nickname}님`;
+    renderUserLabel();
   } catch (e) {
     alert('닉네임을 바꾸지 못했어요.');
   }
+});
+
+function renderAvatarGrid() {
+  const grid = document.getElementById('boardAvatarGrid');
+  const resetBtn = `<button type="button" class="board-avatar-option reset ${!boardSession.avatar ? 'selected' : ''}" data-avatar="">기본</button>`;
+  const options = AVATAR_OPTIONS.map((emoji) =>
+    `<button type="button" class="board-avatar-option ${boardSession.avatar === emoji ? 'selected' : ''}" data-avatar="${emoji}">${emoji}</button>`
+  ).join('');
+  grid.innerHTML = resetBtn + options;
+  grid.querySelectorAll('.board-avatar-option').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const avatar = btn.dataset.avatar || null;
+      if (avatar === (boardSession.avatar || null)) {
+        document.getElementById('boardAvatarModal').classList.remove('show');
+        return;
+      }
+      try {
+        const r = await fetch('/api/update-avatar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ avatar }),
+        });
+        const data = await r.json();
+        if (!r.ok) {
+          alert('프로필을 바꾸지 못했어요.');
+          return;
+        }
+        boardSession.avatar = data.avatar;
+        renderUserLabel();
+        document.getElementById('boardAvatarModal').classList.remove('show');
+      } catch (e) {
+        alert('프로필을 바꾸지 못했어요.');
+      }
+    });
+  });
+}
+
+document.getElementById('boardAvatarEditBtn').addEventListener('click', () => {
+  renderAvatarGrid();
+  document.getElementById('boardAvatarModal').classList.add('show');
+});
+document.getElementById('boardAvatarClose').addEventListener('click', () => {
+  document.getElementById('boardAvatarModal').classList.remove('show');
+});
+document.getElementById('boardAvatarModal').addEventListener('click', (e) => {
+  if (e.target.id === 'boardAvatarModal') document.getElementById('boardAvatarModal').classList.remove('show');
 });
 
 function renderResultChip(data) {
@@ -609,7 +707,7 @@ function renderBoardPostCard(post) {
   el.dataset.id = post.id;
   el.innerHTML = `
     <div class="board-post-head">
-      <span class="board-post-nick">${avatarHtml(post.nickname)}${escapeHtml(post.nickname)}</span>
+      <span class="board-post-nick">${avatarHtml(post.nickname, post.avatar)}${escapeHtml(post.nickname)}</span>
       <span class="board-post-time">${timeAgo(post.createdAt)}</span>
     </div>
     <div class="board-post-body">${escapeHtml(post.body)}</div>
@@ -631,7 +729,7 @@ function renderResultStripCard(post) {
   el.dataset.id = post.id;
   if (tier) el.style.setProperty('--accent', tier.accent);
   el.innerHTML = `
-    <div class="board-result-nick">${avatarHtml(post.nickname)}${escapeHtml(post.nickname)}</div>
+    <div class="board-result-nick">${avatarHtml(post.nickname, post.avatar)}${escapeHtml(post.nickname)}</div>
     <div class="board-result-names">${data ? escapeHtml(data.names || '') : ''}</div>
     ${data && data.score != null ? `<div class="board-result-score">${tier ? tier.badge + ' ' : ''}${data.score}점</div>` : ''}
     ${data && data.tierTitle ? `<div class="board-result-tier">${escapeHtml(data.tierTitle)}</div>` : ''}
@@ -751,7 +849,7 @@ function renderBoardDetail(post, comments) {
   const isMine = boardSession.loggedIn && boardSession.kakaoId === post.kakaoId;
   bodyEl.innerHTML = `
     <div class="board-post-head">
-      <span class="board-post-nick">${avatarHtml(post.nickname)}${escapeHtml(post.nickname)}</span>
+      <span class="board-post-nick">${avatarHtml(post.nickname, post.avatar)}${escapeHtml(post.nickname)}</span>
       <span class="board-post-time">${timeAgo(post.createdAt)}</span>
     </div>
     <div class="board-post-body">${escapeHtml(post.body)}</div>
@@ -765,7 +863,7 @@ function renderBoardDetail(post, comments) {
 
   const commentsEl = document.getElementById('boardComments');
   commentsEl.innerHTML = comments.length
-    ? comments.map((c) => `<div class="board-comment"><span class="board-comment-nick">${avatarHtml(c.nickname)}${escapeHtml(c.nickname)}</span>${escapeHtml(c.body)}</div>`).join('')
+    ? comments.map((c) => `<div class="board-comment"><span class="board-comment-nick">${avatarHtml(c.nickname, c.avatar)}${escapeHtml(c.nickname)}</span>${escapeHtml(c.body)}</div>`).join('')
     : '<p class="board-empty">아직 댓글이 없어요.</p>';
 
   document.getElementById('boardCommentWriteRow').hidden = !boardSession.loggedIn;
@@ -843,7 +941,7 @@ document.getElementById('boardCommentSubmit').addEventListener('click', async ()
     if (empty) empty.remove();
     const div = document.createElement('div');
     div.className = 'board-comment';
-    div.innerHTML = `<span class="board-comment-nick">${avatarHtml(data.comment.nickname)}${escapeHtml(data.comment.nickname)}</span>${escapeHtml(data.comment.body)}`;
+    div.innerHTML = `<span class="board-comment-nick">${avatarHtml(data.comment.nickname, data.comment.avatar)}${escapeHtml(data.comment.nickname)}</span>${escapeHtml(data.comment.body)}`;
     commentsEl.appendChild(div);
     input.value = '';
     const listCardEl = document.querySelector(`.board-post[data-id="${boardDetailPostId}"] .board-post-foot span:last-child`);

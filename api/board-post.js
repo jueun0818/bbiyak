@@ -91,6 +91,7 @@ export default async function handler(req, res) {
           id: `${Date.now()}-${Math.round(Math.random() * 1e6)}`,
           kakaoId: user.kakaoId,
           nickname: user.nickname,
+          avatar: user.avatar || null,
           body: text,
           createdAt: Date.now(),
         };

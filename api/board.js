@@ -82,7 +82,7 @@ export default async function handler(req, res) {
 
       const id = await redisCmd(['INCR', 'board:postSeq']);
       const createdAt = Date.now();
-      const post = { id: String(id), kakaoId: user.kakaoId, nickname: user.nickname, category, body: text, resultData, createdAt };
+      const post = { id: String(id), kakaoId: user.kakaoId, nickname: user.nickname, avatar: user.avatar || null, category, body: text, resultData, createdAt };
 
       await redisCmd(['SET', `board:post:${id}`, JSON.stringify(post)]);
       await redisCmd(['ZADD', 'board:posts', String(createdAt), String(id)]);
