@@ -1321,6 +1321,7 @@ function renderBoardPostCard(post) {
       <span class="board-post-time">${timeAgo(post.createdAt)}</span>
     </div>
     <div class="board-post-title">${escapeHtml(postTitleText(post))}</div>
+    ${renderResultChip(post.resultData)}
     <div class="board-post-foot">
       <span class="${post.likedByMe ? 'liked' : ''}">❤️ ${post.likeCount}</span>
       <span>💬 ${post.commentCount}</span>
@@ -1449,14 +1450,13 @@ document.getElementById('boardWriteSubmit').addEventListener('click', async () =
   if (!body) { textEl.focus(); return; }
 
   const resultData = kind ? buildResultData(kind) : null;
-  const category = resultData ? 'result' : 'free';
 
   btn.disabled = true;
   try {
     const r = await fetch('/api/board', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ category, title, body, resultData }),
+      body: JSON.stringify({ category: 'free', title, body, resultData }),
     });
     const data = await r.json();
     if (!r.ok) {
@@ -1466,13 +1466,9 @@ document.getElementById('boardWriteSubmit').addEventListener('click', async () =
     titleEl.value = '';
     textEl.value = '';
     document.getElementById('boardAttachResult').value = '';
-    if (data.post.category === 'result') {
-      document.getElementById('boardResultStrip').prepend(renderResultStripCard(data.post));
-    } else {
-      document.getElementById('boardList').prepend(renderBoardPostCard(data.post));
-      const empty = document.querySelector('#boardList .board-empty');
-      if (empty) empty.remove();
-    }
+    document.getElementById('boardList').prepend(renderBoardPostCard(data.post));
+    const empty = document.querySelector('#boardList .board-empty');
+    if (empty) empty.remove();
     showToast('게시글을 올렸어요 🐥', 'success');
   } catch (e) {
     showToast('글을 올리지 못했어요.', 'error');

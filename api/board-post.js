@@ -20,7 +20,10 @@ export default async function handler(req, res) {
         res.status(401).json({ error: 'login required' });
         return;
       }
-      const rawList = await redisCmd(['LRANGE', `user:${user.kakaoId}:comments`, '0', '49']);
+      // 작성 시 LTRIM으로 최대 200개까지 보관하므로(아래 board-post.js의 comment 액션 참고),
+      // 여기서도 49개가 아니라 199개까지 읽어야 오래전(예: 닉네임 변경 전) 댓글도
+      // "내 댓글 모아보기"에 나타나 수정・삭제할 수 있다.
+      const rawList = await redisCmd(['LRANGE', `user:${user.kakaoId}:comments`, '0', '199']);
       const comments = (rawList || [])
         .map((s) => { try { return JSON.parse(s); } catch { return null; } })
         .filter(Boolean);
