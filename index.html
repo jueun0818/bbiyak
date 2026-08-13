@@ -1535,6 +1535,11 @@
         <p id="todayReasonText"></p>
       </div>
 
+      <div class="reason-box">
+        <h4>💡 오늘의 조언</h4>
+        <p id="todayAdviceText"></p>
+      </div>
+
       <div class="lucky-row" id="todayLuckyRow"></div>
 
       <div class="action-row">
@@ -3119,24 +3124,36 @@ function computeSajuCompat(y1, m1, d1, hb1, y2, m2, d2, hb2) {
 
   let score = 60;
   let ilganText = '';
+  let storyIlganText = ''; // 캔버스는 Jua 폰트가 한자를 못 그려서, 한자 없는 버전을 따로 만든다.
   const e1 = ELEMENT_INFO[p1.day.stemElement].label;
   const e2 = ELEMENT_INFO[p2.day.stemElement].label;
   const n1 = `${p1.day.stemChar}${p1.day.stemHanja}(${e1})`;
   const n2 = `${p2.day.stemChar}${p2.day.stemHanja}(${e2})`;
+  // ELEMENT_INFO.label도 "금(金)"처럼 한자가 섞여 있어, 앞의 한글만 잘라 캔버스용으로 쓴다.
+  const se1 = e1.split('(')[0], se2 = e2.split('(')[0];
+  const sn1 = `${p1.day.stemChar}(${se1})`;
+  const sn2 = `${p2.day.stemChar}(${se2})`;
 
   if (ilganRel.type === 'same') {
     score = 70;
     ilganText = `두 사람의 일간이 똑같이 ${n1} 기운이에요. 비화(比和) 관계로, 서로 통하는 부분이 많고 가치관이 비슷해요. 다만 같은 기운끼리는 은근히 경쟁심이 생기거나 고집이 부딪힐 때도 있어요.`;
+    storyIlganText = `두 사람의 일간이 똑같이 ${sn1} 기운이에요. 서로 통하는 부분이 많고 가치관이 비슷해요. 다만 은근히 경쟁심이 생기거나 고집이 부딪힐 때도 있어요.`;
   } else if (ilganRel.type === 'a_generates_b' || ilganRel.type === 'b_generates_a') {
     score = 88;
     const giver = ilganRel.type === 'a_generates_b' ? n1 : n2;
     const receiver = ilganRel.type === 'a_generates_b' ? n2 : n1;
+    const sGiver = ilganRel.type === 'a_generates_b' ? sn1 : sn2;
+    const sReceiver = ilganRel.type === 'a_generates_b' ? sn2 : sn1;
     ilganText = `${giver}이 ${receiver}을 낳는 상생(相生) 관계예요. 한쪽의 기운이 자연스럽게 다른 쪽에 힘을 보태주는 흐름이라, 명리학에서 궁합을 볼 때 가장 이상적으로 보는 조합 중 하나예요.`;
+    storyIlganText = `${sGiver}이 ${sReceiver}을 낳는 상생 관계예요. 한쪽의 기운이 자연스럽게 다른 쪽에 힘을 보태주는, 궁합에서 가장 이상적으로 보는 조합 중 하나예요.`;
   } else {
     score = 48;
     const winner = ilganRel.type === 'a_overcomes_b' ? n1 : n2;
     const loser = ilganRel.type === 'a_overcomes_b' ? n2 : n1;
+    const sWinner = ilganRel.type === 'a_overcomes_b' ? sn1 : sn2;
+    const sLoser = ilganRel.type === 'a_overcomes_b' ? sn2 : sn1;
     ilganText = `${winner}이 ${loser}을 극(剋)하는 상극(相剋) 관계예요. 기운이 서로 부딪히는 편이라 초반엔 삐걱거리거나 주도권 다툼이 생기기 쉽지만, 서로에게 자극이 되어 함께 성장하는 케이스도 많아요.`;
+    storyIlganText = `${sWinner}이 ${sLoser}을 누르는 상극 관계예요. 기운이 서로 부딪히는 편이라 초반엔 삐걱거릴 수 있지만, 서로에게 자극이 되어 함께 성장하는 경우도 많아요.`;
   }
 
   const b1 = `${p1.day.branchChar}${p1.day.branchHanja}(${p1.day.animal}띠)`;
@@ -3160,7 +3177,7 @@ function computeSajuCompat(y1, m1, d1, hb1, y2, m2, d2, hb2) {
   }
 
   score = clamp(Math.round(score), 5, 98);
-  return { p1, p2, score, ilganText, iljiText };
+  return { p1, p2, score, ilganText, iljiText, storyIlganText };
 }
 
 document.getElementById('sajuCompatBtn').addEventListener('click', () => {
@@ -3205,11 +3222,12 @@ initDateSelect('todayDate');
 const SIPSUNG_INFO = {
   same: {
     label: '비화(比和)',
-    overall: 72, love: 62, money: 56, health: 80,
+    simple: '오늘은 평소의 내 스타일과 색깔이 유독 또렷하게 드러나는 날이에요.',
+    overall: 72, love: 62, money: 56, health: 80, work: 58, relation: 72,
     texts: [
-      (me, td) => `오늘은 나(${me})와 기운이 꼭 닮은 ${td}의 날이에요. 비화(比和)의 흐름이라 내 색깔과 고집이 유독 또렷하게 드러나요. 주도적으로 움직이기엔 좋지만, 가끔은 남 얘기에도 귀를 열어보세요.`,
-      (me, td) => `승부욕이 스멀스멀 올라오는 하루예요. ${me}인 내 기운과 오늘의 ${td} 기운이 똑같이 겹치는 비화(比和)라, 협업보다는 혼자 몰두하는 일이 유독 잘 풀려요.`,
-      (me, td) => `낯익은 얼굴, 낯익은 방식이 유난히 편안하게 느껴지는 날이에요. ${td} 기운이 ${me}인 나와 나란히 서는 비화(比和)의 흐름이라, 새로운 시도는 다음으로 미뤄도 좋아요.`,
+      (me, td) => `오늘은 나(${me})와 기운이 꼭 닮은 ${td}의 날이에요. 비화(比和)의 흐름이라 내 색깔과 고집이 유독 또렷하게 드러나요. 회의나 상의 자리에서는 내 의견을 밀어붙이기보다, 한 번쯤 다른 사람 얘기에도 귀를 열어보면 뜻밖에 좋은 아이디어를 얻을 수 있어요.`,
+      (me, td) => `승부욕이 스멀스멀 올라오는 하루예요. ${me}인 내 기운과 오늘의 ${td} 기운이 똑같이 겹치는 비화(比和)라, 협업보다는 혼자 몰두하는 일이 유독 잘 풀려요. 다만 비슷한 성향의 사람과는 사소한 걸로 신경전이 붙기 쉬우니, 굳이 맞서기보다 한 발 물러서는 여유가 필요해요.`,
+      (me, td) => `낯익은 얼굴, 낯익은 방식이 유난히 편안하게 느껴지는 날이에요. ${td} 기운이 ${me}인 나와 나란히 서는 비화(比和)의 흐름이라, 새로운 시도는 다음으로 미뤄도 좋아요. 오래된 친구나 익숙한 동료와 함께하는 시간이 유독 힘이 되어줄 거예요.`,
     ],
     tips: [
       '오늘은 남 눈치 보지 말고 내 스타일대로 밀고 나가보세요.',
@@ -3219,11 +3237,12 @@ const SIPSUNG_INFO = {
   },
   a_generates_b: {
     label: '식상(食傷)',
-    overall: 78, love: 82, money: 60, health: 64,
+    simple: '오늘은 표현력과 아이디어가 반짝이는 날이에요. 대신 체력 관리가 필요해요.',
+    overall: 78, love: 82, money: 60, health: 64, work: 72, relation: 78,
     texts: [
-      (me, td) => `오늘은 내(${me}) 안의 끼가 밖으로 터져 나오는 날이에요. ${td}를 향해 뻗어가는 식상(食傷)의 기운 덕분에 표현력과 아이디어가 반짝여요. 다만 에너지 소모가 커서 체력 관리가 필요해요.`,
-      (me, td) => `말이든 글이든 창작이든, 뭔가를 표현하는 일에서 특히 빛을 발하는 날이에요. ${me}인 내가 ${td} 기운을 만들어내는 식상(食傷)의 흐름이니, SNS나 대화에서 적극적으로 나서보세요.`,
-      (me, td) => `머릿속에 아이디어가 샘솟는 하루예요. ${me}인 나의 기운이 ${td}를 향해 흘러나가는 식상(食傷)의 날이라 산만해지기도 쉬우니, 한 가지에 집중하면 훨씬 좋은 결과가 따라와요.`,
+      (me, td) => `오늘은 내(${me}) 안의 끼가 밖으로 터져 나오는 날이에요. ${td}를 향해 뻗어가는 식상(食傷)의 기운 덕분에 표현력과 아이디어가 반짝여요. 다만 에너지 소모가 커서 체력 관리가 필요해요. 발표나 면접, 소개팅처럼 나를 드러내야 하는 자리가 있다면 오늘 잡아보세요.`,
+      (me, td) => `말이든 글이든 창작이든, 뭔가를 표현하는 일에서 특히 빛을 발하는 날이에요. ${me}인 내가 ${td} 기운을 만들어내는 식상(食傷)의 흐름이니, SNS나 대화에서 적극적으로 나서보세요. 특히 아이디어 회의나 브레인스토밍 자리에서는 평소보다 훨씬 많은 말이 술술 나올 거예요.`,
+      (me, td) => `머릿속에 아이디어가 샘솟는 하루예요. ${me}인 나의 기운이 ${td}를 향해 흘러나가는 식상(食傷)의 날이라 산만해지기도 쉬우니, 한 가지에 집중하면 훨씬 좋은 결과가 따라와요. 떠오른 생각은 그 자리에서 메모해두는 습관이 오늘따라 큰 힘을 발휘할 거예요.`,
     ],
     tips: [
       '머릿속 아이디어를 메모해두면 나중에 큰 도움이 될 거예요.',
@@ -3233,11 +3252,12 @@ const SIPSUNG_INFO = {
   },
   b_generates_a: {
     label: '인성(印星)',
-    overall: 86, love: 76, money: 64, health: 90,
+    simple: '오늘은 주변의 도움을 받기 좋고, 배우거나 쉬기에도 좋은 날이에요.',
+    overall: 86, love: 76, money: 64, health: 90, work: 88, relation: 68,
     texts: [
-      (me, td) => `오늘은 ${td} 기운이 나(${me})를 든든하게 채워주는 인성(印星)의 날이에요. 주변의 도움이나 좋은 정보가 자연스럽게 들어오고, 배우거나 쉬기에도 좋은 흐름이에요.`,
-      (me, td) => `귀인의 조언이나 뜻밖의 좋은 소식이 찾아올 수 있는 하루예요. 오늘의 ${td} 기운이 ${me}인 나를 받쳐주는 인성(印星)의 흐름이니, 주변 이야기에 귀 기울여보세요.`,
-      (me, td) => `무리해서 밀어붙이기보다 한 박자 쉬면서 재충전하기 좋은 날이에요. ${td} 기운이 ${me}인 나에게 스며드는 인성(印星)이라, 오늘 받은 기운이 며칠 뒤 더 큰 힘이 되어줄 거예요.`,
+      (me, td) => `오늘은 ${td} 기운이 나(${me})를 든든하게 채워주는 인성(印星)의 날이에요. 주변의 도움이나 좋은 정보가 자연스럽게 들어오고, 배우거나 쉬기에도 좋은 흐름이에요. 특히 시험이나 자격증, 계약서 같은 문서 관련 일에서 좋은 결과를 기대해볼 만해요.`,
+      (me, td) => `귀인의 조언이나 뜻밖의 좋은 소식이 찾아올 수 있는 하루예요. 오늘의 ${td} 기운이 ${me}인 나를 받쳐주는 인성(印星)의 흐름이니, 주변 이야기에 귀 기울여보세요. 평소 존경하던 사람이나 선배의 한마디가 오늘따라 유독 크게 와닿을 수 있어요.`,
+      (me, td) => `무리해서 밀어붙이기보다 한 박자 쉬면서 재충전하기 좋은 날이에요. ${td} 기운이 ${me}인 나에게 스며드는 인성(印星)이라, 오늘 받은 기운이 며칠 뒤 더 큰 힘이 되어줄 거예요. 미뤄뒀던 공부나 자격증 준비를 시작하기에도 특히 좋은 타이밍이에요.`,
     ],
     tips: [
       '평소 미뤄뒀던 공부나 독서를 시작하기 좋은 흐름이에요.',
@@ -3247,11 +3267,12 @@ const SIPSUNG_INFO = {
   },
   a_overcomes_b: {
     label: '재성(財星)',
-    overall: 85, love: 74, money: 94, health: 66,
+    simple: '오늘은 추진력이 좋아지고, 특히 성과와 재물운이 따라오는 날이에요.',
+    overall: 85, love: 74, money: 94, health: 66, work: 82, relation: 62,
     texts: [
-      (me, td) => `오늘은 내(${me})가 ${td} 기운을 손에 쥐고 움직이는 재성(財星)의 날이에요. 추진력과 결단력이 좋아지고, 특히 재물·성과와 관련된 일에 유독 좋은 흐름이에요.`,
-      (me, td) => `협상, 거래, 계약처럼 결과가 명확한 일에서 유리한 하루예요. ${me}인 내가 오늘의 ${td} 기운을 다스리는 재성(財星)의 흐름이니, 미뤄뒀던 일이 있다면 오늘 매듭지어보세요.`,
-      (me, td) => `목표를 세우고 밀어붙이면 성과가 따라오는 날이에요. ${me}인 내가 ${td} 기운을 주도적으로 이끄는 재성(財星)의 흐름이라, 자신감 있게 움직여도 좋아요.`,
+      (me, td) => `오늘은 내(${me})가 ${td} 기운을 손에 쥐고 움직이는 재성(財星)의 날이에요. 추진력과 결단력이 좋아지고, 특히 재물·성과와 관련된 일에 유독 좋은 흐름이에요. 미뤄왔던 재테크 상담이나 지출 계획을 오늘 세워보면 좋은 결정을 내릴 수 있어요.`,
+      (me, td) => `협상, 거래, 계약처럼 결과가 명확한 일에서 유리한 하루예요. ${me}인 내가 오늘의 ${td} 기운을 다스리는 재성(財星)의 흐름이니, 미뤄뒀던 일이 있다면 오늘 매듭지어보세요. 금전이 오가는 자리에서 유독 판단력이 또렷해지는 날이에요.`,
+      (me, td) => `목표를 세우고 밀어붙이면 성과가 따라오는 날이에요. ${me}인 내가 ${td} 기운을 주도적으로 이끄는 재성(財星)의 흐름이라, 자신감 있게 움직여도 좋아요. 다만 씀씀이가 커지기도 쉬운 날이니, 큰 지출 앞에서는 한 번 더 생각해보는 게 좋아요.`,
     ],
     tips: [
       '미뤄뒀던 계약이나 협상이 있다면 오늘 매듭짓기 좋아요.',
@@ -3261,11 +3282,12 @@ const SIPSUNG_INFO = {
   },
   b_overcomes_a: {
     label: '관성(官星)',
-    overall: 60, love: 54, money: 50, health: 48,
+    simple: '오늘은 책임감이 강조되는 날이에요. 신중하게 움직이면 좋아요.',
+    overall: 60, love: 54, money: 50, health: 48, work: 68, relation: 50,
     texts: [
-      (me, td) => `오늘은 ${td} 기운이 나(${me})를 지그시 눌러보는 관성(官星)의 날이에요. 책임과 규율이 은근히 강조되는 흐름이라 어깨가 살짝 무거울 수 있어요. 서두르지 말고 한 걸음씩 신중하게 움직여보세요.`,
-      (me, td) => `신경 쓸 일이 은근히 많게 느껴지는 하루예요. ${td} 기운이 ${me}인 나를 살짝 조여오는 관성(官星)의 흐름이지만, 차근차근 해내면 그만큼 인정받기 좋은 날이기도 해요.`,
-      (me, td) => `마음처럼 술술 안 풀리는 순간이 있을 수 있는 날이에요. ${td} 기운이 ${me}인 나를 넌지시 시험해보는 관성(官星)이니, 너무 정색하지 말고 원칙대로 차근차근 풀어가면 무난히 넘어갈 수 있어요.`,
+      (me, td) => `오늘은 ${td} 기운이 나(${me})를 지그시 눌러보는 관성(官星)의 날이에요. 책임과 규율이 은근히 강조되는 흐름이라 어깨가 살짝 무거울 수 있어요. 서두르지 말고 한 걸음씩 신중하게 움직여보세요. 다만 맡은 일을 원칙대로 처리하면 위에서 보는 눈은 오히려 후해지는 날이에요.`,
+      (me, td) => `신경 쓸 일이 은근히 많게 느껴지는 하루예요. ${td} 기운이 ${me}인 나를 살짝 조여오는 관성(官星)의 흐름이지만, 차근차근 해내면 그만큼 인정받기 좋은 날이기도 해요. 급한 일이 갑자기 몰릴 수 있으니, 일정에 여유를 좀 넉넉히 잡아두는 게 좋아요.`,
+      (me, td) => `마음처럼 술술 안 풀리는 순간이 있을 수 있는 날이에요. ${td} 기운이 ${me}인 나를 넌지시 시험해보는 관성(官星)이니, 너무 정색하지 말고 원칙대로 차근차근 풀어가면 무난히 넘어갈 수 있어요. 특히 윗사람이나 공적인 자리에서는 평소보다 한 톤 차분하게 대응하는 게 도움이 돼요.`,
     ],
     tips: [
       '중요한 결정은 하루 미루고, 오늘은 신중하게 지켜보세요.',
@@ -3325,6 +3347,8 @@ function computeTodayFortune(y, m, d) {
   const love = clamp(Math.round(info.love + bonus + jitter(5)), 20, 98);
   const money = clamp(Math.round(info.money + bonus * 0.6 + jitter(10)), 20, 98);
   const health = clamp(Math.round(info.health + bonus * 0.6 + jitter(15)), 20, 98);
+  const work = clamp(Math.round(info.work + bonus * 0.6 + jitter(20)), 20, 98);
+  const relation = clamp(Math.round(info.relation + bonus + jitter(2)), 20, 98);
 
   const meLabel = `${birth.day.stemChar}${birth.day.stemHanja}(${ELEMENT_INFO[birth.day.stemElement].label})`;
   const tdLabel = `${todayPillar.stemChar}${todayPillar.stemHanja}(${ELEMENT_INFO[todayPillar.stemElement].label})`;
@@ -3336,26 +3360,32 @@ function computeTodayFortune(y, m, d) {
 
   const b1 = branchLabel(birth.day), b2 = branchLabel(todayPillar);
   let flavor = '';
+  let simpleFlavor = '';
   if (iljiRel === 'same') {
     flavor = flavorVariant === 0
       ? ` 일지도 ${b1}로 오늘과 똑같아서 컨디션이 안정적인 하루예요.`
       : ` 게다가 일지까지 ${b1}로 겹쳐서, 평소 내 리듬 그대로 움직이면 되는 편안한 날이에요.`;
+    simpleFlavor = ' 컨디션도 안정적이에요.';
   } else if (iljiRel === 'hap') {
     flavor = flavorVariant === 0
       ? ` 일지 ${b1}가 오늘 ${b2}와 육합을 이루어 주변 사람과 손발이 잘 맞는 날이에요.`
       : ` 일지 ${b1}와 오늘의 ${b2}가 육합으로 이어져, 약속이나 만남을 잡기에도 좋은 흐름이에요.`;
+    simpleFlavor = ' 사람들과 손발이 잘 맞는 흐름이에요.';
   } else if (iljiRel === 'samhap') {
     const label = samhapLabelOf(birth.day.branchIdx, todayPillar.branchIdx);
     flavor = flavorVariant === 0
       ? ` 일지 ${b1}가 오늘 ${b2}와 삼합(${label})을 이루어 뜻밖의 시너지가 생기기 쉬워요.`
       : ` 일지 ${b1}와 오늘의 ${b2}가 삼합(${label})으로 뭉쳐서, 여럿이 함께하는 일에서 특히 좋은 결과가 나올 수 있어요.`;
+    simpleFlavor = ' 여럿이 함께하면 좋은 시너지가 나요.';
   } else if (iljiRel === 'chung') {
     flavor = flavorVariant === 0
       ? ` 다만 일지 ${b1}가 오늘 ${b2}와 충(沖)을 이루니, 갑작스러운 변수에는 대비해두세요.`
       : ` 다만 일지 ${b1}와 오늘의 ${b2}가 충(沖)으로 부딪히니, 평소보다 감정 기복이 있을 수 있어 여유를 갖고 넘기세요.`;
+    simpleFlavor = ' 다만 갑작스러운 변수엔 대비해두세요.';
   }
   const tip = info.tips[tipVariant];
-  const reasonText = info.texts[textVariant](meLabel, tdLabel) + flavor + ` ${tip}`;
+  const storyReasonText = info.simple + simpleFlavor;
+  const reasonText = info.texts[textVariant](meLabel, tdLabel) + flavor;
 
   const lucky = {
     color: LUCKY_COLORS[luckySeed % LUCKY_COLORS.length],
@@ -3364,8 +3394,11 @@ function computeTodayFortune(y, m, d) {
   };
 
   const dateLabel = `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일 (${'일월화수목금토'[now.getDay()]}) · 오늘은 ${todayPillar.stemChar}${todayPillar.branchChar}일(${todayPillar.stemHanja}${todayPillar.branchHanja}日)`;
+  // 스토리 이미지(캔버스)는 Jua 폰트로 그리는데 Jua엔 한자 글자가 없어서, 한자가 섞이면
+  // 그 글자만 다른 서체로 대체되어 깨져 보인다. 한자를 뺀 버전을 캔버스 전용으로 따로 둔다.
+  const storyDateLabel = `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일 (${'일월화수목금토'[now.getDay()]}) · 오늘은 ${todayPillar.stemChar}${todayPillar.branchChar}일`;
 
-  return { birth, todayPillar, overall, love, money, health, reasonText, sipsungLabel: info.label, lucky, dateLabel };
+  return { birth, todayPillar, overall, love, money, health, work, relation, reasonText, storyReasonText, tip, sipsungLabel: info.label, lucky, dateLabel, storyDateLabel };
 }
 
 function renderLuckyRow(containerId, lucky) {
@@ -3403,10 +3436,13 @@ document.getElementById('todayBtn').addEventListener('click', () => {
   document.getElementById('todayTierTitle').textContent = tier.title;
   document.getElementById('todayTierDesc').textContent = tier.desc;
   document.getElementById('todayReasonText').textContent = result.reasonText;
+  document.getElementById('todayAdviceText').textContent = result.tip;
   renderCategoryRows('todayBreakdown', [
     { icon: '💕', label: '애정운', score: result.love, desc: result.love >= 65 ? '마음이 잘 통하고 표현하기 좋은 날이에요.' : result.love >= 45 ? '무난한 흐름이에요. 작은 배려가 관계를 더 좋게 만들어요.' : '오해가 생기기 쉬우니 말 한마디 더 신경 써보세요.' },
     { icon: '💰', label: '재물운', score: result.money, desc: result.money >= 65 ? '뜻밖의 수입이나 좋은 성과가 따라올 수 있어요.' : result.money >= 45 ? '큰 변동 없이 무난하게 지나가는 흐름이에요.' : '오늘은 큰 지출이나 투자는 신중하게 결정하세요.' },
     { icon: '💪', label: '건강운', score: result.health, desc: result.health >= 65 ? '컨디션이 좋고 활력이 넘치는 날이에요.' : result.health >= 45 ? '평소 컨디션을 유지하는 무난한 하루예요.' : '무리하지 말고 충분한 휴식을 챙기세요.' },
+    { icon: '💼', label: '직장·학업운', score: result.work, desc: result.work >= 65 ? '실력을 보여줄 기회가 생기기 좋은 날이에요.' : result.work >= 45 ? '맡은 일을 차근차근 처리하면 무난한 하루예요.' : '예상치 못한 잔업이나 변수가 생길 수 있어요.' },
+    { icon: '🤝', label: '인간관계운', score: result.relation, desc: result.relation >= 65 ? '사람들과 유독 잘 통하는 날, 먼저 연락해보세요.' : result.relation >= 45 ? '무난한 흐름이에요. 평소처럼 자연스럽게 지내세요.' : '작은 오해가 생기기 쉬우니 말과 행동에 신경 써보세요.' },
   ]);
   renderLuckyRow('todayLuckyRow', result.lucky);
   showBox('todayResult');
@@ -4935,6 +4971,22 @@ function renderStoryCard(kind) {
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, 1080, 1920);
 
+  // Jua 폰트에는 한자뿐 아니라 ×(곱셈기호)··(가운뎃점)·…(말줄임표) 글리프도 없어서,
+  // 이 글자들이 섞인 문장을 그리면 그 글자만 다른(각진) 서체로 깨져 보인다.
+  // 캔버스 하나에서 쓰는 fillText/strokeText/measureText를 통째로 감싸서, 어디서 어떤
+  // 문자열을 그리든 자동으로 Jua가 지원하는 글자로 바꿔 그리게 한다(getContext는 같은
+  // 인스턴스를 재사용하므로, 다시 감싸지 않도록 플래그로 한 번만 패치한다).
+  if (!ctx.__juaSafePatched) {
+    const juaSafe = (s) => String(s).replace(/×/g, 'x').replace(/·/g, '/').replace(/…/g, '...');
+    const nativeFillText = ctx.fillText.bind(ctx);
+    const nativeStrokeText = ctx.strokeText.bind(ctx);
+    const nativeMeasureText = ctx.measureText.bind(ctx);
+    ctx.fillText = (text, x, y, maxWidth) => nativeFillText(juaSafe(text), x, y, maxWidth);
+    ctx.strokeText = (text, x, y, maxWidth) => nativeStrokeText(juaSafe(text), x, y, maxWidth);
+    ctx.measureText = (text) => nativeMeasureText(juaSafe(text));
+    ctx.__juaSafePatched = true;
+  }
+
   if (kind === 'saju') {
     const { pillars, detail, name } = lastSajuResult;
     drawStoryBackground(ctx, SAJU_THEME);
@@ -5019,9 +5071,9 @@ function renderStoryCard(kind) {
     ctx.font = '48px \'Malgun Gothic\', sans-serif';
     ctx.fillText('🍀', 995, 130);
 
-    drawPillBadge(ctx, r.dateLabel, 540, 520, '#ff9f1c');
+    drawPillBadge(ctx, r.storyDateLabel, 540, 520, '#ff9f1c');
 
-    roundRectPath(ctx, 80, 596, 920, 1094, 40);
+    roundRectPath(ctx, 80, 596, 920, 1050, 40);
     ctx.save();
     ctx.shadowColor = 'rgba(150,110,30,0.18)';
     ctx.shadowBlur = 30;
@@ -5070,11 +5122,12 @@ function renderStoryCard(kind) {
     ty += 20;
     drawSectionDivider(ctx, '🌤️ 오늘의 기운 풀이', CARD_CX, ty, 460);
     ty += 44;
-    // 사주 관계(합/충 등) 조합에 따라 이유 문구가 꽤 길어질 수 있어(최대 7줄) 고정 줄 수
-    // 대신 실제 필요한 줄 수를 재서 그리고, 아래 카드·배지·워터마크가 그만큼 따라 내려온다.
+    // 스토리 이미지는 공유용이라 일간·일지·오행 같은 어려운 용어를 다 빼고 핵심 문장만
+    // 보여준다(자세한 십성・합충 설명은 웹페이지의 "오늘의 기운 풀이"에서 확인). 실제
+    // 필요한 줄 수를 재서 그리고, 아래 카드·배지·워터마크가 그만큼 따라 내려온다.
     ctx.font = "33px 'Jua', 'Malgun Gothic', sans-serif";
-    const todayReasonLines = Math.min(countWrappedLines(ctx, r.reasonText, 780), 7);
-    ty = drawParagraphText(ctx, r.reasonText, ty, todayReasonLines);
+    const todayReasonLines = Math.min(countWrappedLines(ctx, r.storyReasonText, 780), 5);
+    ty = drawParagraphText(ctx, r.storyReasonText, ty, todayReasonLines);
 
     ty += 30;
     const cardY = ty, cardH = 220, cardW = 290, gap = 25;
@@ -5118,11 +5171,12 @@ function renderStoryCard(kind) {
       titleText = '🀄 사주 궁합'; emoji = r.tier.emoji;
       namesText = `${r.name1}  💕  ${r.name2}`;
       score = r.score; tier = r.tier;
-      reasonText = r.ilganText;
+      // 캔버스는 Jua 폰트가 한자를 못 그려서(한자만 다른 서체로 깨져 보임) 한자 없는 문구·라벨을 쓴다.
+      reasonText = r.storyIlganText;
       const ilganRel = ohengRelation(r.p1.day.stemElement, r.p2.day.stemElement);
-      const ilganLabel = ilganRel.type === 'same' ? '비화(比和)' : (ilganRel.type === 'a_generates_b' || ilganRel.type === 'b_generates_a') ? '상생(相生)' : '상극(相剋)';
+      const ilganLabel = ilganRel.type === 'same' ? '비화' : (ilganRel.type === 'a_generates_b' || ilganRel.type === 'b_generates_a') ? '상생' : '상극';
       const iljiRel = branchRelation(r.p1.day.branchIdx, r.p2.day.branchIdx);
-      const iljiLabel = { same: '동일', hap: '육합(六合)', chung: '충(沖)', samhap: '삼합(三合)', none: '무난' }[iljiRel];
+      const iljiLabel = { same: '동일', hap: '육합', chung: '충돌', samhap: '삼합', none: '무난' }[iljiRel];
       infoCards = [
         { emoji: '☀️', label: '일간 궁합', value: ilganLabel, desc: `${r.p1.day.stemChar} × ${r.p2.day.stemChar}`, ...PERSON_COLORS[0] },
         { emoji: '🌙', label: '일지 궁합', value: iljiLabel, desc: `${r.p1.day.animal}띠 × ${r.p2.day.animal}띠`, ...PERSON_COLORS[1] },
@@ -5239,7 +5293,7 @@ function buildResultText(kind) {
   }
   if (kind === 'today') {
     const r = lastTodayResult;
-    return `🌅 ${r.name}님의 오늘의 운세\n${r.dateLabel}\n\n${r.overall}점 · ${r.tier.title}\n${r.tier.desc}\n\n${r.reasonText}\n\n💕 애정운 ${r.love}점 · 💰 재물운 ${r.money}점 · 💪 건강운 ${r.health}점\n🍀 행운의 색 ${r.lucky.color} · 숫자 ${r.lucky.number} · ${r.lucky.item}${FOOTER}`;
+    return `🌅 ${r.name}님의 오늘의 운세\n${r.dateLabel}\n\n${r.overall}점 · ${r.tier.title}\n${r.tier.desc}\n\n${r.reasonText}\n\n💡 오늘의 조언: ${r.tip}\n\n💕 애정운 ${r.love}점 · 💰 재물운 ${r.money}점 · 💪 건강운 ${r.health}점 · 💼 직장·학업운 ${r.work}점 · 🤝 인간관계운 ${r.relation}점\n🍀 행운의 색 ${r.lucky.color} · 숫자 ${r.lucky.number} · ${r.lucky.item}${FOOTER}`;
   }
   if (kind === 'sajuCompat') {
     const r = lastSajuCompatResult;
