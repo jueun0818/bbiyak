@@ -5,7 +5,7 @@
 // - 정적 파일: 캐시 우선 + 백그라운드 갱신(stale-while-revalidate)
 // 파일 내용을 고칠 때마다 VERSION을 올리면 기존 방문자에게 업데이트 배너가 뜬다.
 // ============================================================
-const VERSION = 'v1.5.0';
+const VERSION = 'v1.6.0';
 const CACHE_NAME = 'ppiyak-' + VERSION;
 const CACHE_PREFIX = 'ppiyak-';
 
@@ -57,6 +57,11 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return; // 외부 도메인 요청은 브라우저에 그대로 맡김
+
+  // API 응답(게시판 목록, 세션 등)은 매번 최신이어야 하므로 절대 캐시하지 않고
+  // 그대로 네트워크로 보낸다. 예전엔 이것도 정적 파일과 같이 캐시 우선으로 처리돼서,
+  // 한 번 저장된 옛 응답(글이 없던 시절 등)이 계속 보이는 문제가 있었다.
+  if (url.pathname.startsWith('/api/')) return;
 
   if (req.mode === 'navigate') {
     event.respondWith(handleNavigate(event));
