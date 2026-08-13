@@ -900,7 +900,7 @@ function avatarColor(nickname) {
   for (const ch of String(nickname)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
   return AVATAR_COLORS[h % AVATAR_COLORS.length];
 }
-// 프로필에서 고를 수 있는 귀여운 이모지 아바타 목록. api/update-avatar.js의 허용 목록과 맞춰야 한다.
+// 프로필에서 고를 수 있는 귀여운 이모지 아바타 목록. api/update-profile.js의 허용 목록과 맞춰야 한다.
 const AVATAR_OPTIONS = ['🐥', '🐣', '🐤', '🐰', '🐱', '🐶', '🦊', '🐻', '🐼', '🐨', '🐷', '🐹', '🦄', '🐢', '🦋', '🐸', '🐧', '🦁', '🐯', '🐮'];
 
 function avatarHtml(nickname, avatar) {
@@ -986,7 +986,7 @@ document.getElementById('nicknameEditSubmit').addEventListener('click', async ()
     return;
   }
   try {
-    const r = await fetch('/api/update-nickname', {
+    const r = await fetch('/api/update-profile', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nickname: trimmed.slice(0, 20) }),
@@ -1053,7 +1053,7 @@ async function submitAvatar(avatar) {
     return;
   }
   try {
-    const r = await fetch('/api/update-avatar', {
+    const r = await fetch('/api/update-profile', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ avatar }),
@@ -1281,7 +1281,7 @@ document.getElementById('boardGateLoginBtn').addEventListener('click', () => {
 });
 
 document.getElementById('boardLogoutBtn').addEventListener('click', async () => {
-  await fetch('/api/logout', { method: 'POST' });
+  await fetch('/api/session', { method: 'POST' });
   await refreshBoardSession();
 });
 

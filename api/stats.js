@@ -23,6 +23,64 @@ async function redisCmd(url, token, cmd) {
   return data.result;
 }
 
+// 방문자 수 집계(stats:uniques:*)와 기능별 "오늘" 집계(stats:tab:{tab}:{date})를
+// 나중에 추가했기 때문에, 그 이전 활동에는 반영된 기록이 없다. stats:log(궁합 기능을
+// 한 번이라도 눌러본 최근 기록, 최대 200건)에서 방문자 ID와 오늘 치 기능별 클릭 수를
+// 모아 소급 반영한다. 궁합을 눌러본 적 없는 순수 방문은 로그 자체가 없어 복구가
+// 불가능하므로, 이건 정확한 전체 값이 아니라 "복구 가능한 만큼"의 근사치다.
+async function backfillVisitors(url, token, res) {
+  const LOG_KEY = 'stats:log';
+  try {
+    const rawLogs = await redisCmd(url, token, ['LRANGE', LOG_KEY, '0', '-1']);
+    const entries = (rawLogs || [])
+      .map((s) => { try { return JSON.parse(s); } catch { return null; } })
+      .filter((e) => e && e.t);
+
+    const totalSet = new Set();
+    const byDate = new Map();
+    entries.forEach((e) => {
+      if (!e.v) return;
+      totalSet.add(e.v);
+      const date = new Date(e.t).toISOString().slice(0, 10);
+      if (!byDate.has(date)) byDate.set(date, new Set());
+      byDate.get(date).add(e.v);
+    });
+
+    const cmds = [];
+    totalSet.forEach((v) => cmds.push(['SADD', 'stats:uniques:total', v]));
+    byDate.forEach((set, date) => {
+      set.forEach((v) => cmds.push(['SADD', `stats:uniques:${date}`, v]));
+    });
+
+    // 오늘 치 "기능별 조회수"도 오늘 새로 도입됐으므로, 배포 전에 이미 있었던
+    // 오늘의 클릭은 stats:tab:{tab}:{date} 카운터에 반영이 안 되어 있다. 로그에서
+    // 오늘 날짜분만 세어 채워 넣되, SET ... NX로 "키가 아직 없을 때만" 채워서
+    // 실시간 카운트를 덮어쓰거나 버튼을 여러 번 눌러 중복 집계되는 일을 막는다.
+    const todayKey = new Date().toISOString().slice(0, 10);
+    const todayTabCounts = new Map();
+    entries.forEach((e) => {
+      const date = new Date(e.t).toISOString().slice(0, 10);
+      if (date !== todayKey || !e.tab) return;
+      todayTabCounts.set(e.tab, (todayTabCounts.get(e.tab) || 0) + 1);
+    });
+    await Promise.all(
+      [...todayTabCounts.entries()].map(([tab, count]) =>
+        redisCmd(url, token, ['SET', `stats:tab:${tab}:${todayKey}`, String(count), 'NX'])
+      )
+    );
+
+    await Promise.all(cmds.map((c) => redisCmd(url, token, c)));
+
+    res.status(200).json({
+      ok: true,
+      logEntries: entries.length,
+      uniqueVisitorsFound: totalSet.size,
+    });
+  } catch (e) {
+    res.status(500).json({ error: 'failed' });
+  }
+}
+
 export default async function handler(req, res) {
   const { UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, ADMIN_PASSWORD } = process.env;
   if (!UPSTASH_REDIS_REST_URL || !UPSTASH_REDIS_REST_TOKEN || !ADMIN_PASSWORD) {
@@ -30,9 +88,21 @@ export default async function handler(req, res) {
     return;
   }
 
-  const password = (req.method === 'POST' ? req.body && req.body.password : req.query.password) || '';
+  let postBody = req.body;
+  if (req.method === 'POST' && typeof postBody === 'string') {
+    try { postBody = JSON.parse(postBody); } catch { postBody = {}; }
+  }
+
+  const password = (req.method === 'POST' ? postBody && postBody.password : req.query.password) || '';
   if (password !== ADMIN_PASSWORD) {
     res.status(401).json({ error: 'unauthorized' });
+    return;
+  }
+
+  // Vercel Hobby 플랜의 서버리스 함수 개수 제한 때문에 예전 backfill-visitors.js를
+  // 이 파일의 POST 액션으로 합쳤다. 대시보드 읽기(GET)와는 무관한 일회성 관리 기능이다.
+  if (req.method === 'POST' && postBody && postBody.action === 'backfill') {
+    await backfillVisitors(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, res);
     return;
   }
 

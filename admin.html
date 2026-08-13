@@ -1010,7 +1010,7 @@ async function loadReports() {
   const pw = sessionStorage.getItem('bbiyak_admin_pw');
   if (!pw) return;
   try {
-    const res = await fetch('/api/admin-reports?password=' + encodeURIComponent(pw));
+    const res = await fetch('/api/admin?type=reports&password=' + encodeURIComponent(pw));
     if (!res.ok) throw new Error('failed');
     const data = await res.json();
     renderReports(data.reports || []);
@@ -1052,10 +1052,10 @@ async function resolveReport(id, action) {
   const pw = sessionStorage.getItem('bbiyak_admin_pw');
   if (!pw) return;
   try {
-    await fetch('/api/admin-reports', {
+    await fetch('/api/admin', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: pw, id, action }),
+      body: JSON.stringify({ password: pw, type: 'reports', id, action }),
     });
     loadReports();
   } catch (e) { /* 무시 */ }
@@ -1068,7 +1068,7 @@ async function loadFeedback() {
   const pw = sessionStorage.getItem('bbiyak_admin_pw');
   if (!pw) return;
   try {
-    const res = await fetch('/api/admin-feedback?password=' + encodeURIComponent(pw));
+    const res = await fetch('/api/admin?type=feedback&password=' + encodeURIComponent(pw));
     if (!res.ok) throw new Error('failed');
     const data = await res.json();
     renderFeedback(data.items || []);
@@ -1101,10 +1101,10 @@ async function deleteFeedback(id) {
   const pw = sessionStorage.getItem('bbiyak_admin_pw');
   if (!pw) return;
   try {
-    await fetch('/api/admin-feedback', {
+    await fetch('/api/admin', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: pw, id }),
+      body: JSON.stringify({ password: pw, type: 'feedback', id }),
     });
     loadFeedback();
   } catch (e) { /* 무시 */ }
@@ -1124,10 +1124,10 @@ async function backfillVisitors() {
   btn.disabled = true;
   btn.textContent = '가져오는 중…';
   try {
-    const res = await fetch('/api/backfill-visitors', {
+    const res = await fetch('/api/stats', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: pw }),
+      body: JSON.stringify({ password: pw, action: 'backfill' }),
     });
     if (!res.ok) throw new Error('failed');
     const data = await res.json();
