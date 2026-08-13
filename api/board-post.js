@@ -12,6 +12,25 @@ export default async function handler(req, res) {
     return;
   }
 
+  // 내 댓글 모아보기: 특정 글이 아니라 로그인한 사용자 기준으로 조회하므로 postId가 없다.
+  if (req.method === 'GET' && req.query.mine === '1') {
+    try {
+      const user = await getSessionUser(req);
+      if (!user) {
+        res.status(401).json({ error: 'login required' });
+        return;
+      }
+      const rawList = await redisCmd(['LRANGE', `user:${user.kakaoId}:comments`, '0', '49']);
+      const comments = (rawList || [])
+        .map((s) => { try { return JSON.parse(s); } catch { return null; } })
+        .filter(Boolean);
+      res.status(200).json({ comments });
+    } catch (e) {
+      res.status(500).json({ error: 'failed' });
+    }
+    return;
+  }
+
   const postId = String((req.method === 'GET' ? req.query.id : (req.body && req.body.postId)) || '').replace(/[^0-9]/g, '');
   if (!postId) {
     res.status(400).json({ error: 'invalid id' });
@@ -98,7 +117,97 @@ export default async function handler(req, res) {
           createdAt: Date.now(),
         };
         await redisCmd(['LPUSH', `board:post:${postId}:comments`, JSON.stringify(comment)]);
+
+        // "내 댓글 모아보기"에서 매번 글을 다시 불러오지 않도록, 글 제목을 함께 스냅샷으로 남긴다.
+        const postForTitleRaw = await redisCmd(['GET', `board:post:${postId}`]);
+        let postTitle = '(삭제된 글)';
+        if (postForTitleRaw) {
+          try {
+            const postForTitle = JSON.parse(postForTitleRaw);
+            postTitle = postForTitle.title
+              || (postForTitle.body ? (postForTitle.body.length > 24 ? postForTitle.body.slice(0, 24) + '…' : postForTitle.body) : '(제목 없음)');
+          } catch { /* 무시 */ }
+        }
+        const userEntry = { id: comment.id, postId, postTitle, body: text, createdAt: comment.createdAt };
+        const userCommentsKey = `user:${user.kakaoId}:comments`;
+        await redisCmd(['LPUSH', userCommentsKey, JSON.stringify(userEntry)]);
+        await redisCmd(['LTRIM', userCommentsKey, '0', '199']);
+
         res.status(200).json({ ok: true, comment });
+        return;
+      }
+
+      if (action === 'editComment') {
+        const commentId = String((body && body.commentId) || '');
+        const text = safeText(body.body, MAX_COMMENT_LEN);
+        if (!commentId || !text) {
+          res.status(400).json({ error: 'invalid' });
+          return;
+        }
+
+        const postCommentsKey = `board:post:${postId}:comments`;
+        const rawList = (await redisCmd(['LRANGE', postCommentsKey, '0', '-1'])) || [];
+        let foundIndex = -1;
+        let foundComment = null;
+        for (let i = 0; i < rawList.length; i++) {
+          let c;
+          try { c = JSON.parse(rawList[i]); } catch { continue; }
+          if (c.id === commentId) { foundIndex = i; foundComment = c; break; }
+        }
+        if (foundIndex === -1 || !foundComment || foundComment.kakaoId !== user.kakaoId) {
+          res.status(403).json({ error: 'forbidden' });
+          return;
+        }
+        const editedAt = Date.now();
+        const updatedComment = { ...foundComment, body: text, editedAt };
+        await redisCmd(['LSET', postCommentsKey, String(foundIndex), JSON.stringify(updatedComment)]);
+
+        // 내 댓글 모아보기 인덱스도 같이 갱신한다.
+        const userCommentsKey = `user:${user.kakaoId}:comments`;
+        const userRawList = (await redisCmd(['LRANGE', userCommentsKey, '0', '-1'])) || [];
+        for (let i = 0; i < userRawList.length; i++) {
+          let c;
+          try { c = JSON.parse(userRawList[i]); } catch { continue; }
+          if (c.id === commentId) {
+            await redisCmd(['LSET', userCommentsKey, String(i), JSON.stringify({ ...c, body: text, editedAt })]);
+            break;
+          }
+        }
+
+        res.status(200).json({ ok: true, body: text, editedAt });
+        return;
+      }
+
+      if (action === 'deleteComment') {
+        const commentId = String((body && body.commentId) || '');
+        if (!commentId) {
+          res.status(400).json({ error: 'invalid' });
+          return;
+        }
+
+        const postCommentsKey = `board:post:${postId}:comments`;
+        const rawList = (await redisCmd(['LRANGE', postCommentsKey, '0', '-1'])) || [];
+        let targetRaw = null;
+        let targetComment = null;
+        for (const s of rawList) {
+          let c;
+          try { c = JSON.parse(s); } catch { continue; }
+          if (c.id === commentId) { targetRaw = s; targetComment = c; break; }
+        }
+        if (!targetRaw || !targetComment || targetComment.kakaoId !== user.kakaoId) {
+          res.status(403).json({ error: 'forbidden' });
+          return;
+        }
+        await redisCmd(['LREM', postCommentsKey, '1', targetRaw]);
+
+        const userCommentsKey = `user:${user.kakaoId}:comments`;
+        const userRawList = (await redisCmd(['LRANGE', userCommentsKey, '0', '-1'])) || [];
+        const userTargetRaw = userRawList.find((s) => {
+          try { return JSON.parse(s).id === commentId; } catch { return false; }
+        });
+        if (userTargetRaw) await redisCmd(['LREM', userCommentsKey, '1', userTargetRaw]);
+
+        res.status(200).json({ ok: true });
         return;
       }
 
@@ -151,6 +260,21 @@ export default async function handler(req, res) {
           res.status(403).json({ error: 'forbidden' });
           return;
         }
+        // 글이 사라지면 그 밑에 달렸던 댓글들도 각 댓글 작성자의 "내 댓글 모아보기"
+        // 인덱스에서 같이 지워야, 클릭했을 때 없는 글로 연결되는 걸 막을 수 있다.
+        const commentsToClean = (await redisCmd(['LRANGE', `board:post:${postId}:comments`, '0', '-1'])) || [];
+        for (const s of commentsToClean) {
+          let c;
+          try { c = JSON.parse(s); } catch { continue; }
+          if (!c || !c.kakaoId || !c.id) continue;
+          const key = `user:${c.kakaoId}:comments`;
+          const list = (await redisCmd(['LRANGE', key, '0', '-1'])) || [];
+          const match = list.find((s2) => {
+            try { return JSON.parse(s2).id === c.id; } catch { return false; }
+          });
+          if (match) await redisCmd(['LREM', key, '1', match]);
+        }
+
         await redisCmd(['DEL', `board:post:${postId}`]);
         await redisCmd(['DEL', `board:post:${postId}:comments`]);
         await redisCmd(['DEL', `board:post:${postId}:likes`]);
