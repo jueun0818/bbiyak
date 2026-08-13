@@ -317,6 +317,19 @@
     font-size: 15px;
     padding: 11px 14px;
   }
+  #boardWriteTitle {
+    width: 100%;
+    padding: 13px 14px;
+    margin-bottom: 8px;
+    border-radius: 14px;
+    border: 1.5px solid var(--line);
+    font-size: 15.5px;
+    font-weight: 700;
+    font-family: inherit;
+    outline: none;
+    box-sizing: border-box;
+  }
+  #boardWriteTitle:focus { border-color: var(--amber-strong); }
   #boardWriteText {
     width: 100%;
     min-height: 76px;
@@ -384,6 +397,13 @@
     word-break: break-word;
   }
   .board-post-time { font-size: 12.5px; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+  .board-post-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text);
+    word-break: break-word;
+  }
+  .board-detail-inner .board-post-title { margin-bottom: 8px; }
   .board-post-body {
     font-size: 15px;
     color: var(--text);
@@ -455,6 +475,16 @@
     font-size: 15px;
     box-shadow: none;
   }
+  /* 글 상세 팝업만 화면을 꽉 채우는 전체화면으로 띄운다(프로필・건의하기 팝업은 기존 바텀시트 유지) */
+  #boardDetailModal { padding: 0; align-items: stretch; }
+  #boardDetailModal .board-detail-inner {
+    max-width: none;
+    max-height: none;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    padding: 24px 18px calc(18px + env(safe-area-inset-bottom, 0px));
+  }
   .board-comments { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
   .board-comment {
     background: var(--panel);
@@ -522,6 +552,7 @@
         <select class="board-attach-select" id="boardAttachResult">
           <option value="">📋 결과 첨부 안 함</option>
         </select>
+        <input type="text" id="boardWriteTitle" maxlength="40" placeholder="제목을 입력해주세요">
         <textarea id="boardWriteText" maxlength="500" placeholder="궁합 결과나 하고 싶은 말을 자유롭게 남겨보세요 🐥"></textarea>
         <div class="board-write-row">
           <button type="button" id="boardWriteSubmit">✍️ 올리기</button>
@@ -832,6 +863,15 @@ document.getElementById('boardAvatarModal').addEventListener('click', (e) => {
   if (e.target.id === 'boardAvatarModal') document.getElementById('boardAvatarModal').classList.remove('show');
 });
 
+// 옛날에 올라온 글은 title 필드가 없을 수 있어(제목 기능 도입 전), 그런 글은 본문
+// 앞부분을 잘라 제목처럼 보여준다.
+function postTitleText(post) {
+  if (post.title) return post.title;
+  const body = (post.body || '').trim();
+  if (!body) return '(제목 없음)';
+  return body.length > 24 ? body.slice(0, 24) + '…' : body;
+}
+
 function renderResultChip(data) {
   if (!data) return '';
   const scoreText = data.score != null ? ` · ${data.score}점` : '';
@@ -850,8 +890,7 @@ function renderBoardPostCard(post) {
       <span class="board-post-nick">${avatarHtml(post.nickname, post.avatar)}${escapeHtml(post.nickname)}</span>
       <span class="board-post-time">${timeAgo(post.createdAt)}</span>
     </div>
-    <div class="board-post-body">${escapeHtml(post.body)}</div>
-    ${renderResultChip(post.resultData)}
+    <div class="board-post-title">${escapeHtml(postTitleText(post))}</div>
     <div class="board-post-foot">
       <span class="${post.likedByMe ? 'liked' : ''}">❤️ ${post.likeCount}</span>
       <span>💬 ${post.commentCount}</span>
@@ -937,9 +976,12 @@ document.getElementById('boardLogoutBtn').addEventListener('click', async () => 
 
 document.getElementById('boardWriteSubmit').addEventListener('click', async () => {
   const btn = document.getElementById('boardWriteSubmit');
+  const titleEl = document.getElementById('boardWriteTitle');
   const textEl = document.getElementById('boardWriteText');
   const kind = document.getElementById('boardAttachResult').value;
+  const title = titleEl.value.trim();
   const body = textEl.value.trim();
+  if (!title) { titleEl.focus(); return; }
   if (!body) { textEl.focus(); return; }
 
   const resultData = kind ? buildResultData(kind) : null;
@@ -950,13 +992,14 @@ document.getElementById('boardWriteSubmit').addEventListener('click', async () =
     const r = await fetch('/api/board', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ category, body, resultData }),
+      body: JSON.stringify({ category, title, body, resultData }),
     });
     const data = await r.json();
     if (!r.ok) {
       alert(r.status === 429 ? '너무 빨리 연달아 올렸어요. 잠시 후 다시 시도해주세요.' : '글을 올리지 못했어요.');
       return;
     }
+    titleEl.value = '';
     textEl.value = '';
     document.getElementById('boardAttachResult').value = '';
     if (data.post.category === 'result') {
@@ -1002,6 +1045,7 @@ function renderBoardDetail(post, comments) {
       <span class="board-post-nick">${avatarHtml(post.nickname, post.avatar)}${escapeHtml(post.nickname)}</span>
       <span class="board-post-time">${timeAgo(post.createdAt)}</span>
     </div>
+    <div class="board-post-title" id="boardDetailPostTitle">${escapeHtml(postTitleText(post))}</div>
     <div class="board-post-body" id="boardDetailPostBody">${escapeHtml(post.body)}</div>
     ${renderResultChip(post.resultData)}
     <div class="board-post-foot">
@@ -1068,21 +1112,27 @@ function renderBoardDetail(post, comments) {
   const editBtn = document.getElementById('boardDetailEdit');
   if (editBtn) {
     editBtn.addEventListener('click', async () => {
-      const next = prompt('내용을 수정해주세요 (최대 500자)', post.body);
-      const trimmed = (next || '').trim();
-      if (!trimmed || trimmed === post.body) return;
+      const nextTitle = prompt('제목을 수정해주세요 (최대 40자)', post.title || postTitleText(post));
+      const trimmedTitle = (nextTitle || '').trim();
+      if (!trimmedTitle) return;
+      const nextBody = prompt('내용을 수정해주세요 (최대 500자)', post.body);
+      const trimmedBody = (nextBody || '').trim();
+      if (!trimmedBody) return;
+      if (trimmedTitle === (post.title || postTitleText(post)) && trimmedBody === post.body) return;
       try {
         const r = await fetch('/api/board-post', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ postId: post.id, action: 'edit', body: trimmed.slice(0, 500) }),
+          body: JSON.stringify({ postId: post.id, action: 'edit', title: trimmedTitle.slice(0, 40), body: trimmedBody.slice(0, 500) }),
         });
         const data = await r.json();
         if (!r.ok) { alert('수정하지 못했어요.'); return; }
+        post.title = data.title;
         post.body = data.body;
+        document.getElementById('boardDetailPostTitle').textContent = data.title;
         document.getElementById('boardDetailPostBody').textContent = data.body;
-        const listCardEl = document.querySelector(`.board-post[data-id="${post.id}"] .board-post-body`);
-        if (listCardEl) listCardEl.textContent = data.body;
+        const listCardEl = document.querySelector(`.board-post[data-id="${post.id}"] .board-post-title`);
+        if (listCardEl) listCardEl.textContent = data.title;
       } catch (e) {
         alert('수정하지 못했어요.');
       }

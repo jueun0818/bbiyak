@@ -3,6 +3,7 @@ import { redisCmd, getSessionUser, safeText } from './_kakao.js';
 
 const MAX_COMMENT_LEN = 200;
 const MAX_BODY_LEN = 500;
+const MAX_TITLE_LEN = 40;
 
 export default async function handler(req, res) {
   const { UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN } = process.env;
@@ -108,14 +109,15 @@ export default async function handler(req, res) {
           res.status(403).json({ error: 'forbidden' });
           return;
         }
+        const title = safeText(body.title, MAX_TITLE_LEN) || post.title;
         const text = safeText(body.body, MAX_BODY_LEN);
-        if (!text) {
+        if (!title || !text) {
           res.status(400).json({ error: 'empty body' });
           return;
         }
-        const updated = { ...post, body: text, editedAt: Date.now() };
+        const updated = { ...post, title, body: text, editedAt: Date.now() };
         await redisCmd(['SET', `board:post:${postId}`, JSON.stringify(updated)]);
-        res.status(200).json({ ok: true, body: text, editedAt: updated.editedAt });
+        res.status(200).json({ ok: true, title, body: text, editedAt: updated.editedAt });
         return;
       }
 

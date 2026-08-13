@@ -4,6 +4,7 @@ import { redisCmd, getSessionUser, safeText } from './_kakao.js';
 const CATEGORIES = new Set(['free', 'result']);
 const PAGE_SIZE = 20;
 const MAX_BODY_LEN = 500;
+const MAX_TITLE_LEN = 40;
 // 인기순은 전체 글이 아니라 최근 이 개수 안에서만 좋아요 순으로 다시 정렬한다
 // (오래된 글이 좋아요 몇 개로 상단을 영구 점거하는 걸 막고, 매 요청마다 훑는 범위도 제한).
 const POPULAR_WINDOW = 200;
@@ -79,9 +80,10 @@ export default async function handler(req, res) {
         try { body = JSON.parse(body); } catch { body = {}; }
       }
       const category = CATEGORIES.has(body && body.category) ? body.category : 'free';
+      const title = safeText(body && body.title, MAX_TITLE_LEN);
       const text = safeText(body && body.body, MAX_BODY_LEN);
       const resultData = body && body.resultData && typeof body.resultData === 'object' ? body.resultData : null;
-      if (!text) {
+      if (!title || !text) {
         res.status(400).json({ error: 'empty body' });
         return;
       }
@@ -96,7 +98,7 @@ export default async function handler(req, res) {
 
       const id = await redisCmd(['INCR', 'board:postSeq']);
       const createdAt = Date.now();
-      const post = { id: String(id), kakaoId: user.kakaoId, nickname: user.nickname, avatar: user.avatar || null, category, body: text, resultData, createdAt };
+      const post = { id: String(id), kakaoId: user.kakaoId, nickname: user.nickname, avatar: user.avatar || null, category, title, body: text, resultData, createdAt };
 
       await redisCmd(['SET', `board:post:${id}`, JSON.stringify(post)]);
       await redisCmd(['ZADD', 'board:posts', String(createdAt), String(id)]);
