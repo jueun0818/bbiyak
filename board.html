@@ -27,6 +27,10 @@
     --panel: #fffbf0;
   }
   * { box-sizing: border-box; }
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible {
+    outline: 2.5px solid #ff8f00;
+    outline-offset: 2px;
+  }
   html {
     background: linear-gradient(168deg, #fffbea 0%, #ffedad 38%, #ffd966 100%);
   }
@@ -188,9 +192,10 @@
     -webkit-overflow-scrolling: touch;
   }
   .board-result-strip:empty::after {
-    content: '아직 올라온 궁합 결과가 없어요';
+    content: '🎉 아직 올라온 궁합 결과가 없어요';
     font-size: 13.5px;
     color: var(--muted);
+    padding: 8px 2px;
   }
   .board-result-card {
     flex: 0 0 auto;
@@ -282,6 +287,102 @@
   }
   .board-avatar-option:active { transform: scale(0.94); }
   .board-avatar-option.reset { font-size: 12.5px; font-weight: 700; color: var(--muted); }
+
+  .modal-text-input {
+    width: 100%;
+    padding: 13px 14px;
+    margin-bottom: 8px;
+    border-radius: 14px;
+    border: 1.5px solid var(--line);
+    font-size: 15.5px;
+    font-weight: 700;
+    font-family: inherit;
+    outline: none;
+    box-sizing: border-box;
+  }
+  .modal-text-input:focus { border-color: var(--amber-strong); }
+  .modal-textarea {
+    width: 100%;
+    min-height: 90px;
+    padding: 13px 14px;
+    border-radius: 14px;
+    border: 1.5px solid var(--line);
+    font-size: 15px;
+    font-family: inherit;
+    resize: vertical;
+    outline: none;
+    box-sizing: border-box;
+  }
+  .modal-textarea:focus { border-color: var(--amber-strong); }
+
+  /* ---- 확인 모달 (confirm() 대체) ---- */
+  .confirm-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(30,20,0,0.5);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .confirm-modal.show { display: flex; }
+  .confirm-modal-inner {
+    width: 100%;
+    max-width: 340px;
+    background: #fffdf7;
+    border-radius: 18px;
+    padding: 22px 20px;
+    text-align: center;
+  }
+  .confirm-modal-message { margin: 0 0 18px; font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.5; }
+  .confirm-modal-actions { display: flex; gap: 8px; }
+  .confirm-modal-cancel, .confirm-modal-ok {
+    flex: 1;
+    width: auto;
+    margin: 0;
+    padding: 12px;
+    font-size: 14.5px;
+    font-weight: 700;
+    border-radius: 12px;
+  }
+  .confirm-modal-cancel { background: #fff; color: #a3781c; border: 1.5px solid var(--line); box-shadow: none; }
+  .confirm-modal-ok { background: var(--grad-amber); color: #fff; }
+  .confirm-modal-ok.danger { background: linear-gradient(90deg, #e0507a, #d0304a); box-shadow: 0 8px 18px -7px rgba(208,48,74,0.6); }
+
+  /* ---- 토스트 (alert() 대체) ---- */
+  .toast-container {
+    position: fixed;
+    left: 50%;
+    bottom: max(24px, env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 8px;
+    align-items: center;
+    pointer-events: none;
+    width: 100%;
+    padding: 0 16px;
+    box-sizing: border-box;
+  }
+  .toast {
+    pointer-events: auto;
+    max-width: 420px;
+    padding: 12px 18px;
+    border-radius: 999px;
+    background: #3b3227;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 10px 24px -10px rgba(0,0,0,0.5);
+    animation: toastIn .22s ease, toastOut .22s ease 2.4s forwards;
+  }
+  .toast.success { background: #2f8f5b; }
+  .toast.error { background: #d0304a; }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes toastOut { to { opacity: 0; transform: translateY(6px); } }
   .board-auth { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .board-user-label { display: inline-flex; align-items: center; font-size: 13.5px; color: var(--muted); font-weight: 700; min-width: 0; word-break: break-word; }
   .board-login-btn, .board-logout-btn, .board-nickname-edit-btn {
@@ -367,7 +468,41 @@
   }
 
   .board-list { display: flex; flex-direction: column; gap: 12px; }
-  .board-empty { text-align: center; color: var(--muted); font-size: 14.5px; padding: 24px 0; }
+  .board-empty { text-align: center; color: var(--muted); font-size: 14.5px; line-height: 1.7; padding: 28px 12px; }
+
+  /* ---- 로딩 스켈레톤 ---- */
+  .skeleton {
+    background: linear-gradient(100deg, #f3ead4 30%, #fff6df 50%, #f3ead4 70%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.4s ease-in-out infinite;
+    border-radius: 6px;
+  }
+  @keyframes skeletonShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  .skeleton-post {
+    border: 1.5px solid var(--line);
+    border-radius: 16px;
+    padding: 14px 16px;
+    background: #fff;
+  }
+  .skeleton-post-head { display: flex; align-items: center; gap: 8px; }
+  .skeleton-avatar { flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; }
+  .skeleton-post-title { height: 15px; width: 65%; margin-top: 10px; }
+  .skeleton-post-foot { display: flex; gap: 10px; margin-top: 12px; }
+  .skeleton-pill { width: 36px; height: 12px; }
+  .skeleton-result-card {
+    flex: 0 0 auto;
+    width: 168px;
+    border: 1.5px solid var(--line);
+    border-radius: 16px;
+    padding: 12px 13px;
+    background: #fff;
+  }
+  .skeleton-result-nick { height: 11px; width: 50%; }
+  .skeleton-result-name { height: 14px; width: 85%; margin-top: 8px; }
+  .skeleton-result-score { height: 20px; width: 45%; margin-top: 6px; }
   .board-post {
     border: 1.5px solid var(--line);
     border-radius: 16px;
@@ -576,7 +711,7 @@
   <p class="disclaimer">* 게시판 글과 댓글은 카카오 로그인 닉네임으로 공개 게시돼요. 서로 예의를 지켜주세요 🐥<br>* "결과 첨부"는 방금 전 이 기기의 삐약궁합에서 확인한 결과만 골라 올릴 수 있어요.</p>
 </div>
 
-<div class="board-detail-modal" id="boardDetailModal">
+<div class="board-detail-modal" id="boardDetailModal" role="dialog" aria-modal="true" aria-label="게시글 상세">
   <div class="board-detail-inner">
     <button type="button" class="board-detail-close" id="boardDetailClose" aria-label="닫기">✕</button>
     <div id="boardDetailBody"></div>
@@ -588,7 +723,7 @@
   </div>
 </div>
 
-<div class="board-detail-modal" id="boardAvatarModal">
+<div class="board-detail-modal" id="boardAvatarModal" role="dialog" aria-modal="true" aria-label="프로필 그림 고르기">
   <div class="board-detail-inner board-avatar-modal-inner">
     <button type="button" class="board-detail-close" id="boardAvatarClose" aria-label="닫기">✕</button>
     <p class="board-avatar-modal-title">🖼️ 프로필 그림 고르기</p>
@@ -598,7 +733,7 @@
   </div>
 </div>
 
-<div class="board-detail-modal" id="boardFeedbackModal">
+<div class="board-detail-modal" id="boardFeedbackModal" role="dialog" aria-modal="true" aria-label="개선하면 좋겠는 점">
   <div class="board-detail-inner board-avatar-modal-inner">
     <button type="button" class="board-detail-close" id="boardFeedbackClose" aria-label="닫기">✕</button>
     <p class="board-avatar-modal-title">💡 개선하면 좋겠는 점</p>
@@ -609,6 +744,41 @@
     <p class="board-feedback-note">다른 사람에게는 공개되지 않고 운영자만 확인해요. 로그인 중이면 닉네임과 함께 전달돼요.</p>
   </div>
 </div>
+
+<div class="board-detail-modal" id="nicknameEditModal" role="dialog" aria-modal="true" aria-label="닉네임 변경">
+  <div class="board-detail-inner board-avatar-modal-inner">
+    <button type="button" class="board-detail-close" id="nicknameEditClose" aria-label="닫기">✕</button>
+    <p class="board-avatar-modal-title">✏️ 닉네임 변경</p>
+    <input type="text" id="nicknameEditInput" class="modal-text-input" maxlength="20" placeholder="사용할 닉네임을 입력해주세요" aria-label="닉네임">
+    <div class="board-write-row">
+      <button type="button" id="nicknameEditSubmit">저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="board-detail-modal" id="postEditModal" role="dialog" aria-modal="true" aria-label="글 수정">
+  <div class="board-detail-inner board-avatar-modal-inner">
+    <button type="button" class="board-detail-close" id="postEditClose" aria-label="닫기">✕</button>
+    <p class="board-avatar-modal-title">✏️ 글 수정</p>
+    <input type="text" id="postEditTitle" class="modal-text-input" maxlength="40" placeholder="제목을 입력해주세요" aria-label="제목">
+    <textarea id="postEditBody" class="modal-textarea" maxlength="500" placeholder="내용을 입력해주세요" aria-label="내용"></textarea>
+    <div class="board-write-row">
+      <button type="button" id="postEditSubmit">저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="confirm-modal" id="confirmModal" role="alertdialog" aria-modal="true" aria-labelledby="confirmModalMessage">
+  <div class="confirm-modal-inner">
+    <p class="confirm-modal-message" id="confirmModalMessage"></p>
+    <div class="confirm-modal-actions">
+      <button type="button" class="confirm-modal-cancel" id="confirmModalCancel">취소</button>
+      <button type="button" class="confirm-modal-ok" id="confirmModalOk">확인</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
 
 <script>
 // index.html의 각 결과 화면이 계산을 마칠 때마다 localStorage에 남겨두는 가벼운
@@ -678,6 +848,49 @@ function timeAgo(ms) {
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// 브라우저 기본 alert() 대신 쓰는 토스트. 2.6초 뒤 자동으로 사라진다.
+function showToast(message, type) {
+  const container = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = `toast${type ? ' ' + type : ''}`;
+  el.setAttribute('role', 'status');
+  el.textContent = message;
+  container.appendChild(el);
+  setTimeout(() => el.remove(), 2700);
+}
+
+// 브라우저 기본 confirm() 대신 쓰는 확인 모달. Promise<boolean>이라
+// `if (!(await showConfirm('...'))) return;` 형태로 그대로 대체할 수 있다.
+function showConfirm(message, opts) {
+  const danger = !!(opts && opts.danger);
+  return new Promise((resolve) => {
+    const modal = document.getElementById('confirmModal');
+    document.getElementById('confirmModalMessage').textContent = message;
+    const okBtn = document.getElementById('confirmModalOk');
+    const cancelBtn = document.getElementById('confirmModalCancel');
+    okBtn.classList.toggle('danger', danger);
+    okBtn.textContent = danger ? '삭제' : '확인';
+    modal.classList.add('show');
+    okBtn.focus();
+    const cleanup = (result) => {
+      modal.classList.remove('show');
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      modal.removeEventListener('click', onBackdrop);
+      document.removeEventListener('keydown', onKey);
+      resolve(result);
+    };
+    const onOk = () => cleanup(true);
+    const onCancel = () => cleanup(false);
+    const onBackdrop = (e) => { if (e.target.id === 'confirmModal') cleanup(false); };
+    const onKey = (e) => { if (e.key === 'Escape') cleanup(false); };
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+    modal.addEventListener('click', onBackdrop);
+    document.addEventListener('keydown', onKey);
+  });
 }
 
 // 닉네임마다 고정된 색을 배정해서 게시판에 여러 사람이 있다는 느낌을 시각적으로 준다.
@@ -750,10 +963,28 @@ function renderUserLabel() {
     : '';
 }
 
-document.getElementById('boardNicknameEditBtn').addEventListener('click', async () => {
-  const next = prompt('사용할 닉네임을 입력해주세요 (최대 20자)', boardSession.nickname || '');
-  const trimmed = (next || '').trim();
-  if (!trimmed || trimmed === boardSession.nickname) return;
+document.getElementById('boardNicknameEditBtn').addEventListener('click', () => {
+  document.getElementById('nicknameEditInput').value = boardSession.nickname || '';
+  document.getElementById('nicknameEditModal').classList.add('show');
+  document.getElementById('nicknameEditInput').focus();
+});
+document.getElementById('nicknameEditClose').addEventListener('click', () => {
+  document.getElementById('nicknameEditModal').classList.remove('show');
+});
+document.getElementById('nicknameEditModal').addEventListener('click', (e) => {
+  if (e.target.id === 'nicknameEditModal') document.getElementById('nicknameEditModal').classList.remove('show');
+});
+document.getElementById('nicknameEditInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('nicknameEditSubmit').click();
+});
+document.getElementById('nicknameEditSubmit').addEventListener('click', async () => {
+  const input = document.getElementById('nicknameEditInput');
+  const trimmed = input.value.trim();
+  if (!trimmed) { input.focus(); return; }
+  if (trimmed === boardSession.nickname) {
+    document.getElementById('nicknameEditModal').classList.remove('show');
+    return;
+  }
   try {
     const r = await fetch('/api/update-nickname', {
       method: 'POST',
@@ -762,13 +993,57 @@ document.getElementById('boardNicknameEditBtn').addEventListener('click', async 
     });
     const data = await r.json();
     if (!r.ok) {
-      alert('닉네임을 바꾸지 못했어요.');
+      showToast('닉네임을 바꾸지 못했어요.', 'error');
       return;
     }
     boardSession.nickname = data.nickname;
     renderUserLabel();
+    document.getElementById('nicknameEditModal').classList.remove('show');
+    showToast('닉네임을 바꿨어요.', 'success');
   } catch (e) {
-    alert('닉네임을 바꾸지 못했어요.');
+    showToast('닉네임을 바꾸지 못했어요.', 'error');
+  }
+});
+
+document.getElementById('postEditClose').addEventListener('click', () => {
+  document.getElementById('postEditModal').classList.remove('show');
+});
+document.getElementById('postEditModal').addEventListener('click', (e) => {
+  if (e.target.id === 'postEditModal') document.getElementById('postEditModal').classList.remove('show');
+});
+document.getElementById('postEditSubmit').addEventListener('click', async () => {
+  if (!editingPost) return;
+  const titleEl = document.getElementById('postEditTitle');
+  const bodyEl = document.getElementById('postEditBody');
+  const trimmedTitle = titleEl.value.trim();
+  const trimmedBody = bodyEl.value.trim();
+  if (!trimmedTitle) { titleEl.focus(); return; }
+  if (!trimmedBody) { bodyEl.focus(); return; }
+  const post = editingPost;
+  if (trimmedTitle === (post.title || postTitleText(post)) && trimmedBody === post.body) {
+    document.getElementById('postEditModal').classList.remove('show');
+    return;
+  }
+  try {
+    const r = await fetch('/api/board-post', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ postId: post.id, action: 'edit', title: trimmedTitle.slice(0, 40), body: trimmedBody.slice(0, 500) }),
+    });
+    const data = await r.json();
+    if (!r.ok) { showToast('수정하지 못했어요.', 'error'); return; }
+    post.title = data.title;
+    post.body = data.body;
+    const detailTitleEl = document.getElementById('boardDetailPostTitle');
+    const detailBodyEl = document.getElementById('boardDetailPostBody');
+    if (detailTitleEl) detailTitleEl.textContent = data.title;
+    if (detailBodyEl) detailBodyEl.textContent = data.body;
+    const listCardEl = document.querySelector(`.board-post[data-id="${post.id}"] .board-post-title`);
+    if (listCardEl) listCardEl.textContent = data.title;
+    document.getElementById('postEditModal').classList.remove('show');
+    showToast('수정했어요.', 'success');
+  } catch (e) {
+    showToast('수정하지 못했어요.', 'error');
   }
 });
 
@@ -785,14 +1060,15 @@ async function submitAvatar(avatar) {
     });
     const data = await r.json();
     if (!r.ok) {
-      alert(r.status === 413 ? '사진 용량이 너무 커요. 다른 사진으로 시도해주세요.' : '프로필을 바꾸지 못했어요.');
+      showToast(r.status === 413 ? '사진 용량이 너무 커요. 다른 사진으로 시도해주세요.' : '프로필을 바꾸지 못했어요.', 'error');
       return;
     }
     boardSession.avatar = data.avatar;
     renderUserLabel();
     document.getElementById('boardAvatarModal').classList.remove('show');
+    showToast('프로필을 바꿨어요.', 'success');
   } catch (e) {
-    alert('프로필을 바꾸지 못했어요.');
+    showToast('프로필을 바꾸지 못했어요.', 'error');
   }
 }
 
@@ -843,18 +1119,19 @@ document.getElementById('boardAvatarFileInput').addEventListener('change', async
   const file = e.target.files && e.target.files[0];
   e.target.value = '';
   if (!file) return;
-  if (!file.type.startsWith('image/')) { alert('이미지 파일만 올릴 수 있어요.'); return; }
+  if (!file.type.startsWith('image/')) { showToast('이미지 파일만 올릴 수 있어요.', 'error'); return; }
   try {
     const dataUrl = await fileToResizedDataUrl(file);
     await submitAvatar(dataUrl);
   } catch (err) {
-    alert('사진을 불러오지 못했어요.');
+    showToast('사진을 불러오지 못했어요.', 'error');
   }
 });
 
 document.getElementById('boardAvatarEditBtn').addEventListener('click', () => {
   renderAvatarGrid();
   document.getElementById('boardAvatarModal').classList.add('show');
+  document.getElementById('boardAvatarClose').focus();
 });
 document.getElementById('boardAvatarClose').addEventListener('click', () => {
   document.getElementById('boardAvatarModal').classList.remove('show');
@@ -918,14 +1195,45 @@ function renderResultStripCard(post) {
   return el;
 }
 
+function renderPostSkeleton() {
+  const el = document.createElement('div');
+  el.className = 'skeleton-post';
+  el.innerHTML = `
+    <div class="skeleton-post-head">
+      <span class="skeleton skeleton-avatar"></span>
+      <span class="skeleton skeleton-pill" style="width:44px;"></span>
+    </div>
+    <div class="skeleton skeleton-post-title"></div>
+    <div class="skeleton-post-foot">
+      <span class="skeleton skeleton-pill"></span>
+      <span class="skeleton skeleton-pill"></span>
+    </div>
+  `;
+  return el;
+}
+
+function renderResultSkeleton() {
+  const el = document.createElement('div');
+  el.className = 'skeleton-result-card';
+  el.innerHTML = `
+    <div class="skeleton skeleton-result-nick"></div>
+    <div class="skeleton skeleton-result-name"></div>
+    <div class="skeleton skeleton-result-score"></div>
+  `;
+  return el;
+}
+
 async function loadResultStrip() {
   const stripEl = document.getElementById('boardResultStrip');
+  stripEl.innerHTML = '';
+  for (let i = 0; i < 3; i++) stripEl.appendChild(renderResultSkeleton());
   try {
     const r = await fetch('/api/board?category=result&offset=0');
     const data = await r.json();
     stripEl.innerHTML = '';
     (data.posts || []).forEach((post) => stripEl.appendChild(renderResultStripCard(post)));
   } catch (e) {
+    stripEl.innerHTML = '';
     // 비어 있으면 CSS ::after 안내 문구가 대신 보여진다
   }
 }
@@ -934,7 +1242,10 @@ async function loadBoardPosts(reset) {
   if (reset) boardOffset = 0;
   const listEl = document.getElementById('boardList');
   const moreBtn = document.getElementById('boardMoreBtn');
-  if (reset) listEl.innerHTML = '<p class="board-empty">불러오는 중...</p>';
+  if (reset) {
+    listEl.innerHTML = '';
+    for (let i = 0; i < 3; i++) listEl.appendChild(renderPostSkeleton());
+  }
 
   try {
     const params = new URLSearchParams({ category: 'free', offset: String(boardOffset) });
@@ -943,14 +1254,14 @@ async function loadBoardPosts(reset) {
     const data = await r.json();
     if (reset) listEl.innerHTML = '';
     if (reset && (!data.posts || data.posts.length === 0)) {
-      listEl.innerHTML = '<p class="board-empty">아직 자유글이 없어요. 첫 글을 남겨보세요 🐣</p>';
+      listEl.innerHTML = '<p class="board-empty">🐣 아직 자유글이 없어요<br>첫 글을 남겨서 게시판을 열어보세요!</p>';
     } else {
       (data.posts || []).forEach((post) => listEl.appendChild(renderBoardPostCard(post)));
     }
     boardOffset += BOARD_PAGE_SIZE;
     moreBtn.hidden = !data.hasMore;
   } catch (e) {
-    if (reset) listEl.innerHTML = '<p class="board-empty">게시판을 불러오지 못했어요. 잠시 후 다시 시도해주세요.</p>';
+    if (reset) listEl.innerHTML = '<p class="board-empty">🥲 게시판을 불러오지 못했어요<br>잠시 후 다시 시도해주세요</p>';
   }
 }
 
@@ -996,7 +1307,7 @@ document.getElementById('boardWriteSubmit').addEventListener('click', async () =
     });
     const data = await r.json();
     if (!r.ok) {
-      alert(r.status === 429 ? '너무 빨리 연달아 올렸어요. 잠시 후 다시 시도해주세요.' : '글을 올리지 못했어요.');
+      showToast(r.status === 429 ? '너무 빨리 연달아 올렸어요. 잠시 후 다시 시도해주세요.' : '글을 올리지 못했어요.', 'error');
       return;
     }
     titleEl.value = '';
@@ -1009,31 +1320,42 @@ document.getElementById('boardWriteSubmit').addEventListener('click', async () =
       const empty = document.querySelector('#boardList .board-empty');
       if (empty) empty.remove();
     }
+    showToast('게시글을 올렸어요 🐥', 'success');
   } catch (e) {
-    alert('글을 올리지 못했어요.');
+    showToast('글을 올리지 못했어요.', 'error');
   } finally {
     btn.disabled = false;
   }
 });
 
 let boardDetailPostId = null;
+let editingPost = null;
 
 async function openBoardDetail(id) {
   boardDetailPostId = id;
   const modal = document.getElementById('boardDetailModal');
   const bodyEl = document.getElementById('boardDetailBody');
   const commentsEl = document.getElementById('boardComments');
-  bodyEl.innerHTML = '<p class="board-empty">불러오는 중...</p>';
+  bodyEl.innerHTML = `
+    <div class="skeleton-post-head">
+      <span class="skeleton skeleton-avatar"></span>
+      <span class="skeleton skeleton-pill" style="width:60px;"></span>
+    </div>
+    <div class="skeleton skeleton-post-title" style="width:80%;height:20px;"></div>
+    <div class="skeleton skeleton-post-title" style="width:95%;"></div>
+    <div class="skeleton skeleton-post-title" style="width:60%;"></div>
+  `;
   commentsEl.innerHTML = '';
   modal.classList.add('show');
+  document.getElementById('boardDetailClose').focus();
 
   try {
     const r = await fetch(`/api/board-post?id=${encodeURIComponent(id)}`);
-    if (!r.ok) { bodyEl.innerHTML = '<p class="board-empty">글을 찾을 수 없어요.</p>'; return; }
+    if (!r.ok) { bodyEl.innerHTML = '<p class="board-empty">🔍 글을 찾을 수 없어요<br>삭제됐거나 잘못된 링크일 수 있어요</p>'; return; }
     const { post, comments } = await r.json();
     renderBoardDetail(post, comments);
   } catch (e) {
-    bodyEl.innerHTML = '<p class="board-empty">불러오지 못했어요.</p>';
+    bodyEl.innerHTML = '<p class="board-empty">🥲 불러오지 못했어요<br>잠시 후 다시 시도해주세요</p>';
   }
 }
 
@@ -1049,7 +1371,7 @@ function renderBoardDetail(post, comments) {
     <div class="board-post-body" id="boardDetailPostBody">${escapeHtml(post.body)}</div>
     ${renderResultChip(post.resultData)}
     <div class="board-post-foot">
-      <span class="board-like-btn ${post.likedByMe ? 'liked' : ''}" id="boardDetailLike" style="cursor:pointer">❤️ <span id="boardDetailLikeCount">${post.likeCount}</span></span>
+      <span class="board-like-btn ${post.likedByMe ? 'liked' : ''}" id="boardDetailLike" style="cursor:pointer" role="button" tabindex="0" aria-pressed="${post.likedByMe ? 'true' : 'false'}" aria-label="좋아요">❤️ <span id="boardDetailLikeCount">${post.likeCount}</span></span>
       <span>💬 ${post.commentCount}</span>
       ${isMine ? '<button type="button" class="board-delete-btn" id="boardDetailEdit">수정</button>' : ''}
       ${isMine ? '<button type="button" class="board-delete-btn" id="boardDetailDelete">삭제</button>' : ''}
@@ -1060,12 +1382,12 @@ function renderBoardDetail(post, comments) {
   const commentsEl = document.getElementById('boardComments');
   commentsEl.innerHTML = comments.length
     ? comments.map((c) => `<div class="board-comment"><span class="board-comment-nick">${avatarHtml(c.nickname, c.avatar)}${escapeHtml(c.nickname)}</span>${escapeHtml(c.body)}</div>`).join('')
-    : '<p class="board-empty">아직 댓글이 없어요.</p>';
+    : '<p class="board-empty">💬 아직 댓글이 없어요<br>첫 댓글을 남겨보세요</p>';
 
   document.getElementById('boardCommentWriteRow').hidden = !boardSession.loggedIn;
 
   document.getElementById('boardDetailLike').addEventListener('click', async () => {
-    if (!boardSession.loggedIn) { alert('좋아요는 로그인 후 누를 수 있어요.'); return; }
+    if (!boardSession.loggedIn) { showToast('좋아요는 로그인 후 누를 수 있어요.', 'error'); return; }
     try {
       const r = await fetch('/api/board-post', {
         method: 'POST',
@@ -1075,6 +1397,7 @@ function renderBoardDetail(post, comments) {
       const data = await r.json();
       if (!r.ok) return;
       document.getElementById('boardDetailLike').classList.toggle('liked', data.liked);
+      document.getElementById('boardDetailLike').setAttribute('aria-pressed', data.liked ? 'true' : 'false');
       document.getElementById('boardDetailLikeCount').textContent = data.likeCount;
       const listCardEl = document.querySelector(`.board-post[data-id="${post.id}"] .board-post-foot span:first-child`);
       if (listCardEl) {
@@ -1088,61 +1411,48 @@ function renderBoardDetail(post, comments) {
       }
     } catch (e) { /* ignore */ }
   });
+  document.getElementById('boardDetailLike').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); document.getElementById('boardDetailLike').click(); }
+  });
 
   const deleteBtn = document.getElementById('boardDetailDelete');
   if (deleteBtn) {
     deleteBtn.addEventListener('click', async () => {
-      if (!confirm('이 글을 삭제할까요?')) return;
+      if (!(await showConfirm('이 글을 삭제할까요?', { danger: true }))) return;
       try {
         const r = await fetch('/api/board-post', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ postId: post.id, action: 'delete' }),
         });
-        if (!r.ok) return;
+        if (!r.ok) { showToast('삭제하지 못했어요.', 'error'); return; }
         document.getElementById('boardDetailModal').classList.remove('show');
         const listCardEl = document.querySelector(`.board-post[data-id="${post.id}"]`);
         if (listCardEl) listCardEl.remove();
         const stripCardEl = document.querySelector(`.board-result-card[data-id="${post.id}"]`);
         if (stripCardEl) stripCardEl.remove();
-      } catch (e) { /* ignore */ }
+        showToast('삭제했어요.', 'success');
+      } catch (e) {
+        showToast('삭제하지 못했어요.', 'error');
+      }
     });
   }
 
   const editBtn = document.getElementById('boardDetailEdit');
   if (editBtn) {
-    editBtn.addEventListener('click', async () => {
-      const nextTitle = prompt('제목을 수정해주세요 (최대 40자)', post.title || postTitleText(post));
-      const trimmedTitle = (nextTitle || '').trim();
-      if (!trimmedTitle) return;
-      const nextBody = prompt('내용을 수정해주세요 (최대 500자)', post.body);
-      const trimmedBody = (nextBody || '').trim();
-      if (!trimmedBody) return;
-      if (trimmedTitle === (post.title || postTitleText(post)) && trimmedBody === post.body) return;
-      try {
-        const r = await fetch('/api/board-post', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ postId: post.id, action: 'edit', title: trimmedTitle.slice(0, 40), body: trimmedBody.slice(0, 500) }),
-        });
-        const data = await r.json();
-        if (!r.ok) { alert('수정하지 못했어요.'); return; }
-        post.title = data.title;
-        post.body = data.body;
-        document.getElementById('boardDetailPostTitle').textContent = data.title;
-        document.getElementById('boardDetailPostBody').textContent = data.body;
-        const listCardEl = document.querySelector(`.board-post[data-id="${post.id}"] .board-post-title`);
-        if (listCardEl) listCardEl.textContent = data.title;
-      } catch (e) {
-        alert('수정하지 못했어요.');
-      }
+    editBtn.addEventListener('click', () => {
+      editingPost = post;
+      document.getElementById('postEditTitle').value = post.title || postTitleText(post);
+      document.getElementById('postEditBody').value = post.body;
+      document.getElementById('postEditModal').classList.add('show');
+      document.getElementById('postEditTitle').focus();
     });
   }
 
   const reportBtn = document.getElementById('boardDetailReport');
   if (reportBtn) {
     reportBtn.addEventListener('click', async () => {
-      if (!confirm('이 글을 신고할까요? 운영자가 확인 후 조치해요.')) return;
+      if (!(await showConfirm('이 글을 신고할까요? 운영자가 확인 후 조치해요.'))) return;
       try {
         const r = await fetch('/api/board-post', {
           method: 'POST',
@@ -1150,11 +1460,11 @@ function renderBoardDetail(post, comments) {
           body: JSON.stringify({ postId: post.id, action: 'report' }),
         });
         const data = await r.json();
-        if (!r.ok) { alert('신고하지 못했어요.'); return; }
-        alert(data.alreadyReported ? '이미 신고한 글이에요.' : '신고했어요. 운영자가 확인할게요.');
+        if (!r.ok) { showToast('신고하지 못했어요.', 'error'); return; }
+        showToast(data.alreadyReported ? '이미 신고한 글이에요.' : '신고했어요. 운영자가 확인할게요.', 'success');
         reportBtn.disabled = true;
       } catch (e) {
-        alert('신고하지 못했어요.');
+        showToast('신고하지 못했어요.', 'error');
       }
     });
   }
@@ -1182,6 +1492,7 @@ function getDeviceId() {
 
 document.getElementById('boardFeedbackBtn').addEventListener('click', () => {
   document.getElementById('boardFeedbackModal').classList.add('show');
+  document.getElementById('boardFeedbackText').focus();
 });
 document.getElementById('boardFeedbackClose').addEventListener('click', () => {
   document.getElementById('boardFeedbackModal').classList.remove('show');
@@ -1202,14 +1513,14 @@ document.getElementById('boardFeedbackSubmit').addEventListener('click', async (
       body: JSON.stringify({ body: text, deviceId: getDeviceId() }),
     });
     if (!r.ok) {
-      alert(r.status === 429 ? '너무 빨리 연달아 보냈어요. 잠시 후 다시 시도해주세요.' : '보내지 못했어요.');
+      showToast(r.status === 429 ? '너무 빨리 연달아 보냈어요. 잠시 후 다시 시도해주세요.' : '보내지 못했어요.', 'error');
       return;
     }
     textEl.value = '';
     document.getElementById('boardFeedbackModal').classList.remove('show');
-    alert('의견 감사해요! 꼼꼼히 읽어볼게요 🐥');
+    showToast('의견 감사해요! 꼼꼼히 읽어볼게요 🐥', 'success');
   } catch (e) {
-    alert('보내지 못했어요.');
+    showToast('보내지 못했어요.', 'error');
   } finally {
     btn.disabled = false;
   }
@@ -1227,7 +1538,7 @@ document.getElementById('boardCommentSubmit').addEventListener('click', async ()
     });
     const data = await r.json();
     if (!r.ok) {
-      alert(r.status === 429 ? '너무 빨리 연달아 남겼어요. 잠시 후 다시 시도해주세요.' : '댓글을 남기지 못했어요.');
+      showToast(r.status === 429 ? '너무 빨리 연달아 남겼어요. 잠시 후 다시 시도해주세요.' : '댓글을 남기지 못했어요.', 'error');
       return;
     }
     const commentsEl = document.getElementById('boardComments');
@@ -1257,8 +1568,15 @@ document.getElementById('boardCommentText').addEventListener('keydown', (e) => {
 });
 
 if (new URLSearchParams(location.search).get('loginError')) {
-  setTimeout(() => alert('카카오 로그인에 실패했어요. 다시 시도해주세요.'), 300);
+  setTimeout(() => showToast('카카오 로그인에 실패했어요. 다시 시도해주세요.', 'error'), 300);
 }
+
+// Esc로 현재 열려있는 팝업(바텀시트/상세)을 전부 닫을 수 있게 한다. 확인 모달은
+// showConfirm() 안에서 이미 자체적으로 Esc를 처리한다.
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  document.querySelectorAll('.board-detail-modal.show').forEach((m) => m.classList.remove('show'));
+});
 
 refreshBoardSession();
 </script>
