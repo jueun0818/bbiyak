@@ -161,16 +161,37 @@
     flex: 0 0 auto;
     width: 168px;
     border: 1.5px solid var(--line);
+    border-left: 4px solid var(--accent, var(--amber-strong));
     border-radius: 16px;
     padding: 12px 13px;
     background: linear-gradient(160deg, #fffdf2, var(--panel));
     cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease;
   }
-  .board-result-card .board-result-nick { font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
+  .board-result-card:active { transform: scale(0.97); }
+  .board-result-card .board-result-nick {
+    display: flex; align-items: center;
+    font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 6px;
+  }
   .board-result-card .board-result-names { font-size: 14px; font-weight: 800; color: var(--text); line-height: 1.3; }
-  .board-result-card .board-result-score { font-size: 20px; font-weight: 800; color: var(--amber-text); margin-top: 4px; }
+  .board-result-card .board-result-score { font-size: 20px; font-weight: 800; color: var(--accent, var(--amber-text)); margin-top: 4px; }
   .board-result-card .board-result-tier { font-size: 12px; color: var(--muted); margin-top: 2px; }
   .board-result-card .board-result-foot { margin-top: 8px; font-size: 12px; color: var(--muted); }
+  .board-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    font-size: 10.5px;
+    font-weight: 800;
+    color: #fff;
+    margin-right: 6px;
+    flex: 0 0 auto;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.15);
+  }
+  .board-comment .board-avatar { width: 18px; height: 18px; font-size: 9.5px; }
   .board-auth { display: flex; align-items: center; gap: 8px; }
   .board-user-label { font-size: 13.5px; color: var(--muted); font-weight: 700; }
   .board-login-btn, .board-logout-btn, .board-nickname-edit-btn {
@@ -248,6 +269,11 @@
     padding: 14px 16px;
     background: #fff;
     cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  }
+  .board-post:active {
+    transform: scale(0.99);
+    box-shadow: 0 6px 16px -8px rgba(180,120,0,0.3);
   }
   .board-post-head {
     display: flex;
@@ -255,7 +281,7 @@
     justify-content: space-between;
     margin-bottom: 6px;
   }
-  .board-post-nick { font-weight: 700; color: var(--purple); font-size: 14.5px; }
+  .board-post-nick { display: flex; align-items: center; font-weight: 700; color: var(--purple); font-size: 14.5px; }
   .board-post-time { font-size: 12.5px; color: var(--muted); }
   .board-post-body {
     font-size: 15px;
@@ -271,8 +297,9 @@
     margin-top: 8px;
     padding: 7px 12px;
     border-radius: 999px;
+    border-left: 3px solid var(--accent, var(--amber-strong));
     background: var(--panel);
-    color: var(--amber-text);
+    color: var(--accent, var(--amber-text));
     font-size: 13.5px;
     font-weight: 700;
   }
@@ -490,6 +517,31 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
+// 닉네임마다 고정된 색을 배정해서 게시판에 여러 사람이 있다는 느낌을 시각적으로 준다.
+const AVATAR_COLORS = ['#ff8a65', '#f06292', '#ba68c8', '#7e93e0', '#4fc3f7', '#4db6ac', '#81c784', '#dba13a'];
+function avatarColor(nickname) {
+  let h = 0;
+  for (const ch of String(nickname)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return AVATAR_COLORS[h % AVATAR_COLORS.length];
+}
+function avatarHtml(nickname) {
+  const initial = String(nickname).trim().slice(0, 1) || '🐥';
+  return `<span class="board-avatar" style="background:${avatarColor(nickname)}">${escapeHtml(initial)}</span>`;
+}
+
+// 점수대별 강조색 · 뱃지. index.html의 TIERS 등급 색과 톤을 맞췄다.
+const SCORE_TIERS = [
+  { min: 90, badge: '👑', accent: '#ff5c7a' },
+  { min: 75, badge: '💕', accent: '#f2711a' },
+  { min: 60, badge: '😆', accent: '#f9a825' },
+  { min: 45, badge: '🙂', accent: '#e0784f' },
+  { min: 30, badge: '❓', accent: '#8d6a8c' },
+  { min: 0,  badge: '😵', accent: '#5f6f92' },
+];
+function scoreTier(score) {
+  return SCORE_TIERS.find((t) => score >= t.min) || SCORE_TIERS[SCORE_TIERS.length - 1];
+}
+
 async function refreshBoardSession() {
   try {
     const r = await fetch('/api/session');
@@ -545,7 +597,10 @@ document.getElementById('boardNicknameEditBtn').addEventListener('click', async 
 function renderResultChip(data) {
   if (!data) return '';
   const scoreText = data.score != null ? ` · ${data.score}점` : '';
-  return `<div class="board-result-chip">${data.emoji} ${escapeHtml(data.label)} · ${escapeHtml(data.names || '')}${scoreText}${data.tierTitle ? ' · ' + escapeHtml(data.tierTitle) : ''}</div>`;
+  const tier = data.score != null ? scoreTier(data.score) : null;
+  const style = tier ? ` style="--accent:${tier.accent}"` : '';
+  const badge = tier ? `${tier.badge} ` : '';
+  return `<div class="board-result-chip"${style}>${badge}${data.emoji} ${escapeHtml(data.label)} · ${escapeHtml(data.names || '')}${scoreText}${data.tierTitle ? ' · ' + escapeHtml(data.tierTitle) : ''}</div>`;
 }
 
 function renderBoardPostCard(post) {
@@ -554,7 +609,7 @@ function renderBoardPostCard(post) {
   el.dataset.id = post.id;
   el.innerHTML = `
     <div class="board-post-head">
-      <span class="board-post-nick">🐥 ${escapeHtml(post.nickname)}</span>
+      <span class="board-post-nick">${avatarHtml(post.nickname)}${escapeHtml(post.nickname)}</span>
       <span class="board-post-time">${timeAgo(post.createdAt)}</span>
     </div>
     <div class="board-post-body">${escapeHtml(post.body)}</div>
@@ -570,13 +625,15 @@ function renderBoardPostCard(post) {
 
 function renderResultStripCard(post) {
   const data = post.resultData;
+  const tier = data && data.score != null ? scoreTier(data.score) : null;
   const el = document.createElement('div');
   el.className = 'board-result-card';
   el.dataset.id = post.id;
+  if (tier) el.style.setProperty('--accent', tier.accent);
   el.innerHTML = `
-    <div class="board-result-nick">🐥 ${escapeHtml(post.nickname)}</div>
+    <div class="board-result-nick">${avatarHtml(post.nickname)}${escapeHtml(post.nickname)}</div>
     <div class="board-result-names">${data ? escapeHtml(data.names || '') : ''}</div>
-    ${data && data.score != null ? `<div class="board-result-score">${data.score}점</div>` : ''}
+    ${data && data.score != null ? `<div class="board-result-score">${tier ? tier.badge + ' ' : ''}${data.score}점</div>` : ''}
     ${data && data.tierTitle ? `<div class="board-result-tier">${escapeHtml(data.tierTitle)}</div>` : ''}
     <div class="board-result-foot">❤️ ${post.likeCount} · 💬 ${post.commentCount}</div>
   `;
@@ -694,7 +751,7 @@ function renderBoardDetail(post, comments) {
   const isMine = boardSession.loggedIn && boardSession.kakaoId === post.kakaoId;
   bodyEl.innerHTML = `
     <div class="board-post-head">
-      <span class="board-post-nick">🐥 ${escapeHtml(post.nickname)}</span>
+      <span class="board-post-nick">${avatarHtml(post.nickname)}${escapeHtml(post.nickname)}</span>
       <span class="board-post-time">${timeAgo(post.createdAt)}</span>
     </div>
     <div class="board-post-body">${escapeHtml(post.body)}</div>
@@ -708,7 +765,7 @@ function renderBoardDetail(post, comments) {
 
   const commentsEl = document.getElementById('boardComments');
   commentsEl.innerHTML = comments.length
-    ? comments.map((c) => `<div class="board-comment"><span class="board-comment-nick">${escapeHtml(c.nickname)}</span>${escapeHtml(c.body)}</div>`).join('')
+    ? comments.map((c) => `<div class="board-comment"><span class="board-comment-nick">${avatarHtml(c.nickname)}${escapeHtml(c.nickname)}</span>${escapeHtml(c.body)}</div>`).join('')
     : '<p class="board-empty">아직 댓글이 없어요.</p>';
 
   document.getElementById('boardCommentWriteRow').hidden = !boardSession.loggedIn;
@@ -786,7 +843,7 @@ document.getElementById('boardCommentSubmit').addEventListener('click', async ()
     if (empty) empty.remove();
     const div = document.createElement('div');
     div.className = 'board-comment';
-    div.innerHTML = `<span class="board-comment-nick">${escapeHtml(data.comment.nickname)}</span>${escapeHtml(data.comment.body)}`;
+    div.innerHTML = `<span class="board-comment-nick">${avatarHtml(data.comment.nickname)}${escapeHtml(data.comment.nickname)}</span>${escapeHtml(data.comment.body)}`;
     commentsEl.appendChild(div);
     input.value = '';
     const listCardEl = document.querySelector(`.board-post[data-id="${boardDetailPostId}"] .board-post-foot span:last-child`);
