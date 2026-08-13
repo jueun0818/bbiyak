@@ -20,6 +20,33 @@ function isValidAvatar(v) {
   return PHOTO_DATA_URL_RE.test(v) && v.length <= MAX_PHOTO_LEN;
 }
 
+// 예전에 쓴 댓글들도 새 닉네임으로 소급 반영한다. user:{kakaoId}:comments에 남겨둔
+// 최근 50개(응답 시간 제한 때문에 전체를 다 훑진 않는다)에서 어떤 글에 댓글을 달았는지
+// 확인한 뒤, 그 글들의 댓글 목록에서 내가 쓴 댓글의 닉네임을 한 번에 바꾼다.
+// 글 자체의 닉네임은 그대로 남는다(글은 작성자별 인덱스가 없어 찾을 방법이 없음).
+async function renameCommentsNickname(kakaoId, nickname) {
+  const userCommentsKey = `user:${kakaoId}:comments`;
+  const rawEntries = (await redisCmd(['LRANGE', userCommentsKey, '0', '49'])) || [];
+  const postIds = new Set();
+  for (const raw of rawEntries) {
+    try {
+      const entry = JSON.parse(raw);
+      if (entry && entry.postId) postIds.add(entry.postId);
+    } catch { /* 무시 */ }
+  }
+  await Promise.all([...postIds].map(async (postId) => {
+    const postCommentsKey = `board:post:${postId}:comments`;
+    const list = (await redisCmd(['LRANGE', postCommentsKey, '0', '-1'])) || [];
+    for (let i = 0; i < list.length; i++) {
+      let c;
+      try { c = JSON.parse(list[i]); } catch { continue; }
+      if (c.kakaoId === kakaoId && c.nickname !== nickname) {
+        await redisCmd(['LSET', postCommentsKey, String(i), JSON.stringify({ ...c, nickname })]);
+      }
+    }
+  }));
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'method not allowed' });
@@ -64,6 +91,11 @@ export default async function handler(req, res) {
       }
       const updated = { ...user, nickname };
       await redisCmd(['SET', `session:${sessionId}`, JSON.stringify(updated), 'EX', String(SESSION_TTL_SEC)]);
+      try {
+        await renameCommentsNickname(user.kakaoId, nickname);
+      } catch (e) {
+        // 소급 반영이 실패해도 닉네임 자체는 이미 바뀌었으니 에러로 취급하지 않는다.
+      }
       res.status(200).json({ ok: true, nickname });
       return;
     }
