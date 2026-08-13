@@ -1,4 +1,4 @@
-// 로그인한 사용자가 게시판에 표시될 프로필 그림(귀여운 이모지)을 고를 수 있게 한다.
+// 로그인한 사용자가 게시판에 표시될 프로필 그림(귀여운 이모지 또는 직접 올린 사진)을 고를 수 있게 한다.
 // 닉네임과 마찬가지로 세션에만 저장되고, 이후 글・댓글부터 새 프로필이 붙는다.
 import { parseCookies, redisCmd, SESSION_COOKIE, SESSION_TTL_SEC } from './_kakao.js';
 
@@ -7,6 +7,16 @@ const ALLOWED_AVATARS = new Set([
   '🐥', '🐣', '🐤', '🐰', '🐱', '🐶', '🦊', '🐻', '🐼', '🐨',
   '🐷', '🐹', '🦄', '🐢', '🦋', '🐸', '🐧', '🦁', '🐯', '🐮',
 ]);
+
+// 사진 아바타는 클라이언트가 96x96으로 이미 줄여서 보내지만, 서버에서도 형식과 용량을 한 번 더 막는다.
+const PHOTO_DATA_URL_RE = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+=*$/;
+const MAX_PHOTO_LEN = 60000; // base64 기준 대략 44KB
+
+function isValidAvatar(v) {
+  if (typeof v !== 'string') return false;
+  if (ALLOWED_AVATARS.has(v)) return true;
+  return PHOTO_DATA_URL_RE.test(v) && v.length <= MAX_PHOTO_LEN;
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -44,11 +54,12 @@ export default async function handler(req, res) {
     }
     // avatar: null이면 기본(닉네임 이니셜) 아바타로 되돌린다.
     const avatarInput = body && body.avatar;
-    const avatar = avatarInput === null ? null : (ALLOWED_AVATARS.has(avatarInput) ? avatarInput : undefined);
-    if (avatar === undefined) {
-      res.status(400).json({ error: 'invalid avatar' });
+    if (avatarInput !== null && !isValidAvatar(avatarInput)) {
+      const tooLarge = typeof avatarInput === 'string' && avatarInput.startsWith('data:image/') && avatarInput.length > MAX_PHOTO_LEN;
+      res.status(tooLarge ? 413 : 400).json({ error: tooLarge ? 'photo too large' : 'invalid avatar' });
       return;
     }
+    const avatar = avatarInput;
 
     const updated = { ...user, avatar };
     await redisCmd(['SET', `session:${sessionId}`, JSON.stringify(updated), 'EX', String(SESSION_TTL_SEC)]);

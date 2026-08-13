@@ -194,9 +194,19 @@
   .board-comment .board-avatar { width: 18px; height: 18px; font-size: 9.5px; }
   .board-avatar.emoji { background: var(--panel); font-size: 13px; text-shadow: none; }
   .board-comment .board-avatar.emoji { font-size: 11px; }
+  .board-avatar.photo { background: var(--panel); object-fit: cover; }
 
   .board-avatar-modal-inner { max-height: none; padding: 22px 20px 24px; }
   .board-avatar-modal-title { margin: 0 0 14px; font-size: 15.5px; font-weight: 800; color: var(--purple); text-align: center; }
+  .board-avatar-photo-btn {
+    background: #fff;
+    color: #a3781c;
+    border: 1.5px solid var(--line);
+    box-shadow: none;
+    padding: 12px;
+    font-size: 14.5px;
+    margin-bottom: 14px;
+  }
   .board-avatar-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -484,6 +494,8 @@
   <div class="board-detail-inner board-avatar-modal-inner">
     <button type="button" class="board-detail-close" id="boardAvatarClose" aria-label="닫기">✕</button>
     <p class="board-avatar-modal-title">🖼️ 프로필 그림 고르기</p>
+    <button type="button" class="board-avatar-photo-btn" id="boardAvatarPhotoBtn">📷 내 사진으로 설정</button>
+    <input type="file" id="boardAvatarFileInput" accept="image/*" hidden>
     <div class="board-avatar-grid" id="boardAvatarGrid"></div>
   </div>
 </div>
@@ -568,6 +580,9 @@ function avatarColor(nickname) {
 const AVATAR_OPTIONS = ['🐥', '🐣', '🐤', '🐰', '🐱', '🐶', '🦊', '🐻', '🐼', '🐨', '🐷', '🐹', '🦄', '🐢', '🦋', '🐸', '🐧', '🦁', '🐯', '🐮'];
 
 function avatarHtml(nickname, avatar) {
+  if (avatar && avatar.startsWith('data:image/')) {
+    return `<img class="board-avatar photo" src="${escapeHtml(avatar)}" alt="">`;
+  }
   if (avatar) return `<span class="board-avatar emoji">${escapeHtml(avatar)}</span>`;
   const initial = String(nickname).trim().slice(0, 1) || '🐥';
   return `<span class="board-avatar" style="background:${avatarColor(nickname)}">${escapeHtml(initial)}</span>`;
@@ -646,6 +661,30 @@ document.getElementById('boardNicknameEditBtn').addEventListener('click', async 
   }
 });
 
+async function submitAvatar(avatar) {
+  if (avatar === (boardSession.avatar || null)) {
+    document.getElementById('boardAvatarModal').classList.remove('show');
+    return;
+  }
+  try {
+    const r = await fetch('/api/update-avatar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ avatar }),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      alert(r.status === 413 ? '사진 용량이 너무 커요. 다른 사진으로 시도해주세요.' : '프로필을 바꾸지 못했어요.');
+      return;
+    }
+    boardSession.avatar = data.avatar;
+    renderUserLabel();
+    document.getElementById('boardAvatarModal').classList.remove('show');
+  } catch (e) {
+    alert('프로필을 바꾸지 못했어요.');
+  }
+}
+
 function renderAvatarGrid() {
   const grid = document.getElementById('boardAvatarGrid');
   const resetBtn = `<button type="button" class="board-avatar-option reset ${!boardSession.avatar ? 'selected' : ''}" data-avatar="">기본</button>`;
@@ -654,32 +693,53 @@ function renderAvatarGrid() {
   ).join('');
   grid.innerHTML = resetBtn + options;
   grid.querySelectorAll('.board-avatar-option').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      const avatar = btn.dataset.avatar || null;
-      if (avatar === (boardSession.avatar || null)) {
-        document.getElementById('boardAvatarModal').classList.remove('show');
-        return;
-      }
-      try {
-        const r = await fetch('/api/update-avatar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ avatar }),
-        });
-        const data = await r.json();
-        if (!r.ok) {
-          alert('프로필을 바꾸지 못했어요.');
-          return;
-        }
-        boardSession.avatar = data.avatar;
-        renderUserLabel();
-        document.getElementById('boardAvatarModal').classList.remove('show');
-      } catch (e) {
-        alert('프로필을 바꾸지 못했어요.');
-      }
-    });
+    btn.addEventListener('click', () => submitAvatar(btn.dataset.avatar || null));
+  });
+  const photoBtn = document.getElementById('boardAvatarPhotoBtn');
+  const isPhoto = !!(boardSession.avatar && boardSession.avatar.startsWith('data:image/'));
+  photoBtn.textContent = isPhoto ? '📷 다른 사진으로 바꾸기' : '📷 내 사진으로 설정';
+}
+
+// 사진을 원본 그대로 올리면 용량이 커서, 캔버스로 정사각형으로 잘라 작은 크기로 줄인 뒤
+// data URL(base64) 문자열로 만들어 이모지 아바타와 같은 방식(세션의 avatar 필드)으로 저장한다.
+const AVATAR_PHOTO_SIZE = 96;
+function fileToResizedDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('read failed'));
+    reader.onload = () => { img.src = reader.result; };
+    img.onerror = () => reject(new Error('decode failed'));
+    img.onload = () => {
+      const side = Math.min(img.width, img.height);
+      const sx = (img.width - side) / 2;
+      const sy = (img.height - side) / 2;
+      const canvas = document.createElement('canvas');
+      canvas.width = AVATAR_PHOTO_SIZE;
+      canvas.height = AVATAR_PHOTO_SIZE;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, sx, sy, side, side, 0, 0, AVATAR_PHOTO_SIZE, AVATAR_PHOTO_SIZE);
+      resolve(canvas.toDataURL('image/jpeg', 0.72));
+    };
+    reader.readAsDataURL(file);
   });
 }
+
+document.getElementById('boardAvatarPhotoBtn').addEventListener('click', () => {
+  document.getElementById('boardAvatarFileInput').click();
+});
+document.getElementById('boardAvatarFileInput').addEventListener('change', async (e) => {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { alert('이미지 파일만 올릴 수 있어요.'); return; }
+  try {
+    const dataUrl = await fileToResizedDataUrl(file);
+    await submitAvatar(dataUrl);
+  } catch (err) {
+    alert('사진을 불러오지 못했어요.');
+  }
+});
 
 document.getElementById('boardAvatarEditBtn').addEventListener('click', () => {
   renderAvatarGrid();
