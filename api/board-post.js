@@ -2,6 +2,7 @@
 import { redisCmd, getSessionUser, safeText } from './_kakao.js';
 
 const MAX_COMMENT_LEN = 200;
+const MAX_BODY_LEN = 500;
 
 export default async function handler(req, res) {
   const { UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN } = process.env;
@@ -100,6 +101,47 @@ export default async function handler(req, res) {
         return;
       }
 
+      if (action === 'edit') {
+        const raw = await redisCmd(['GET', `board:post:${postId}`]);
+        const post = raw ? JSON.parse(raw) : null;
+        if (!post || post.kakaoId !== user.kakaoId) {
+          res.status(403).json({ error: 'forbidden' });
+          return;
+        }
+        const text = safeText(body.body, MAX_BODY_LEN);
+        if (!text) {
+          res.status(400).json({ error: 'empty body' });
+          return;
+        }
+        const updated = { ...post, body: text, editedAt: Date.now() };
+        await redisCmd(['SET', `board:post:${postId}`, JSON.stringify(updated)]);
+        res.status(200).json({ ok: true, body: text, editedAt: updated.editedAt });
+        return;
+      }
+
+      if (action === 'report') {
+        const raw = await redisCmd(['GET', `board:post:${postId}`]);
+        const post = raw ? JSON.parse(raw) : null;
+        if (!post) {
+          res.status(404).json({ error: 'not found' });
+          return;
+        }
+        if (post.kakaoId === user.kakaoId) {
+          res.status(400).json({ error: 'cannot report own post' });
+          return;
+        }
+        const reportersKey = `board:post:${postId}:reporters`;
+        const already = await redisCmd(['SISMEMBER', reportersKey, user.kakaoId]);
+        if (!already) {
+          await redisCmd(['SADD', reportersKey, user.kakaoId]);
+          const reportCount = await redisCmd(['SCARD', reportersKey]);
+          // 신고된 글 목록(admin.html)에서 신고 많은 순으로 보기 위해 점수를 신고 수로 유지한다.
+          await redisCmd(['ZADD', 'board:reportedPosts', String(Number(reportCount) || 1), postId]);
+        }
+        res.status(200).json({ ok: true, alreadyReported: !!already });
+        return;
+      }
+
       if (action === 'delete') {
         const raw = await redisCmd(['GET', `board:post:${postId}`]);
         const post = raw ? JSON.parse(raw) : null;
@@ -110,6 +152,8 @@ export default async function handler(req, res) {
         await redisCmd(['DEL', `board:post:${postId}`]);
         await redisCmd(['DEL', `board:post:${postId}:comments`]);
         await redisCmd(['DEL', `board:post:${postId}:likes`]);
+        await redisCmd(['DEL', `board:post:${postId}:reporters`]);
+        await redisCmd(['ZREM', 'board:reportedPosts', postId]);
         await redisCmd(['ZREM', 'board:posts', postId]);
         await redisCmd(['ZREM', `board:posts:${post.category}`, postId]);
         res.status(200).json({ ok: true });

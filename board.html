@@ -55,6 +55,21 @@
     align-items: center;
     gap: 10px;
     margin: 4px 0 16px;
+    flex-wrap: wrap;
+  }
+  .board-feedback-btn {
+    width: auto;
+    margin: 0 0 0 auto;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: #fff;
+    color: #a3781c;
+    font-size: 13px;
+    font-weight: 700;
+    border: 1.5px solid var(--line);
+    box-shadow: none;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .board-back-link {
     display: inline-flex;
@@ -144,6 +159,26 @@
     margin: 18px 0 10px;
   }
   .board-list ~ .board-section-title { margin-top: 18px; }
+  .board-list-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+  .board-list-head .board-section-title { margin: 0; }
+  .board-sort-toggle { display: flex; gap: 6px; }
+  .board-sort-toggle button {
+    width: auto;
+    margin: 0;
+    padding: 6px 12px;
+    font-size: 12.5px;
+    font-weight: 700;
+    border-radius: 999px;
+    background: var(--panel);
+    color: var(--muted);
+    border: 1.5px solid var(--line);
+    box-shadow: none;
+  }
+  .board-sort-toggle button.active {
+    background: var(--grad-amber);
+    color: #fff;
+    border-color: transparent;
+  }
   .board-result-strip {
     display: flex;
     gap: 10px;
@@ -207,6 +242,20 @@
     font-size: 14.5px;
     margin-bottom: 14px;
   }
+  #boardFeedbackText {
+    width: 100%;
+    min-height: 100px;
+    padding: 13px 14px;
+    border-radius: 14px;
+    border: 1.5px solid var(--line);
+    font-size: 15px;
+    font-family: inherit;
+    resize: vertical;
+    outline: none;
+    box-sizing: border-box;
+  }
+  #boardFeedbackText:focus { border-color: var(--amber-strong); }
+  .board-feedback-note { margin: 10px 0 0; font-size: 12px; color: var(--muted); text-align: center; line-height: 1.5; }
   .board-avatar-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -449,6 +498,7 @@
   <div class="board-page-header">
     <a class="board-back-link" href="./">← 삐약궁합</a>
     <h1 class="board-page-title">💬 궁합 게시판</h1>
+    <button type="button" class="board-feedback-btn" id="boardFeedbackBtn">💡 건의하기</button>
   </div>
 
   <div class="card board-card">
@@ -481,7 +531,13 @@
       <div class="board-section-title">🎉 궁합 결과</div>
       <div class="board-result-strip" id="boardResultStrip"></div>
 
-      <div class="board-section-title">💬 자유글</div>
+      <div class="board-list-head">
+        <div class="board-section-title">💬 자유글</div>
+        <div class="board-sort-toggle" id="boardSortToggle">
+          <button type="button" class="active" data-sort="latest">🕒 최신순</button>
+          <button type="button" data-sort="popular">🔥 인기순</button>
+        </div>
+      </div>
       <div class="board-list" id="boardList"></div>
       <button type="button" class="board-more-btn" id="boardMoreBtn" hidden>더보기</button>
     </div>
@@ -508,6 +564,18 @@
     <button type="button" class="board-avatar-photo-btn" id="boardAvatarPhotoBtn">📷 내 사진으로 설정</button>
     <input type="file" id="boardAvatarFileInput" accept="image/*" hidden>
     <div class="board-avatar-grid" id="boardAvatarGrid"></div>
+  </div>
+</div>
+
+<div class="board-detail-modal" id="boardFeedbackModal">
+  <div class="board-detail-inner board-avatar-modal-inner">
+    <button type="button" class="board-detail-close" id="boardFeedbackClose" aria-label="닫기">✕</button>
+    <p class="board-avatar-modal-title">💡 개선하면 좋겠는 점</p>
+    <textarea id="boardFeedbackText" maxlength="300" placeholder="불편했던 점이나 있었으면 하는 기능을 자유롭게 적어주세요"></textarea>
+    <div class="board-write-row">
+      <button type="button" id="boardFeedbackSubmit">보내기</button>
+    </div>
+    <p class="board-feedback-note">다른 사람에게는 공개되지 않고 운영자만 확인해요. 로그인 중이면 닉네임과 함께 전달돼요.</p>
   </div>
 </div>
 
@@ -561,6 +629,7 @@ document.getElementById('boardAttachResult').addEventListener('change', () => {
 let boardSession = { loggedIn: false, nickname: '', kakaoId: '' };
 let boardOffset = 0;
 let boardLoadedOnce = false;
+let boardSort = 'latest';
 const BOARD_PAGE_SIZE = 20;
 
 function timeAgo(ms) {
@@ -830,6 +899,7 @@ async function loadBoardPosts(reset) {
 
   try {
     const params = new URLSearchParams({ category: 'free', offset: String(boardOffset) });
+    if (boardSort === 'popular') params.set('sort', 'popular');
     const r = await fetch(`/api/board?${params.toString()}`);
     const data = await r.json();
     if (reset) listEl.innerHTML = '';
@@ -846,6 +916,15 @@ async function loadBoardPosts(reset) {
 }
 
 document.getElementById('boardMoreBtn').addEventListener('click', () => loadBoardPosts(false));
+
+document.getElementById('boardSortToggle').querySelectorAll('button').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    if (btn.dataset.sort === boardSort) return;
+    boardSort = btn.dataset.sort;
+    document.getElementById('boardSortToggle').querySelectorAll('button').forEach((b) => b.classList.toggle('active', b === btn));
+    loadBoardPosts(true);
+  });
+});
 
 document.getElementById('boardGateLoginBtn').addEventListener('click', () => {
   location.href = `/api/kakao-login?back=${encodeURIComponent('/board.html')}`;
@@ -923,12 +1002,14 @@ function renderBoardDetail(post, comments) {
       <span class="board-post-nick">${avatarHtml(post.nickname, post.avatar)}${escapeHtml(post.nickname)}</span>
       <span class="board-post-time">${timeAgo(post.createdAt)}</span>
     </div>
-    <div class="board-post-body">${escapeHtml(post.body)}</div>
+    <div class="board-post-body" id="boardDetailPostBody">${escapeHtml(post.body)}</div>
     ${renderResultChip(post.resultData)}
     <div class="board-post-foot">
       <span class="board-like-btn ${post.likedByMe ? 'liked' : ''}" id="boardDetailLike" style="cursor:pointer">❤️ <span id="boardDetailLikeCount">${post.likeCount}</span></span>
       <span>💬 ${post.commentCount}</span>
+      ${isMine ? '<button type="button" class="board-delete-btn" id="boardDetailEdit">수정</button>' : ''}
       ${isMine ? '<button type="button" class="board-delete-btn" id="boardDetailDelete">삭제</button>' : ''}
+      ${!isMine ? '<button type="button" class="board-delete-btn" id="boardDetailReport">🚩 신고</button>' : ''}
     </div>
   `;
 
@@ -983,6 +1064,50 @@ function renderBoardDetail(post, comments) {
       } catch (e) { /* ignore */ }
     });
   }
+
+  const editBtn = document.getElementById('boardDetailEdit');
+  if (editBtn) {
+    editBtn.addEventListener('click', async () => {
+      const next = prompt('내용을 수정해주세요 (최대 500자)', post.body);
+      const trimmed = (next || '').trim();
+      if (!trimmed || trimmed === post.body) return;
+      try {
+        const r = await fetch('/api/board-post', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ postId: post.id, action: 'edit', body: trimmed.slice(0, 500) }),
+        });
+        const data = await r.json();
+        if (!r.ok) { alert('수정하지 못했어요.'); return; }
+        post.body = data.body;
+        document.getElementById('boardDetailPostBody').textContent = data.body;
+        const listCardEl = document.querySelector(`.board-post[data-id="${post.id}"] .board-post-body`);
+        if (listCardEl) listCardEl.textContent = data.body;
+      } catch (e) {
+        alert('수정하지 못했어요.');
+      }
+    });
+  }
+
+  const reportBtn = document.getElementById('boardDetailReport');
+  if (reportBtn) {
+    reportBtn.addEventListener('click', async () => {
+      if (!confirm('이 글을 신고할까요? 운영자가 확인 후 조치해요.')) return;
+      try {
+        const r = await fetch('/api/board-post', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ postId: post.id, action: 'report' }),
+        });
+        const data = await r.json();
+        if (!r.ok) { alert('신고하지 못했어요.'); return; }
+        alert(data.alreadyReported ? '이미 신고한 글이에요.' : '신고했어요. 운영자가 확인할게요.');
+        reportBtn.disabled = true;
+      } catch (e) {
+        alert('신고하지 못했어요.');
+      }
+    });
+  }
 }
 
 document.getElementById('boardDetailClose').addEventListener('click', () => {
@@ -990,6 +1115,54 @@ document.getElementById('boardDetailClose').addEventListener('click', () => {
 });
 document.getElementById('boardDetailModal').addEventListener('click', (e) => {
   if (e.target.id === 'boardDetailModal') document.getElementById('boardDetailModal').classList.remove('show');
+});
+
+// ============================================================
+// 건의사항 (로그인 없이도 누구나 보낼 수 있는, 운영자에게만 보이는 의견함)
+// ============================================================
+function getDeviceId() {
+  let id = '';
+  try { id = localStorage.getItem('bbiyak_device_id') || ''; } catch (e) { /* 무시 */ }
+  if (!id) {
+    id = (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    try { localStorage.setItem('bbiyak_device_id', id); } catch (e) { /* 무시 */ }
+  }
+  return id;
+}
+
+document.getElementById('boardFeedbackBtn').addEventListener('click', () => {
+  document.getElementById('boardFeedbackModal').classList.add('show');
+});
+document.getElementById('boardFeedbackClose').addEventListener('click', () => {
+  document.getElementById('boardFeedbackModal').classList.remove('show');
+});
+document.getElementById('boardFeedbackModal').addEventListener('click', (e) => {
+  if (e.target.id === 'boardFeedbackModal') document.getElementById('boardFeedbackModal').classList.remove('show');
+});
+document.getElementById('boardFeedbackSubmit').addEventListener('click', async () => {
+  const textEl = document.getElementById('boardFeedbackText');
+  const text = textEl.value.trim();
+  if (!text) { textEl.focus(); return; }
+  const btn = document.getElementById('boardFeedbackSubmit');
+  btn.disabled = true;
+  try {
+    const r = await fetch('/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ body: text, deviceId: getDeviceId() }),
+    });
+    if (!r.ok) {
+      alert(r.status === 429 ? '너무 빨리 연달아 보냈어요. 잠시 후 다시 시도해주세요.' : '보내지 못했어요.');
+      return;
+    }
+    textEl.value = '';
+    document.getElementById('boardFeedbackModal').classList.remove('show');
+    alert('의견 감사해요! 꼼꼼히 읽어볼게요 🐥');
+  } catch (e) {
+    alert('보내지 못했어요.');
+  } finally {
+    btn.disabled = false;
+  }
 });
 
 document.getElementById('boardCommentSubmit').addEventListener('click', async () => {

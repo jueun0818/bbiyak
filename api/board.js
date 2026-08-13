@@ -4,6 +4,9 @@ import { redisCmd, getSessionUser, safeText } from './_kakao.js';
 const CATEGORIES = new Set(['free', 'result']);
 const PAGE_SIZE = 20;
 const MAX_BODY_LEN = 500;
+// 인기순은 전체 글이 아니라 최근 이 개수 안에서만 좋아요 순으로 다시 정렬한다
+// (오래된 글이 좋아요 몇 개로 상단을 영구 점거하는 걸 막고, 매 요청마다 훑는 범위도 제한).
+const POPULAR_WINDOW = 200;
 
 async function attachMeta(ids, myKakaoId) {
   return Promise.all(
@@ -39,8 +42,19 @@ export default async function handler(req, res) {
       const category = CATEGORIES.has(req.query.category) ? req.query.category : null;
       const offset = Math.max(0, Number(req.query.offset) || 0);
       const key = category ? `board:posts:${category}` : 'board:posts';
+      const sortPopular = req.query.sort === 'popular';
 
       const user = await getSessionUser(req);
+
+      if (sortPopular) {
+        const ids = await redisCmd(['ZREVRANGE', key, '0', String(POPULAR_WINDOW - 1)]);
+        const windowPosts = (await attachMeta(ids || [], user && user.kakaoId)).filter(Boolean);
+        windowPosts.sort((a, b) => (b.likeCount - a.likeCount) || (b.createdAt - a.createdAt));
+        const posts = windowPosts.slice(offset, offset + PAGE_SIZE);
+        res.status(200).json({ posts, hasMore: offset + PAGE_SIZE < windowPosts.length });
+        return;
+      }
+
       const ids = await redisCmd(['ZREVRANGE', key, String(offset), String(offset + PAGE_SIZE - 1)]);
       const posts = (await attachMeta(ids || [], user && user.kakaoId)).filter(Boolean);
       const total = await redisCmd(['ZCARD', key]);

@@ -341,6 +341,42 @@
   }
   #emptyOverrides { color: var(--muted); font-size: 13px; text-align: center; padding: 8px 0; display: none; }
 
+  .report-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .report-row:last-child { border-bottom: none; }
+  .report-row .report-count {
+    display: inline-block;
+    background: #ffe1e1;
+    color: #d0304a;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 12.5px;
+    font-weight: 800;
+    margin-right: 6px;
+    flex-shrink: 0;
+  }
+  .report-row .report-nick { font-weight: 700; }
+  .report-row .report-body { color: var(--muted); font-size: 13px; margin-top: 4px; word-break: break-word; white-space: pre-wrap; }
+  .report-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+  .report-actions button {
+    width: auto;
+    padding: 6px 12px;
+    font-size: 12.5px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .report-actions .report-del { color: #d0304a; border-color: #f3d4d3; }
+
   /* ===== PWA: 설치 배너 / iOS 안내 시트 / 업데이트 토스트 ===== */
   .pwa-banner[hidden], .pwa-guide[hidden], .pwa-toast[hidden] { display: none !important; }
 
@@ -574,6 +610,18 @@
     </div>
 
     <div class="section">
+      <h2>🚩 신고된 글 <span class="hint">(신고 많은 순)</span></h2>
+      <div id="reportList"></div>
+      <p id="emptyReports" class="hint" style="display:none; text-align:center; padding: 8px 0;">신고된 글이 없어요.</p>
+    </div>
+
+    <div class="section">
+      <h2>💡 건의사항</h2>
+      <div id="feedbackList"></div>
+      <p id="emptyFeedback" class="hint" style="display:none; text-align:center; padding: 8px 0;">아직 들어온 의견이 없어요.</p>
+    </div>
+
+    <div class="section">
       <h2>📈 최근 30일 방문 추이</h2>
       <div class="trend-chart-wrap" id="trendChart"></div>
     </div>
@@ -674,6 +722,8 @@ async function loadStats(pw) {
     $('loginCard').style.display = 'none';
     $('dashboard').style.display = 'block';
     loadOverrides();
+    loadReports();
+    loadFeedback();
   } catch (e) {
     $('dashError').style.display = 'block';
   }
@@ -950,6 +1000,113 @@ async function deleteOverride(id) {
       body: JSON.stringify({ password: pw, id }),
     });
     loadOverrides();
+  } catch (e) { /* 무시 */ }
+}
+
+// ============================================================
+// 신고된 글 (게시판 신고 큐)
+// ============================================================
+async function loadReports() {
+  const pw = sessionStorage.getItem('bbiyak_admin_pw');
+  if (!pw) return;
+  try {
+    const res = await fetch('/api/admin-reports?password=' + encodeURIComponent(pw));
+    if (!res.ok) throw new Error('failed');
+    const data = await res.json();
+    renderReports(data.reports || []);
+  } catch (e) {
+    $('reportList').innerHTML = '';
+  }
+}
+
+const CATEGORY_LABEL = { free: '자유글', result: '결과' };
+
+function renderReports(reports) {
+  $('emptyReports').style.display = reports.length ? 'none' : 'block';
+  $('reportList').innerHTML = reports.map((r) => `
+    <div class="report-row">
+      <div>
+        <span class="report-count">🚩 ${r.reportCount}</span>
+        <span class="report-nick">${esc(r.nickname)}</span>
+        <span class="hint">· ${CATEGORY_LABEL[r.category] || r.category} · ${relTime(r.createdAt)}</span>
+        <div class="report-body">${esc(r.body)}</div>
+      </div>
+      <div class="report-actions">
+        <button class="report-del" data-id="${esc(r.id)}">삭제</button>
+        <button class="report-dismiss" data-id="${esc(r.id)}">신고 무시</button>
+      </div>
+    </div>
+  `).join('');
+
+  $('reportList').querySelectorAll('.report-del').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (confirm('이 글을 삭제할까요? 되돌릴 수 없어요.')) resolveReport(btn.dataset.id, 'delete');
+    });
+  });
+  $('reportList').querySelectorAll('.report-dismiss').forEach((btn) => {
+    btn.addEventListener('click', () => resolveReport(btn.dataset.id, 'dismiss'));
+  });
+}
+
+async function resolveReport(id, action) {
+  const pw = sessionStorage.getItem('bbiyak_admin_pw');
+  if (!pw) return;
+  try {
+    await fetch('/api/admin-reports', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw, id, action }),
+    });
+    loadReports();
+  } catch (e) { /* 무시 */ }
+}
+
+// ============================================================
+// 건의사항 (게시판과 별개로, 로그인 없이도 누구나 보낼 수 있는 의견함)
+// ============================================================
+async function loadFeedback() {
+  const pw = sessionStorage.getItem('bbiyak_admin_pw');
+  if (!pw) return;
+  try {
+    const res = await fetch('/api/admin-feedback?password=' + encodeURIComponent(pw));
+    if (!res.ok) throw new Error('failed');
+    const data = await res.json();
+    renderFeedback(data.items || []);
+  } catch (e) {
+    $('feedbackList').innerHTML = '';
+  }
+}
+
+function renderFeedback(items) {
+  $('emptyFeedback').style.display = items.length ? 'none' : 'block';
+  $('feedbackList').innerHTML = items.map((f) => `
+    <div class="report-row">
+      <div>
+        <span class="report-nick">${esc(f.nickname || '익명')}</span>
+        <span class="hint">· ${relTime(f.createdAt)}</span>
+        <div class="report-body">${esc(f.body)}</div>
+      </div>
+      <div class="report-actions">
+        <button class="report-del" data-id="${esc(f.id)}">확인함</button>
+      </div>
+    </div>
+  `).join('');
+
+  $('feedbackList').querySelectorAll('.report-del').forEach((btn) => {
+    btn.addEventListener('click', () => deleteFeedback(btn.dataset.id));
+  });
+}
+
+async function deleteFeedback(id) {
+  const pw = sessionStorage.getItem('bbiyak_admin_pw');
+  if (!pw) return;
+  try {
+    await fetch('/api/admin-feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw, id }),
+    });
+    loadFeedback();
   } catch (e) { /* 무시 */ }
 }
 
