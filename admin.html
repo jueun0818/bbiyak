@@ -655,6 +655,12 @@
     </div>
 
     <div class="section">
+      <h2>🧪 예시 글 궁합결과 채우기 <span class="hint">(자유글 초기 예시 8개, 한 번만 실행)</span></h2>
+      <button id="seedResultsBtn" class="more-btn">✨ 지금 채우기</button>
+      <p class="hint" style="text-align:center; margin-top:8px;">이미 채워진 글은 다시 눌러도 값이 덮어써질 뿐 문제 없어요.</p>
+    </div>
+
+    <div class="section">
       <h2>📋 최근 궁합 기록 <span class="hint">(누가 누구랑 봤는지)</span></h2>
       <div id="logList"></div>
       <p id="emptyLog">아직 기록이 없어요.</p>
@@ -1143,6 +1149,49 @@ async function backfillVisitors() {
   }
 }
 $('backfillBtn').addEventListener('click', backfillVisitors);
+
+// ============================================================
+// 자유글 초기 예시(seed) 8개에 궁합결과를 나중에 채워 넣는 일회성 도구.
+// seed 글은 유저 계정이 없어(kakaoId가 "seed-*") 일반 글쓰기 경로로는
+// 결과를 첨부할 수 없어서, 각 글 내용에 맞는 결과를 관리자가 직접 넣어준다.
+// ============================================================
+const SEED_RESULT_ITEMS = [
+  { postId: '16', resultData: { kind: 'name', emoji: '💌', label: '이름 궁합', names: '지훈 × 수아', score: 91, tierTitle: '삐약계의 전설, 100년에 한 번 나올 조합' } },
+  { postId: '7', resultData: { kind: 'name', emoji: '💌', label: '이름 궁합', names: '민재 × 하은', score: 68, tierTitle: '티키타카 만렙, 알콩달콩 라이벌' } },
+  { postId: '14', resultData: { kind: 'zodiac', emoji: '⭐', label: '별자리 궁합', names: '나연 × 도윤', score: 79, tierTitle: '삐약이들 사이에 낀 큐피드' } },
+  { postId: '5', resultData: { kind: 'mbti', emoji: '🧩', label: 'MBTI 궁합', names: '서연 × 유진', score: 84, tierTitle: '삐약이들 사이에 낀 큐피드' } },
+  { postId: '12', resultData: { kind: 'today', emoji: '🌅', label: '오늘의 운세', names: '하린', score: 91, tierTitle: '삐약! 오늘은 완전 럭키데이' } },
+  { postId: '3', resultData: { kind: 'name', emoji: '💌', label: '이름 궁합', names: '은서 × 태윤', score: 90, tierTitle: '삐약계의 전설, 100년에 한 번 나올 조합' } },
+  { postId: '2', resultData: { kind: 'name', emoji: '💌', label: '이름 궁합', names: '예진 × 준서', score: 92, tierTitle: '삐약계의 전설, 100년에 한 번 나올 조합' } },
+  { postId: '9', resultData: { kind: 'sajuCompat', emoji: '🀄', label: '사주 궁합', names: '도현 × 세아', score: 87, tierTitle: '삐약이들 사이에 낀 큐피드' } },
+];
+
+async function attachSeedResults() {
+  const pw = sessionStorage.getItem('bbiyak_admin_pw');
+  if (!pw) return;
+  const btn = $('seedResultsBtn');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '채우는 중…';
+  try {
+    const res = await fetch('/api/admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw, type: 'attachResult', items: SEED_RESULT_ITEMS }),
+    });
+    if (!res.ok) throw new Error('failed');
+    const data = await res.json();
+    btn.textContent = `✅ ${data.updated}개 글에 결과 채움`;
+  } catch (e) {
+    btn.textContent = '⚠️ 실패했어요, 다시 시도해주세요';
+  } finally {
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }, 4000);
+  }
+}
+$('seedResultsBtn').addEventListener('click', attachSeedResults);
 
 $('loginBtn').addEventListener('click', login);
 $('pwInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') login(); });

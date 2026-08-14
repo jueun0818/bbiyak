@@ -88,6 +88,26 @@ async function getFeedback(url, token, res) {
   res.status(200).json({ items });
 }
 
+// 자유글 예시(seed) 글에 궁합 결과를 나중에 첨부할 때 쓰는 일회성 관리 기능.
+// 실제 유저 글은 작성 시점에만 결과를 첨부할 수 있지만(board-post.js), seed 글은
+// 유저 계정이 없어 그 경로를 못 타므로 관리자가 직접 채워 넣는다.
+async function postAttachResult(url, token, body, res) {
+  const items = Array.isArray(body && body.items) ? body.items : [];
+  let updated = 0;
+  for (const item of items) {
+    const id = String((item && item.postId) || '').replace(/[^0-9]/g, '');
+    const resultData = item && item.resultData && typeof item.resultData === 'object' ? item.resultData : null;
+    if (!id || !resultData) continue;
+    const raw = await redisCmd(url, token, ['GET', `board:post:${id}`]);
+    if (!raw) continue;
+    let post;
+    try { post = JSON.parse(raw); } catch { continue; }
+    await redisCmd(url, token, ['SET', `board:post:${id}`, JSON.stringify({ ...post, resultData })]);
+    updated += 1;
+  }
+  res.status(200).json({ ok: true, updated });
+}
+
 async function postFeedback(url, token, body, res) {
   const id = String((body && body.id) || '').replace(/[^0-9]/g, '');
   if (!id) {
@@ -127,6 +147,7 @@ export default async function handler(req, res) {
       }
       if (body && body.type === 'feedback') { await postFeedback(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, body, res); return; }
       if (body && body.type === 'reports') { await postReports(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, body, res); return; }
+      if (body && body.type === 'attachResult') { await postAttachResult(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, body, res); return; }
       res.status(400).json({ error: 'invalid type' });
       return;
     }
