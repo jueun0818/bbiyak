@@ -1611,7 +1611,12 @@ window.addEventListener('popstate', () => {
 
 async function openBoardDetail(id, opts) {
   boardDetailPostId = id;
-  if (!opts || opts.pushState !== false) pushBoardDetailUrl(id);
+  if (!opts || opts.pushState !== false) {
+    pushBoardDetailUrl(id);
+  } else {
+    // ?post=ID로 바로 들어온 경우도, 이미 주소창에 ?post=가 있는 상태이니 닫을 때 정리할 수 있게 표시해둔다.
+    boardDetailUrlPushed = true;
+  }
   const modal = document.getElementById('boardDetailModal');
   const bodyEl = document.getElementById('boardDetailBody');
   const commentsEl = document.getElementById('boardComments');
