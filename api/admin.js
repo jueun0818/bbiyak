@@ -41,6 +41,15 @@ async function postReports(url, token, body, res) {
   if (action === 'dismiss') {
     await redisCmd(url, token, ['ZREM', 'board:reportedPosts', id]);
     await redisCmd(url, token, ['DEL', `board:post:${id}:reporters`]);
+    // 신고 누적으로 자동 가려졌던 글이면(board-post.js REPORT_AUTO_HIDE_THRESHOLD), 다시 보이게 한다.
+    const raw = await redisCmd(url, token, ['GET', `board:post:${id}`]);
+    if (raw) {
+      let post;
+      try { post = JSON.parse(raw); } catch { post = null; }
+      if (post && post.hidden) {
+        await redisCmd(url, token, ['SET', `board:post:${id}`, JSON.stringify({ ...post, hidden: false })]);
+      }
+    }
     res.status(200).json({ ok: true });
     return;
   }
@@ -108,6 +117,46 @@ async function postAttachResult(url, token, body, res) {
   res.status(200).json({ ok: true, updated });
 }
 
+// 공지(고정) 글 목록. board:pinned(ZSET, score=고정한 시각)에 담긴 id들을 최근 고정순으로 보여준다.
+async function getPinned(url, token, res) {
+  const idsWithScores = await redisCmd(url, token, ['ZREVRANGE', 'board:pinned', '0', '19', 'WITHSCORES']);
+  const items = [];
+  for (let i = 0; i < (idsWithScores || []).length; i += 2) {
+    const id = idsWithScores[i];
+    const pinnedAt = Number(idsWithScores[i + 1]) || 0;
+    const raw = await redisCmd(url, token, ['GET', `board:post:${id}`]);
+    if (!raw) {
+      // 이미 삭제된 글이면 고정 목록에서도 정리한다.
+      await redisCmd(url, token, ['ZREM', 'board:pinned', id]);
+      continue;
+    }
+    let post;
+    try { post = JSON.parse(raw); } catch { continue; }
+    items.push({ id, pinnedAt, nickname: post.nickname, title: post.title });
+  }
+  res.status(200).json({ items });
+}
+
+async function postTogglePin(url, token, body, res) {
+  const id = String((body && body.id) || '').replace(/[^0-9]/g, '');
+  const pinned = !!(body && body.pinned);
+  if (!id) {
+    res.status(400).json({ error: 'invalid' });
+    return;
+  }
+  const raw = await redisCmd(url, token, ['GET', `board:post:${id}`]);
+  if (!raw) {
+    res.status(404).json({ error: 'not found' });
+    return;
+  }
+  let post;
+  try { post = JSON.parse(raw); } catch { res.status(500).json({ error: 'failed' }); return; }
+  await redisCmd(url, token, ['SET', `board:post:${id}`, JSON.stringify({ ...post, pinned })]);
+  if (pinned) await redisCmd(url, token, ['ZADD', 'board:pinned', String(Date.now()), id]);
+  else await redisCmd(url, token, ['ZREM', 'board:pinned', id]);
+  res.status(200).json({ ok: true, pinned });
+}
+
 async function postFeedback(url, token, body, res) {
   const id = String((body && body.id) || '').replace(/[^0-9]/g, '');
   if (!id) {
@@ -136,6 +185,7 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
       if (req.query.type === 'feedback') { await getFeedback(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, res); return; }
       if (req.query.type === 'reports') { await getReports(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, res); return; }
+      if (req.query.type === 'pinned') { await getPinned(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, res); return; }
       res.status(400).json({ error: 'invalid type' });
       return;
     }
@@ -148,6 +198,7 @@ export default async function handler(req, res) {
       if (body && body.type === 'feedback') { await postFeedback(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, body, res); return; }
       if (body && body.type === 'reports') { await postReports(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, body, res); return; }
       if (body && body.type === 'attachResult') { await postAttachResult(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, body, res); return; }
+      if (body && body.type === 'pin') { await postTogglePin(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, body, res); return; }
       res.status(400).json({ error: 'invalid type' });
       return;
     }

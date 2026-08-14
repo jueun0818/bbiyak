@@ -182,14 +182,6 @@
   .trend-chart-wrap .trend-dot { fill: var(--accent); }
   .trend-chart-wrap .trend-dot:hover { r: 5; }
 
-  .pair-row { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
-  .pair-row:last-child { border-bottom: none; }
-  .pair-rank { width: 24px; flex-shrink: 0; text-align: center; font-weight: 800; font-size: 13px; color: var(--muted); }
-  .pair-rank.medal { font-size: 18px; }
-  .pair-name { flex: 1; font-weight: 600; }
-  .pair-name .sep { color: var(--muted); font-weight: 400; margin: 0 4px; }
-  .pair-count { font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; flex-shrink: 0; }
-
   .tab-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 14px; }
   .tab-row .tab-label { width: 92px; flex-shrink: 0; }
   .tab-row .bar-track { flex: 1; height: 20px; background: var(--accent-soft); border-radius: 6px; overflow: hidden; }
@@ -278,7 +270,7 @@
 
   .override-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
   .override-form .row { display: flex; gap: 8px; }
-  .override-form input {
+  .override-form input, .override-form select {
     flex: 1;
     min-width: 0;
     padding: 11px 12px;
@@ -289,6 +281,18 @@
     font-size: 14px;
   }
   .override-form input#ovScore { flex: 0 0 84px; }
+  .override-form select#ovKind { flex: 0 0 128px; }
+  .override-row .ov-kind {
+    display: inline-block;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 999px;
+    padding: 1px 8px;
+    font-size: 11px;
+    font-weight: 800;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
   .hint { font-size: 12px; color: var(--muted); }
   .override-form .hint { margin: -2px 0 0; }
   .override-form button {
@@ -610,6 +614,19 @@
     </div>
 
     <div class="section">
+      <h2>📌 공지(고정) 글 관리</h2>
+      <div class="override-form">
+        <div class="row">
+          <input type="text" id="pinPostIdInput" placeholder="글 ID (예: 7)" inputmode="numeric">
+          <button id="pinAddBtn" style="width:auto;">📌 고정</button>
+        </div>
+        <p class="hint">글 ID는 게시판에서 그 글을 열었을 때 주소창의 ?post= 뒤 숫자예요. 고정된 글은 자유글 맨 위에 항상 붙어요.</p>
+      </div>
+      <div id="pinnedList"></div>
+      <p id="emptyPinned" class="hint" style="display:none; text-align:center; padding: 8px 0;">고정된 글이 없어요.</p>
+    </div>
+
+    <div class="section">
       <h2>🚩 신고된 글 <span class="hint">(신고 많은 순)</span></h2>
       <div id="reportList"></div>
       <p id="emptyReports" class="hint" style="display:none; text-align:center; padding: 8px 0;">신고된 글이 없어요.</p>
@@ -632,14 +649,18 @@
     </div>
 
     <div class="section">
-      <h2>🏆 인기 궁합 조합 TOP 10 <span class="hint">(서비스 오픈 이후 누적)</span></h2>
-      <div id="pairsList"></div>
-      <p id="emptyPairs" class="hint" style="display:none; text-align:center; padding: 8px 0;">아직 데이터가 없어요.</p>
-    </div>
-
-    <div class="section">
-      <h2>🎛️ 이름 점수 조작</h2>
+      <h2>🎛️ 궁합 점수 조작</h2>
       <div class="override-form">
+        <div class="row">
+          <select id="ovKind">
+            <option value="name">💌 이름 궁합</option>
+            <option value="sajuCompat">🀄 사주 궁합</option>
+            <option value="zodiac">⭐ 별자리 궁합</option>
+            <option value="blood">🩸 혈액형 궁합</option>
+            <option value="mbti">🧩 MBTI 궁합</option>
+            <option value="combo">💫 종합 궁합</option>
+          </select>
+        </div>
         <div class="row">
           <input type="text" id="ovName1" placeholder="이름1 (필수)" maxlength="20">
           <input type="text" id="ovName2" placeholder="이름2 (비우면 상대 무관)" maxlength="20">
@@ -730,6 +751,7 @@ async function loadStats(pw) {
     loadOverrides();
     loadReports();
     loadFeedback();
+    loadPinned();
   } catch (e) {
     $('dashError').style.display = 'block';
   }
@@ -788,7 +810,6 @@ function render(data) {
   $('engagementRate').textContent = totalVisitorsN > 0 ? `${engagement.toFixed(1)}회` : '-';
 
   renderTrendChart(daily);
-  renderPairs(data.topPairs || []);
 
   const maxTab = Math.max(1, ...data.tabClicks.map((t) => t.count));
   $('tabChart').innerHTML = data.tabClicks.map((t) => {
@@ -910,20 +931,6 @@ function renderTrendChart(daily) {
     </svg>`;
 }
 
-function renderPairs(pairs) {
-  $('emptyPairs').style.display = pairs.length ? 'none' : 'block';
-  const medals = ['🥇', '🥈', '🥉'];
-  $('pairsList').innerHTML = pairs.map((p, i) => {
-    const rank = i < 3 ? medals[i] : String(i + 1);
-    const rankClass = i < 3 ? 'pair-rank medal' : 'pair-rank';
-    return `<div class="pair-row">
-      <span class="${rankClass}">${rank}</span>
-      <span class="pair-name">${esc(p.n1)}<span class="sep">×</span>${esc(p.n2)}</span>
-      <span class="pair-count">${p.count.toLocaleString()}회</span>
-    </div>`;
-  }).join('');
-}
-
 function hashHue(str) {
   let h = 0;
   for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
@@ -944,15 +951,21 @@ async function loadOverrides() {
   }
 }
 
+const OVERRIDE_KIND_LABEL = {
+  name: '💌 이름', sajuCompat: '🀄 사주', zodiac: '⭐ 별자리', blood: '🩸 혈액형', mbti: '🧩 MBTI', combo: '💫 종합',
+};
+
 function renderOverrides(rules) {
   $('emptyOverrides').style.display = rules.length ? 'none' : 'block';
   $('overrideList').innerHTML = rules.map((r) => {
+    const kind = r.kind || 'name';
     const pairHtml = r.n2
       ? `${esc(r.n1)}<span class="sep">×</span>${esc(r.n2)}`
       : `${esc(r.n1)} <span class="ov-wild">(상대 무관)</span>`;
     const noteHtml = r.note ? `<div class="ov-note">${esc(r.note)}</div>` : '';
     return `<div class="override-row">
       <div>
+        <span class="ov-kind">${OVERRIDE_KIND_LABEL[kind] || kind}</span>
         <span class="ov-pair">${pairHtml}<span class="ov-score">${r.score}점</span></span>
         ${noteHtml}
       </div>
@@ -968,6 +981,7 @@ function renderOverrides(rules) {
 async function addOverride() {
   const pw = sessionStorage.getItem('bbiyak_admin_pw');
   if (!pw) return;
+  const kind = $('ovKind').value;
   const name1 = $('ovName1').value.trim();
   const name2 = $('ovName2').value.trim();
   const score = $('ovScore').value;
@@ -983,7 +997,7 @@ async function addOverride() {
     const res = await fetch('/api/overrides', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: pw, name1, name2, score, note }),
+      body: JSON.stringify({ password: pw, kind, name1, name2, score, note }),
     });
     if (!res.ok) throw new Error('failed');
     $('ovName1').value = '';
@@ -1008,6 +1022,62 @@ async function deleteOverride(id) {
     loadOverrides();
   } catch (e) { /* 무시 */ }
 }
+
+// ============================================================
+// 공지(고정) 글 관리
+// ============================================================
+async function loadPinned() {
+  const pw = sessionStorage.getItem('bbiyak_admin_pw');
+  if (!pw) return;
+  try {
+    const res = await fetch('/api/admin?type=pinned&password=' + encodeURIComponent(pw));
+    if (!res.ok) throw new Error('failed');
+    const data = await res.json();
+    renderPinned(data.items || []);
+  } catch (e) {
+    $('pinnedList').innerHTML = '';
+  }
+}
+
+function renderPinned(items) {
+  $('emptyPinned').style.display = items.length ? 'none' : 'block';
+  $('pinnedList').innerHTML = items.map((it) => `
+    <div class="report-row">
+      <div>
+        <span class="report-nick">#${esc(it.id)}</span>
+        <span class="hint">· ${esc(it.nickname || '')}</span>
+        <div class="report-body">${esc(it.title || '(제목 없음)')}</div>
+      </div>
+      <div class="report-actions">
+        <button class="report-dismiss" data-id="${esc(it.id)}">고정 해제</button>
+      </div>
+    </div>
+  `).join('');
+  $('pinnedList').querySelectorAll('.report-dismiss').forEach((btn) => {
+    btn.addEventListener('click', () => togglePin(btn.dataset.id, false));
+  });
+}
+
+async function togglePin(id, pinned) {
+  const pw = sessionStorage.getItem('bbiyak_admin_pw');
+  if (!pw || !id) return;
+  try {
+    const res = await fetch('/api/admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw, type: 'pin', id, pinned }),
+    });
+    if (!res.ok) throw new Error('failed');
+    loadPinned();
+  } catch (e) { /* 무시 */ }
+}
+
+$('pinAddBtn').addEventListener('click', () => {
+  const id = $('pinPostIdInput').value.trim();
+  if (!id) return;
+  $('pinPostIdInput').value = '';
+  togglePin(id, true);
+});
 
 // ============================================================
 // 신고된 글 (게시판 신고 큐)

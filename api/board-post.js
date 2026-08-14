@@ -4,6 +4,8 @@ import { redisCmd, getSessionUser, safeText } from './_kakao.js';
 const MAX_COMMENT_LEN = 200;
 const MAX_BODY_LEN = 500;
 const MAX_TITLE_LEN = 40;
+// 이 수만큼 신고가 쌓이면 관리자가 확인하기 전까지 자동으로 가린다(완전 삭제 아님).
+const REPORT_AUTO_HIDE_THRESHOLD = 3;
 
 export default async function handler(req, res) {
   const { UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN } = process.env;
@@ -299,6 +301,11 @@ export default async function handler(req, res) {
           const reportCount = await redisCmd(['SCARD', reportersKey]);
           // 신고된 글 목록(admin.html)에서 신고 많은 순으로 보기 위해 점수를 신고 수로 유지한다.
           await redisCmd(['ZADD', 'board:reportedPosts', String(Number(reportCount) || 1), postId]);
+          // 신고가 임계치를 넘으면 관리자가 확인하기 전까지 목록·상세에서 자동으로 가린다.
+          // (완전 삭제는 아니라서, 관리자가 "신고 무시"를 누르면 hidden을 다시 풀어줄 수 있다.)
+          if (Number(reportCount) >= REPORT_AUTO_HIDE_THRESHOLD && !post.hidden) {
+            await redisCmd(['SET', `board:post:${postId}`, JSON.stringify({ ...post, hidden: true })]);
+          }
         }
         res.status(200).json({ ok: true, alreadyReported: !!already });
         return;

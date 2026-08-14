@@ -151,18 +151,6 @@ export default async function handler(req, res) {
     );
     tabClicks.sort((a, b) => b.count - a.count);
 
-    // 인기 조합 랭킹: stats:log(최근 200건)와 달리 서비스 오픈 이후 전체 누적 집계라,
-    // "역대 가장 많이 확인된 이름 조합" 순위를 정확히 보여준다.
-    const topPairsRaw = await redisCmd(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, ['ZREVRANGE', 'stats:pairs', '0', '9', 'WITHSCORES']);
-    const topPairs = [];
-    for (let i = 0; i < (topPairsRaw || []).length; i += 2) {
-      const member = topPairsRaw[i];
-      const score = Number(topPairsRaw[i + 1]) || 0;
-      const sep = member.indexOf('|');
-      if (sep === -1) continue;
-      topPairs.push({ n1: member.slice(0, sep), n2: member.slice(sep + 1), count: score });
-    }
-
     const rawLogs = await redisCmd(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, ['LRANGE', 'stats:log', '0', String(LOG_FETCH_COUNT - 1)]);
     const recentLogs = (rawLogs || [])
       .map((s) => { try { return JSON.parse(s); } catch { return null; } })
@@ -171,7 +159,7 @@ export default async function handler(req, res) {
 
     res.status(200).json({
       totalVisits, totalVisitors, todayVisitors, retentionRate, returningToday,
-      dailyVisits, tabClicks, topPairs, recentLogs,
+      dailyVisits, tabClicks, recentLogs,
     });
   } catch (e) {
     res.status(500).json({ error: 'failed' });

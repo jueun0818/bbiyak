@@ -1,8 +1,10 @@
-// 이름 궁합 점수 조작(관리자 설정 오버라이드)
+// 궁합 점수 조작(관리자 설정 오버라이드) — 이름 궁합뿐 아니라 사주・별자리・혈액형・
+// MBTI・종합 궁합도 각각 따로 규칙을 걸 수 있다(kind로 구분).
 // - GET: 누구나 조회 가능(공개 API). index.html이 궁합 계산 전에 이 목록을 불러와
-//   일치하는 규칙이 있으면 피라미드 획수 감산법 대신 이 점수를 그대로 보여준다.
+//   같은 kind + 일치하는 이름 규칙이 있으면 원래 계산법 대신 이 점수를 그대로 보여준다.
 // - POST/DELETE: 관리자 비밀번호 필요.
 const KEY = 'overrides:list';
+const KINDS = new Set(['name', 'sajuCompat', 'zodiac', 'blood', 'mbti', 'combo']);
 
 async function redisCmd(url, token, cmd) {
   const r = await fetch(url, {
@@ -61,6 +63,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
+    const kind = KINDS.has(body.kind) ? body.kind : 'name';
     const n1 = safeName(body.name1);
     const n2 = safeName(body.name2);
     const score = clampScore(body.score);
@@ -70,7 +73,7 @@ export default async function handler(req, res) {
       return;
     }
     const id = safeName(body.id) || (Date.now().toString(36) + Math.random().toString(36).slice(2, 8));
-    const rule = { id, n1, n2, score, note, createdAt: Date.now() };
+    const rule = { id, kind, n1, n2, score, note, createdAt: Date.now() };
     try {
       await redisCmd(UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, ['HSET', KEY, id, JSON.stringify(rule)]);
       res.status(200).json({ ok: true, rule });

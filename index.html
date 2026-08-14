@@ -2080,15 +2080,17 @@ let scoreOverrides = [];
   } catch (e) { /* 무시 */ }
 })();
 
-function findScoreOverride(name1, name2) {
+function findScoreOverride(kind, name1, name2) {
   const a = (name1 || '').trim();
   const b = (name2 || '').trim();
   if (!a && !b) return null;
+  // 예전 규칙(kind 필드 생기기 전에 저장된 것)은 전부 이름 궁합용이었으므로 'name'으로 취급
+  const rules = scoreOverrides.filter((r) => (r.kind || 'name') === kind);
   // 이름 두 개가 모두 지정된 규칙: 순서 상관없이 정확히 일치할 때 우선 적용
-  const pairMatch = scoreOverrides.find((r) => r.n2 && ((r.n1 === a && r.n2 === b) || (r.n1 === b && r.n2 === a)));
+  const pairMatch = rules.find((r) => r.n2 && ((r.n1 === a && r.n2 === b) || (r.n1 === b && r.n2 === a)));
   if (pairMatch) return pairMatch;
   // 이름 하나만 지정된 규칙: 그 이름이 어느 쪽이든 포함되면 적용(상대는 누구든 상관없음)
-  return scoreOverrides.find((r) => !r.n2 && (r.n1 === a || r.n1 === b)) || null;
+  return rules.find((r) => !r.n2 && (r.n1 === a || r.n1 === b)) || null;
 }
 
 // ---- 한글 획수 테이블 ----
@@ -2458,7 +2460,7 @@ function renderChars(containerId, breakdown) {
 function showResult(name1, name2) {
   const a1 = analyzeName(name1);
   const a2 = analyzeName(name2);
-  const override = findScoreOverride(name1, name2);
+  const override = findScoreOverride('name', name1, name2);
   const score = override ? override.score : computeScore(a1.breakdown, a2.breakdown);
   const tier = getTier(score);
 
@@ -3199,7 +3201,9 @@ document.getElementById('sajuCompatBtn').addEventListener('click', () => {
   const hb1 = h1 === 'unknown' ? null : HOUR_BLOCKS.find(hb => hb.value === h1).branch;
   const hb2 = h2 === 'unknown' ? null : HOUR_BLOCKS.find(hb => hb.value === h2).branch;
 
-  const result = computeSajuCompat(y1, m1, dd1, hb1, y2, m2, dd2, hb2);
+  const rawResult = computeSajuCompat(y1, m1, dd1, hb1, y2, m2, dd2, hb2);
+  const scOverride = findScoreOverride('sajuCompat', document.getElementById('scName1').value, document.getElementById('scName2').value);
+  const result = scOverride ? { ...rawResult, score: scOverride.score } : rawResult;
   renderPillars(result.p1, 'sajuCompatPillars1');
   renderPillars(result.p2, 'sajuCompatPillars2');
   const tier = renderScoreUI('sajuCompat', result.score);
@@ -3534,7 +3538,9 @@ document.getElementById('zodiacBtn').addEventListener('click', () => {
   const [, m2, dd2] = d2.split('-').map(Number);
   const sign1 = getZodiacSign(m1, dd1);
   const sign2 = getZodiacSign(m2, dd2);
-  const matchup = getZodiacMatchup(sign1.element, sign2.element);
+  const rawMatchup = getZodiacMatchup(sign1.element, sign2.element);
+  const zOverride = findScoreOverride('zodiac', document.getElementById('zName1').value, document.getElementById('zName2').value);
+  const matchup = zOverride ? { ...rawMatchup, score: zOverride.score } : rawMatchup;
 
   renderSignCard('zCard1', sign1);
   renderSignCard('zCard2', sign2);
@@ -3587,7 +3593,9 @@ document.getElementById('bloodBtn').addEventListener('click', () => {
   const n1 = document.getElementById('bName1').value.trim() || '첫 번째 분';
   const n2 = document.getElementById('bName2').value.trim() || '두 번째 분';
   trackEvent('tab_action', 'blood', n1, n2);
-  const matchup = getBloodMatchup(t1, t2);
+  const rawMatchup = getBloodMatchup(t1, t2);
+  const bOverride = findScoreOverride('blood', n1, n2);
+  const matchup = bOverride ? { ...rawMatchup, score: bOverride.score } : rawMatchup;
 
   const tier = renderScoreUI('blood', matchup.score);
   document.getElementById('bTrait1Title').textContent = `${n1}님 (${t1}형)의 특징`;
@@ -3755,7 +3763,9 @@ document.getElementById('mbtiBtn').addEventListener('click', () => {
   const n1 = document.getElementById('mName1').value.trim() || '첫 번째 분';
   const n2 = document.getElementById('mName2').value.trim() || '두 번째 분';
   trackEvent('tab_action', 'mbti', n1, n2);
-  const result = computeMbtiCompat(type1, type2);
+  const rawResult = computeMbtiCompat(type1, type2);
+  const mOverride = findScoreOverride('mbti', n1, n2);
+  const result = mOverride ? { ...rawResult, score: mOverride.score } : rawResult;
 
   const tier = renderScoreUI('mbti', result.score);
   const specialBox = document.getElementById('mSpecialBox');
@@ -3824,7 +3834,7 @@ document.getElementById('comboBtn').addEventListener('click', () => {
 
   // 1) 이름 궁합
   const a1 = analyzeName(name1), a2 = analyzeName(name2);
-  const nameOverride = findScoreOverride(name1, name2);
+  const nameOverride = findScoreOverride('name', name1, name2);
   const nameScore = nameOverride ? nameOverride.score : computeScore(a1.breakdown, a2.breakdown);
 
   // 2) 사주 궁합
@@ -3851,7 +3861,9 @@ document.getElementById('comboBtn').addEventListener('click', () => {
   const mbti2 = document.getElementById('cbMbti2').value;
   const mbtiRes = computeMbtiCompat(mbti1, mbti2);
 
-  const overall = Math.round((nameScore + sajuRes.score + zodiacMatch.score + bloodMatch.score + mbtiRes.score) / 5);
+  const rawOverall = Math.round((nameScore + sajuRes.score + zodiacMatch.score + bloodMatch.score + mbtiRes.score) / 5);
+  const cbOverride = findScoreOverride('combo', name1, name2);
+  const overall = cbOverride ? cbOverride.score : rawOverall;
 
   const tier = renderScoreUI('combo', overall);
   renderCategoryRows('comboBreakdown', [

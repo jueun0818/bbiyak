@@ -163,6 +163,37 @@
     margin: 18px 0 10px;
   }
   .board-list ~ .board-section-title { margin-top: 18px; }
+  .board-search-row { position: relative; margin-top: 18px; }
+  #boardSearchInput {
+    width: 100%;
+    padding: 11px 38px 11px 14px;
+    border-radius: 12px;
+    border: 1.5px solid var(--line);
+    background: var(--panel);
+    color: var(--text);
+    font-size: 14.5px;
+    font-family: inherit;
+    outline: none;
+    box-sizing: border-box;
+  }
+  #boardSearchInput:focus { border-color: var(--amber-strong); background: #fff; }
+  .board-search-clear {
+    position: absolute;
+    right: 7px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 26px;
+    height: 26px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--line);
+    color: var(--muted);
+    font-size: 12px;
+    box-shadow: none;
+    cursor: pointer;
+  }
   .board-list-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
   .board-list-head .board-section-title { margin: 0; }
   .board-sort-toggle { display: flex; gap: 6px; }
@@ -183,40 +214,6 @@
     color: #fff;
     border-color: transparent;
   }
-  .board-result-strip {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding-bottom: 4px;
-    margin-bottom: 4px;
-    -webkit-overflow-scrolling: touch;
-  }
-  .board-result-strip:empty::after {
-    content: '🎉 아직 올라온 궁합 결과가 없어요';
-    font-size: 13.5px;
-    color: var(--muted);
-    padding: 8px 2px;
-  }
-  .board-result-card {
-    flex: 0 0 auto;
-    width: 168px;
-    border: 1.5px solid var(--line);
-    border-left: 4px solid var(--accent, var(--amber-strong));
-    border-radius: 16px;
-    padding: 12px 13px;
-    background: linear-gradient(160deg, #fffdf2, var(--panel));
-    cursor: pointer;
-    transition: transform .12s ease, box-shadow .12s ease;
-  }
-  .board-result-card:active { transform: scale(0.97); }
-  .board-result-card .board-result-nick {
-    display: flex; align-items: center;
-    font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 6px;
-  }
-  .board-result-card .board-result-names { font-size: 14px; font-weight: 800; color: var(--text); line-height: 1.3; }
-  .board-result-card .board-result-score { font-size: 20px; font-weight: 800; color: var(--accent, var(--amber-text)); margin-top: 4px; }
-  .board-result-card .board-result-tier { font-size: 12px; color: var(--muted); margin-top: 2px; }
-  .board-result-card .board-result-foot { margin-top: 8px; font-size: 12px; color: var(--muted); }
   .board-avatar {
     display: inline-flex;
     align-items: center;
@@ -421,7 +418,7 @@
   #boardWriteTitle {
     width: 100%;
     padding: 13px 14px;
-    margin-bottom: 8px;
+    margin-bottom: 2px;
     border-radius: 14px;
     border: 1.5px solid var(--line);
     font-size: 15.5px;
@@ -435,6 +432,7 @@
     width: 100%;
     min-height: 76px;
     padding: 13px 14px;
+    margin-top: 6px;
     border-radius: 14px;
     border: 1.5px solid var(--line);
     font-size: 15.5px;
@@ -444,6 +442,15 @@
     box-sizing: border-box;
   }
   #boardWriteText:focus { border-color: var(--amber-strong); }
+  .char-counter {
+    display: block;
+    text-align: right;
+    font-size: 11px;
+    color: var(--muted);
+    margin: 2px 2px 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .char-counter.char-counter-near-limit { color: #d0304a; font-weight: 700; }
   .board-write-row {
     display: flex;
     align-items: center;
@@ -492,17 +499,6 @@
   .skeleton-post-title { height: 15px; width: 65%; margin-top: 10px; }
   .skeleton-post-foot { display: flex; gap: 10px; margin-top: 12px; }
   .skeleton-pill { width: 36px; height: 12px; }
-  .skeleton-result-card {
-    flex: 0 0 auto;
-    width: 168px;
-    border: 1.5px solid var(--line);
-    border-radius: 16px;
-    padding: 12px 13px;
-    background: #fff;
-  }
-  .skeleton-result-nick { height: 11px; width: 50%; }
-  .skeleton-result-name { height: 14px; width: 85%; margin-top: 8px; }
-  .skeleton-result-score { height: 20px; width: 45%; margin-top: 6px; }
   .board-post {
     border: 1.5px solid var(--line);
     border-radius: 16px;
@@ -510,6 +506,21 @@
     background: #fff;
     cursor: pointer;
     transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  }
+  .board-post.pinned {
+    border-color: var(--amber-strong);
+    background: linear-gradient(160deg, #fffdf2, #fff);
+  }
+  .board-pin-badge {
+    display: inline-block;
+    background: var(--grad-amber);
+    color: #fff;
+    border-radius: 999px;
+    padding: 2px 9px;
+    font-size: 11.5px;
+    font-weight: 800;
+    margin-right: 4px;
+    vertical-align: middle;
   }
   .board-post:active {
     transform: scale(0.99);
@@ -645,6 +656,11 @@
     font-size: 14.5px;
   }
   .board-comment-nick { font-weight: 700; color: var(--purple); margin-right: 6px; }
+  .board-comment-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .board-comment-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .board-comment-actions .board-delete-btn { padding: 3px 9px; font-size: 11.5px; }
+  .board-comment-body { margin-top: 2px; white-space: pre-wrap; word-break: break-word; }
+  .board-comment-edited { font-size: 11.5px; color: var(--muted); font-weight: 400; }
   .board-comment-write {
     display: flex;
     gap: 8px;
@@ -706,14 +722,18 @@
           <option value="">📋 결과 첨부 안 함</option>
         </select>
         <input type="text" id="boardWriteTitle" maxlength="40" placeholder="제목을 입력해주세요">
+        <span class="char-counter" id="boardWriteTitleCount">0/40</span>
         <textarea id="boardWriteText" maxlength="500" placeholder="궁합 결과나 하고 싶은 말을 자유롭게 남겨보세요 🐥"></textarea>
+        <span class="char-counter" id="boardWriteTextCount">0/500</span>
         <div class="board-write-row">
           <button type="button" id="boardWriteSubmit">✍️ 올리기</button>
         </div>
       </div>
 
-      <div class="board-section-title">🎉 궁합 결과</div>
-      <div class="board-result-strip" id="boardResultStrip"></div>
+      <div class="board-search-row">
+        <input type="text" id="boardSearchInput" maxlength="40" placeholder="🔍 글 제목・내용 검색">
+        <button type="button" class="board-search-clear" id="boardSearchClear" hidden aria-label="검색어 지우기">✕</button>
+      </div>
 
       <div class="board-list-head">
         <div class="board-section-title">💬 자유글</div>
@@ -779,7 +799,9 @@
     <button type="button" class="board-detail-close" id="postEditClose" aria-label="닫기">✕</button>
     <p class="board-avatar-modal-title">✏️ 글 수정</p>
     <input type="text" id="postEditTitle" class="modal-text-input" maxlength="40" placeholder="제목을 입력해주세요" aria-label="제목">
+    <span class="char-counter" id="postEditTitleCount">0/40</span>
     <textarea id="postEditBody" class="modal-textarea" maxlength="500" placeholder="내용을 입력해주세요" aria-label="내용"></textarea>
+    <span class="char-counter" id="postEditBodyCount">0/500</span>
     <div class="board-write-row">
       <button type="button" id="postEditSubmit">저장</button>
     </div>
@@ -868,6 +890,7 @@ let boardSession = { loggedIn: false, nickname: '', kakaoId: '' };
 let boardOffset = 0;
 let boardLoadedOnce = false;
 let boardSort = 'latest';
+let boardSearchQuery = '';
 const BOARD_PAGE_SIZE = 20;
 
 function timeAgo(ms) {
@@ -886,6 +909,23 @@ function timeAgo(ms) {
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
+
+// 제목/본문 입력창 아래에 "12/40"처럼 실시간 글자 수를 보여준다. 한도의 90% 넘어가면 강조색으로 바뀐다.
+function wireCharCounter(inputId, counterId, maxLen) {
+  const inputEl = document.getElementById(inputId);
+  const counterEl = document.getElementById(counterId);
+  const update = () => {
+    const len = inputEl.value.length;
+    counterEl.textContent = `${len}/${maxLen}`;
+    counterEl.classList.toggle('char-counter-near-limit', len >= maxLen * 0.9);
+  };
+  inputEl.addEventListener('input', update);
+  update();
+}
+wireCharCounter('boardWriteTitle', 'boardWriteTitleCount', 40);
+wireCharCounter('boardWriteText', 'boardWriteTextCount', 500);
+wireCharCounter('postEditTitle', 'postEditTitleCount', 40);
+wireCharCounter('postEditBody', 'postEditBodyCount', 500);
 
 // 브라우저 기본 alert() 대신 쓰는 토스트. 2.6초 뒤 자동으로 사라진다.
 function showToast(message, type) {
@@ -988,8 +1028,10 @@ async function refreshBoardSession() {
     populateAttachSelect();
     if (!boardLoadedOnce) {
       boardLoadedOnce = true;
-      loadResultStrip();
       loadBoardPosts(true);
+      // 특정 글 링크(?post=ID)로 바로 들어온 경우, 목록 로드와 별개로 그 글의 상세를 바로 연다.
+      const initialPostId = new URLSearchParams(location.search).get('post');
+      if (initialPostId) openBoardDetail(initialPostId, { pushState: false });
     }
   }
 }
@@ -1179,8 +1221,10 @@ document.getElementById('commentEditModal').addEventListener('click', (e) => {
 document.getElementById('commentEditSubmit').addEventListener('click', async () => {
   if (!editingComment) return;
   const textEl = document.getElementById('commentEditText');
+  const submitBtn = document.getElementById('commentEditSubmit');
   const text = textEl.value.trim();
   if (!text) { textEl.focus(); return; }
+  submitBtn.disabled = true;
   try {
     const r = await fetch('/api/board-post', {
       method: 'POST',
@@ -1193,10 +1237,16 @@ document.getElementById('commentEditSubmit').addEventListener('click', async () 
     if (row) {
       row.querySelector('.my-comment-body').innerHTML = `${escapeHtml(data.body)} <span class="my-comment-edited">(수정됨)</span>`;
     }
+    const threadRow = document.querySelector(`.board-comment[data-id="${editingComment.commentId}"]`);
+    if (threadRow) {
+      threadRow.querySelector('.board-comment-body').innerHTML = `${escapeHtml(data.body)} <span class="board-comment-edited">(수정됨)</span>`;
+    }
     document.getElementById('commentEditModal').classList.remove('show');
     showToast('수정했어요.', 'success');
   } catch (e) {
     showToast('수정하지 못했어요.', 'error');
+  } finally {
+    submitBtn.disabled = false;
   }
 });
 
@@ -1313,37 +1363,19 @@ function renderResultChip(data) {
 
 function renderBoardPostCard(post) {
   const el = document.createElement('div');
-  el.className = 'board-post';
+  el.className = post.pinned ? 'board-post pinned' : 'board-post';
   el.dataset.id = post.id;
   el.innerHTML = `
     <div class="board-post-head">
       <span class="board-post-nick">${avatarHtml(post.nickname, post.avatar)}${escapeHtml(post.nickname)}</span>
       <span class="board-post-time">${timeAgo(post.createdAt)}</span>
     </div>
-    <div class="board-post-title">${escapeHtml(postTitleText(post))}</div>
+    <div class="board-post-title">${post.pinned ? '<span class="board-pin-badge">📌 공지</span> ' : ''}${escapeHtml(postTitleText(post))}</div>
     ${renderResultChip(post.resultData)}
     <div class="board-post-foot">
       <span class="${post.likedByMe ? 'liked' : ''}">❤️ ${post.likeCount}</span>
       <span>💬 ${post.commentCount}</span>
     </div>
-  `;
-  el.addEventListener('click', () => openBoardDetail(post.id));
-  return el;
-}
-
-function renderResultStripCard(post) {
-  const data = post.resultData;
-  const tier = data && data.score != null ? scoreTier(data.score) : null;
-  const el = document.createElement('div');
-  el.className = 'board-result-card';
-  el.dataset.id = post.id;
-  if (tier) el.style.setProperty('--accent', tier.accent);
-  el.innerHTML = `
-    <div class="board-result-nick">${avatarHtml(post.nickname, post.avatar)}${escapeHtml(post.nickname)}</div>
-    <div class="board-result-names">${data ? escapeHtml(data.names || '') : ''}</div>
-    ${data && data.score != null ? `<div class="board-result-score">${tier ? tier.badge + ' ' : ''}${data.score}점</div>` : ''}
-    ${data && data.tierTitle ? `<div class="board-result-tier">${escapeHtml(data.tierTitle)}</div>` : ''}
-    <div class="board-result-foot">❤️ ${post.likeCount} · 💬 ${post.commentCount}</div>
   `;
   el.addEventListener('click', () => openBoardDetail(post.id));
   return el;
@@ -1366,32 +1398,6 @@ function renderPostSkeleton() {
   return el;
 }
 
-function renderResultSkeleton() {
-  const el = document.createElement('div');
-  el.className = 'skeleton-result-card';
-  el.innerHTML = `
-    <div class="skeleton skeleton-result-nick"></div>
-    <div class="skeleton skeleton-result-name"></div>
-    <div class="skeleton skeleton-result-score"></div>
-  `;
-  return el;
-}
-
-async function loadResultStrip() {
-  const stripEl = document.getElementById('boardResultStrip');
-  stripEl.innerHTML = '';
-  for (let i = 0; i < 3; i++) stripEl.appendChild(renderResultSkeleton());
-  try {
-    const r = await fetch('/api/board?category=result&offset=0');
-    const data = await r.json();
-    stripEl.innerHTML = '';
-    (data.posts || []).forEach((post) => stripEl.appendChild(renderResultStripCard(post)));
-  } catch (e) {
-    stripEl.innerHTML = '';
-    // 비어 있으면 CSS ::after 안내 문구가 대신 보여진다
-  }
-}
-
 async function loadBoardPosts(reset) {
   if (reset) boardOffset = 0;
   const listEl = document.getElementById('boardList');
@@ -1403,12 +1409,15 @@ async function loadBoardPosts(reset) {
 
   try {
     const params = new URLSearchParams({ category: 'free', offset: String(boardOffset) });
-    if (boardSort === 'popular') params.set('sort', 'popular');
+    if (boardSearchQuery) params.set('q', boardSearchQuery);
+    else if (boardSort === 'popular') params.set('sort', 'popular');
     const r = await fetch(`/api/board?${params.toString()}`);
     const data = await r.json();
     if (reset) listEl.innerHTML = '';
     if (reset && (!data.posts || data.posts.length === 0)) {
-      listEl.innerHTML = '<p class="board-empty">🐣 아직 자유글이 없어요<br>첫 글을 남겨서 게시판을 열어보세요!</p>';
+      listEl.innerHTML = boardSearchQuery
+        ? '<p class="board-empty">🔍 검색 결과가 없어요<br>다른 검색어로 시도해보세요</p>'
+        : '<p class="board-empty">🐣 아직 자유글이 없어요<br>첫 글을 남겨서 게시판을 열어보세요!</p>';
     } else {
       (data.posts || []).forEach((post) => listEl.appendChild(renderBoardPostCard(post)));
     }
@@ -1420,6 +1429,36 @@ async function loadBoardPosts(reset) {
 }
 
 document.getElementById('boardMoreBtn').addEventListener('click', () => loadBoardPosts(false));
+
+// 검색어가 있는 동안은 정렬 토글(최신순/인기순)이 무의미해지므로 숨긴다 —
+// 검색 결과는 항상 최신순으로만 보여준다.
+let boardSearchDebounce = null;
+document.getElementById('boardSearchInput').addEventListener('input', (e) => {
+  const q = e.target.value.trim();
+  document.getElementById('boardSearchClear').hidden = !q;
+  document.getElementById('boardSortToggle').style.display = q ? 'none' : '';
+  clearTimeout(boardSearchDebounce);
+  boardSearchDebounce = setTimeout(() => {
+    boardSearchQuery = q;
+    loadBoardPosts(true);
+  }, 300);
+});
+document.getElementById('boardSearchInput').addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter') return;
+  clearTimeout(boardSearchDebounce);
+  boardSearchQuery = e.target.value.trim();
+  loadBoardPosts(true);
+});
+document.getElementById('boardSearchClear').addEventListener('click', () => {
+  const input = document.getElementById('boardSearchInput');
+  input.value = '';
+  input.focus();
+  document.getElementById('boardSearchClear').hidden = true;
+  document.getElementById('boardSortToggle').style.display = '';
+  clearTimeout(boardSearchDebounce);
+  boardSearchQuery = '';
+  loadBoardPosts(true);
+});
 
 document.getElementById('boardSortToggle').querySelectorAll('button').forEach((btn) => {
   btn.addEventListener('click', () => {
@@ -1465,6 +1504,8 @@ document.getElementById('boardWriteSubmit').addEventListener('click', async () =
     }
     titleEl.value = '';
     textEl.value = '';
+    titleEl.dispatchEvent(new Event('input'));
+    textEl.dispatchEvent(new Event('input'));
     document.getElementById('boardAttachResult').value = '';
     document.getElementById('boardList').prepend(renderBoardPostCard(data.post));
     const empty = document.querySelector('#boardList .board-empty');
@@ -1480,8 +1521,97 @@ document.getElementById('boardWriteSubmit').addEventListener('click', async () =
 let boardDetailPostId = null;
 let editingPost = null;
 
-async function openBoardDetail(id) {
+// 글 상세의 댓글 목록 + "내 댓글 모아보기"가 같은 댓글 수정 모달(commentEditModal)을
+// 공유하므로, 내 댓글이면 그 자리에서 바로 수정・삭제할 수 있게 여기서도 버튼을 붙인다.
+function renderCommentRow(c, postId) {
+  const el = document.createElement('div');
+  el.className = 'board-comment';
+  el.dataset.id = c.id;
+  const isMineComment = boardSession.loggedIn && boardSession.kakaoId === c.kakaoId;
+  el.innerHTML = `
+    <div class="board-comment-head">
+      <span class="board-comment-nick">${avatarHtml(c.nickname, c.avatar)}${escapeHtml(c.nickname)}</span>
+      ${isMineComment ? `<span class="board-comment-actions">
+        <button type="button" class="board-delete-btn" data-act="edit">수정</button>
+        <button type="button" class="board-delete-btn" data-act="delete">삭제</button>
+      </span>` : ''}
+    </div>
+    <div class="board-comment-body">${escapeHtml(c.body)}${c.editedAt ? ' <span class="board-comment-edited">(수정됨)</span>' : ''}</div>
+  `;
+  if (isMineComment) {
+    el.querySelector('[data-act="edit"]').addEventListener('click', () => {
+      editingComment = { postId, commentId: c.id };
+      document.getElementById('commentEditText').value = c.body;
+      document.getElementById('commentEditModal').classList.add('show');
+      document.getElementById('commentEditText').focus();
+    });
+    el.querySelector('[data-act="delete"]').addEventListener('click', async () => {
+      if (!(await showConfirm('이 댓글을 삭제할까요?', { danger: true }))) return;
+      try {
+        const r = await fetch('/api/board-post', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ postId, action: 'deleteComment', commentId: c.id }),
+        });
+        if (!r.ok) { showToast('삭제하지 못했어요.', 'error'); return; }
+        el.remove();
+        showToast('삭제했어요.', 'success');
+        const commentsEl = document.getElementById('boardComments');
+        if (!commentsEl.children.length) {
+          commentsEl.innerHTML = '<p class="board-empty">💬 아직 댓글이 없어요<br>첫 댓글을 남겨보세요</p>';
+        }
+        adjustCommentCount(postId, -1);
+      } catch (e) {
+        showToast('삭제하지 못했어요.', 'error');
+      }
+    });
+  }
+  return el;
+}
+
+// 글 상세 화면의 댓글 수와 목록 카드의 💬 카운트를 한 번에 맞춘다(댓글 등록/삭제 시 공용으로 사용).
+function adjustCommentCount(postId, delta) {
+  const countEl = document.getElementById('boardDetailCommentCount');
+  if (countEl && boardDetailPostId === postId) {
+    countEl.textContent = Math.max(0, (parseInt(countEl.textContent, 10) || 0) + delta);
+  }
+  const listCardEl = document.querySelector(`.board-post[data-id="${postId}"] .board-post-foot span:last-child`);
+  if (listCardEl) {
+    const n = Math.max(0, (parseInt(listCardEl.textContent.replace(/\D/g, ''), 10) || 0) + delta);
+    listCardEl.textContent = `💬 ${n}`;
+  }
+}
+
+// 글 하나를 콕 집어 공유할 수 있도록, 상세를 열고 닫을 때 주소창의 ?post= 파라미터를 같이 맞춘다.
+let boardDetailUrlPushed = false;
+function pushBoardDetailUrl(id) {
+  const url = new URL(location.href);
+  url.searchParams.set('post', id);
+  history.pushState({ boardPost: id }, '', url.pathname + url.search);
+  boardDetailUrlPushed = true;
+}
+function closeBoardDetail() {
+  document.getElementById('boardDetailModal').classList.remove('show');
+  if (boardDetailUrlPushed) {
+    const url = new URL(location.href);
+    url.searchParams.delete('post');
+    history.pushState({}, '', url.pathname + url.search);
+    boardDetailUrlPushed = false;
+  }
+}
+window.addEventListener('popstate', () => {
+  const postId = new URLSearchParams(location.search).get('post');
+  if (!postId) {
+    document.getElementById('boardDetailModal').classList.remove('show');
+    boardDetailUrlPushed = false;
+  } else if (postId !== boardDetailPostId) {
+    openBoardDetail(postId, { pushState: false });
+  }
+});
+
+async function openBoardDetail(id, opts) {
   boardDetailPostId = id;
+  if (!opts || opts.pushState !== false) pushBoardDetailUrl(id);
   const modal = document.getElementById('boardDetailModal');
   const bodyEl = document.getElementById('boardDetailBody');
   const commentsEl = document.getElementById('boardComments');
@@ -1511,17 +1641,24 @@ async function openBoardDetail(id) {
 function renderBoardDetail(post, comments) {
   const bodyEl = document.getElementById('boardDetailBody');
   const isMine = boardSession.loggedIn && boardSession.kakaoId === post.kakaoId;
+  // 신고가 쌓여 자동으로 가려진 글은, 글쓴이 본인에게만 원래 내용을 보여준다
+  // (스스로 고치거나 지울 수 있게). 다른 사람에게는 검토 중이라는 안내만 뜬다.
+  const hideFromViewer = post.hidden && !isMine;
+  const bodyHtml = hideFromViewer
+    ? '<p class="board-empty">🚩 여러 사용자의 신고가 접수돼 검토 중인 글이에요<br>운영자 확인 후 다시 열릴 수 있어요</p>'
+    : escapeHtml(post.body);
   bodyEl.innerHTML = `
     <div class="board-post-head">
       <span class="board-post-nick">${avatarHtml(post.nickname, post.avatar)}${escapeHtml(post.nickname)}</span>
       <span class="board-post-time">${timeAgo(post.createdAt)}</span>
     </div>
-    <div class="board-post-title" id="boardDetailPostTitle">${escapeHtml(postTitleText(post))}</div>
-    <div class="board-post-body" id="boardDetailPostBody">${escapeHtml(post.body)}</div>
-    ${renderResultChip(post.resultData)}
+    <div class="board-post-title" id="boardDetailPostTitle">${post.pinned ? '<span class="board-pin-badge">📌 공지</span> ' : ''}${escapeHtml(postTitleText(post))}</div>
+    <div class="board-post-body" id="boardDetailPostBody">${bodyHtml}</div>
+    ${hideFromViewer ? '' : renderResultChip(post.resultData)}
+    ${post.hidden && isMine ? '<p class="board-empty">🚩 신고가 접수돼 나에게만 보이는 상태예요</p>' : ''}
     <div class="board-post-foot">
       <span class="board-like-btn ${post.likedByMe ? 'liked' : ''}" id="boardDetailLike" style="cursor:pointer" role="button" tabindex="0" aria-pressed="${post.likedByMe ? 'true' : 'false'}" aria-label="좋아요">❤️ <span id="boardDetailLikeCount">${post.likeCount}</span></span>
-      <span>💬 ${post.commentCount}</span>
+      <span>💬 <span id="boardDetailCommentCount">${post.commentCount}</span></span>
       ${isMine ? '<button type="button" class="board-delete-btn" id="boardDetailEdit">수정</button>' : ''}
       ${isMine ? '<button type="button" class="board-delete-btn" id="boardDetailDelete">삭제</button>' : ''}
       ${!isMine ? '<button type="button" class="board-delete-btn" id="boardDetailReport">🚩 신고</button>' : ''}
@@ -1529,9 +1666,12 @@ function renderBoardDetail(post, comments) {
   `;
 
   const commentsEl = document.getElementById('boardComments');
-  commentsEl.innerHTML = comments.length
-    ? comments.map((c) => `<div class="board-comment"><span class="board-comment-nick">${avatarHtml(c.nickname, c.avatar)}${escapeHtml(c.nickname)}</span>${escapeHtml(c.body)}</div>`).join('')
-    : '<p class="board-empty">💬 아직 댓글이 없어요<br>첫 댓글을 남겨보세요</p>';
+  commentsEl.innerHTML = '';
+  if (comments.length) {
+    comments.forEach((c) => commentsEl.appendChild(renderCommentRow(c, post.id)));
+  } else {
+    commentsEl.innerHTML = '<p class="board-empty">💬 아직 댓글이 없어요<br>첫 댓글을 남겨보세요</p>';
+  }
 
   document.getElementById('boardCommentWriteRow').hidden = !boardSession.loggedIn;
 
@@ -1553,11 +1693,6 @@ function renderBoardDetail(post, comments) {
         listCardEl.classList.toggle('liked', data.liked);
         listCardEl.textContent = `❤️ ${data.likeCount}`;
       }
-      const stripCardEl = document.querySelector(`.board-result-card[data-id="${post.id}"] .board-result-foot`);
-      if (stripCardEl) {
-        const commentCount = post.commentCount || 0;
-        stripCardEl.textContent = `❤️ ${data.likeCount} · 💬 ${commentCount}`;
-      }
     } catch (e) { /* ignore */ }
   });
   document.getElementById('boardDetailLike').addEventListener('keydown', (e) => {
@@ -1575,11 +1710,9 @@ function renderBoardDetail(post, comments) {
           body: JSON.stringify({ postId: post.id, action: 'delete' }),
         });
         if (!r.ok) { showToast('삭제하지 못했어요.', 'error'); return; }
-        document.getElementById('boardDetailModal').classList.remove('show');
+        closeBoardDetail();
         const listCardEl = document.querySelector(`.board-post[data-id="${post.id}"]`);
         if (listCardEl) listCardEl.remove();
-        const stripCardEl = document.querySelector(`.board-result-card[data-id="${post.id}"]`);
-        if (stripCardEl) stripCardEl.remove();
         showToast('삭제했어요.', 'success');
       } catch (e) {
         showToast('삭제하지 못했어요.', 'error');
@@ -1591,8 +1724,12 @@ function renderBoardDetail(post, comments) {
   if (editBtn) {
     editBtn.addEventListener('click', () => {
       editingPost = post;
-      document.getElementById('postEditTitle').value = post.title || postTitleText(post);
-      document.getElementById('postEditBody').value = post.body;
+      const postEditTitleEl = document.getElementById('postEditTitle');
+      const postEditBodyEl = document.getElementById('postEditBody');
+      postEditTitleEl.value = post.title || postTitleText(post);
+      postEditBodyEl.value = post.body;
+      postEditTitleEl.dispatchEvent(new Event('input'));
+      postEditBodyEl.dispatchEvent(new Event('input'));
       document.getElementById('postEditModal').classList.add('show');
       document.getElementById('postEditTitle').focus();
     });
@@ -1619,11 +1756,9 @@ function renderBoardDetail(post, comments) {
   }
 }
 
-document.getElementById('boardDetailClose').addEventListener('click', () => {
-  document.getElementById('boardDetailModal').classList.remove('show');
-});
+document.getElementById('boardDetailClose').addEventListener('click', closeBoardDetail);
 document.getElementById('boardDetailModal').addEventListener('click', (e) => {
-  if (e.target.id === 'boardDetailModal') document.getElementById('boardDetailModal').classList.remove('show');
+  if (e.target.id === 'boardDetailModal') closeBoardDetail();
 });
 
 // ============================================================
@@ -1677,8 +1812,10 @@ document.getElementById('boardFeedbackSubmit').addEventListener('click', async (
 
 document.getElementById('boardCommentSubmit').addEventListener('click', async () => {
   const input = document.getElementById('boardCommentText');
+  const btn = document.getElementById('boardCommentSubmit');
   const text = input.value.trim();
   if (!text || !boardDetailPostId) return;
+  btn.disabled = true;
   try {
     const r = await fetch('/api/board-post', {
       method: 'POST',
@@ -1693,23 +1830,12 @@ document.getElementById('boardCommentSubmit').addEventListener('click', async ()
     const commentsEl = document.getElementById('boardComments');
     const empty = commentsEl.querySelector('.board-empty');
     if (empty) empty.remove();
-    const div = document.createElement('div');
-    div.className = 'board-comment';
-    div.innerHTML = `<span class="board-comment-nick">${avatarHtml(data.comment.nickname, data.comment.avatar)}${escapeHtml(data.comment.nickname)}</span>${escapeHtml(data.comment.body)}`;
-    commentsEl.appendChild(div);
+    commentsEl.appendChild(renderCommentRow(data.comment, boardDetailPostId));
     input.value = '';
-    const listCardEl = document.querySelector(`.board-post[data-id="${boardDetailPostId}"] .board-post-foot span:last-child`);
-    if (listCardEl) {
-      const n = (parseInt(listCardEl.textContent.replace(/\D/g, ''), 10) || 0) + 1;
-      listCardEl.textContent = `💬 ${n}`;
-    }
-    const stripCardEl = document.querySelector(`.board-result-card[data-id="${boardDetailPostId}"] .board-result-foot`);
-    if (stripCardEl) {
-      const n = (parseInt(stripCardEl.textContent.match(/💬 (\d+)/)?.[1], 10) || 0) + 1;
-      const likeMatch = stripCardEl.textContent.match(/❤️ (\d+)/);
-      stripCardEl.textContent = `❤️ ${likeMatch ? likeMatch[1] : 0} · 💬 ${n}`;
-    }
-  } catch (e) { /* ignore */ }
+    adjustCommentCount(boardDetailPostId, 1);
+  } catch (e) { /* ignore */ } finally {
+    btn.disabled = false;
+  }
 });
 
 document.getElementById('boardCommentText').addEventListener('keydown', (e) => {
@@ -1724,6 +1850,7 @@ if (new URLSearchParams(location.search).get('loginError')) {
 // showConfirm() 안에서 이미 자체적으로 Esc를 처리한다.
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
+  if (document.getElementById('boardDetailModal').classList.contains('show')) closeBoardDetail();
   document.querySelectorAll('.board-detail-modal.show').forEach((m) => m.classList.remove('show'));
 });
 
