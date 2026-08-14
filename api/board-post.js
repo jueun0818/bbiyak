@@ -20,13 +20,51 @@ export default async function handler(req, res) {
         res.status(401).json({ error: 'login required' });
         return;
       }
-      // 작성 시 LTRIM으로 최대 200개까지 보관하므로(아래 board-post.js의 comment 액션 참고),
+      // 작성 시 LTRIM으로 최대 200개까지 보관하므로(아래 comment 액션 참고),
       // 여기서도 49개가 아니라 199개까지 읽어야 오래전(예: 닉네임 변경 전) 댓글도
       // "내 댓글 모아보기"에 나타나 수정・삭제할 수 있다.
-      const rawList = await redisCmd(['LRANGE', `user:${user.kakaoId}:comments`, '0', '199']);
-      const comments = (rawList || [])
+      const userCommentsKey = `user:${user.kakaoId}:comments`;
+      const rawList = await redisCmd(['LRANGE', userCommentsKey, '0', '199']);
+      const indexed = (rawList || [])
         .map((s) => { try { return JSON.parse(s); } catch { return null; } })
         .filter(Boolean);
+
+      // 이 인덱스 자체가 "내 댓글 모아보기" 기능이 생긴 뒤로만 채워졌기 때문에, 그 전에
+      // (예: 닉네임 변경 전에) 쓴 댓글은 LRANGE 범위를 아무리 늘려도 여기 없다. 전체 글을
+      // 훑어서 인덱스에 없는 내 댓글을 찾아 응답에 합치고, 다음부턴 바로 보이도록 인덱스에도
+      // 채워 넣는다(글 수가 적은 서비스라 매번 훑어도 부담 없고, 이미 채워진 건 건너뛴다).
+      const indexedIds = new Set(indexed.map((c) => c.id));
+      const BACKFILL_SCAN_LIMIT = 300;
+      const postIds = (await redisCmd(['ZREVRANGE', 'board:posts', '0', String(BACKFILL_SCAN_LIMIT - 1)])) || [];
+      const scanResults = await Promise.all(postIds.map(async (postId) => {
+        const [postRaw, commentsRaw] = await Promise.all([
+          redisCmd(['GET', `board:post:${postId}`]),
+          redisCmd(['LRANGE', `board:post:${postId}:comments`, '0', '-1']),
+        ]);
+        if (!commentsRaw || !commentsRaw.length) return [];
+        let postTitle = '(삭제된 글)';
+        if (postRaw) {
+          try {
+            const p = JSON.parse(postRaw);
+            postTitle = p.title || (p.body ? (p.body.length > 24 ? p.body.slice(0, 24) + '…' : p.body) : '(제목 없음)');
+          } catch { /* 무시 */ }
+        }
+        const found = [];
+        for (const s of commentsRaw) {
+          let c;
+          try { c = JSON.parse(s); } catch { continue; }
+          if (!c || c.kakaoId !== user.kakaoId || indexedIds.has(c.id)) continue;
+          found.push({ id: c.id, postId, postTitle, body: c.body, createdAt: c.createdAt, ...(c.editedAt ? { editedAt: c.editedAt } : {}) });
+        }
+        return found;
+      }));
+      const backfilled = scanResults.flat();
+      if (backfilled.length) {
+        await Promise.all(backfilled.map((entry) => redisCmd(['RPUSH', userCommentsKey, JSON.stringify(entry)])));
+        await redisCmd(['LTRIM', userCommentsKey, '0', '199']);
+      }
+
+      const comments = [...indexed, ...backfilled].sort((a, b) => b.createdAt - a.createdAt);
       res.status(200).json({ comments });
     } catch (e) {
       res.status(500).json({ error: 'failed' });
