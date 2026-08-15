@@ -1398,6 +1398,11 @@ function renderPostSkeleton() {
   return el;
 }
 
+// 검색어를 빠르게 고쳐 치면 요청 여러 개가 동시에 날아갈 수 있는데, 먼저 보낸 요청이
+// 나중에 도착하면 최신 검색어 결과를 옛날 결과로 덮어써버릴 수 있다. 요청마다 번호를 매겨,
+// 응답이 왔을 때 그 사이 더 최신 요청이 시작됐으면(번호가 바뀌었으면) 조용히 버린다.
+let boardListRequestSeq = 0;
+
 async function loadBoardPosts(reset) {
   if (reset) boardOffset = 0;
   const listEl = document.getElementById('boardList');
@@ -1406,6 +1411,7 @@ async function loadBoardPosts(reset) {
     listEl.innerHTML = '';
     for (let i = 0; i < 3; i++) listEl.appendChild(renderPostSkeleton());
   }
+  const requestSeq = ++boardListRequestSeq;
 
   try {
     const params = new URLSearchParams({ category: 'free', offset: String(boardOffset) });
@@ -1413,6 +1419,7 @@ async function loadBoardPosts(reset) {
     else if (boardSort === 'popular') params.set('sort', 'popular');
     const r = await fetch(`/api/board?${params.toString()}`);
     const data = await r.json();
+    if (requestSeq !== boardListRequestSeq) return;
     if (reset) listEl.innerHTML = '';
     if (reset && (!data.posts || data.posts.length === 0)) {
       listEl.innerHTML = boardSearchQuery
@@ -1424,7 +1431,9 @@ async function loadBoardPosts(reset) {
     boardOffset += BOARD_PAGE_SIZE;
     moreBtn.hidden = !data.hasMore;
   } catch (e) {
-    if (reset) listEl.innerHTML = '<p class="board-empty">🥲 게시판을 불러오지 못했어요<br>잠시 후 다시 시도해주세요</p>';
+    if (requestSeq === boardListRequestSeq && reset) {
+      listEl.innerHTML = '<p class="board-empty">🥲 게시판을 불러오지 못했어요<br>잠시 후 다시 시도해주세요</p>';
+    }
   }
 }
 
