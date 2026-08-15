@@ -77,14 +77,14 @@ export default async function handler(req, res) {
         const windowPosts = (await attachMeta(ids || [], user && user.kakaoId)).filter((p) => p && !p.hidden);
         windowPosts.sort((a, b) => (b.likeCount - a.likeCount) || (b.createdAt - a.createdAt));
         let posts = windowPosts.slice(offset, offset + PAGE_SIZE);
-        if (offset === 0 && category === 'free') posts = withPinnedFirst(posts, await getPinnedPosts(user && user.kakaoId));
+        if (offset === 0 && !category) posts = withPinnedFirst(posts, await getPinnedPosts(user && user.kakaoId));
         res.status(200).json({ posts, hasMore: offset + PAGE_SIZE < windowPosts.length });
         return;
       }
 
       const ids = await redisCmd(['ZREVRANGE', key, String(offset), String(offset + PAGE_SIZE - 1)]);
       let posts = (await attachMeta(ids || [], user && user.kakaoId)).filter((p) => p && !p.hidden);
-      if (offset === 0 && category === 'free') posts = withPinnedFirst(posts, await getPinnedPosts(user && user.kakaoId));
+      if (offset === 0 && !category) posts = withPinnedFirst(posts, await getPinnedPosts(user && user.kakaoId));
       const total = await redisCmd(['ZCARD', key]);
 
       res.status(200).json({ posts, hasMore: offset + PAGE_SIZE < (Number(total) || 0) });

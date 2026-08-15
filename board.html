@@ -1414,7 +1414,10 @@ async function loadBoardPosts(reset) {
   const requestSeq = ++boardListRequestSeq;
 
   try {
-    const params = new URLSearchParams({ category: 'free', offset: String(boardOffset) });
+    // category를 안 보내면 서버가 전체 글(자유글 + 예전 "궁합 결과" 카테고리로 남아있던
+    // 글까지)을 다 돌려준다. 궁합결과 스트립을 없앤 뒤로는 카테고리 구분 자체가 의미
+    // 없어졌는데, 예전 result 카테고리 글들이 목록·검색 어디서도 안 보이던 문제가 있었다.
+    const params = new URLSearchParams({ offset: String(boardOffset) });
     if (boardSearchQuery) params.set('q', boardSearchQuery);
     else if (boardSort === 'popular') params.set('sort', 'popular');
     const r = await fetch(`/api/board?${params.toString()}`);
